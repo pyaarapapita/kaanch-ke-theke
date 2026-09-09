@@ -284,7 +284,7 @@ function App() {
       {/* Creator signature & atmospheric footer */}
       <footer className={`footer-atmosphere ${hasEntered ? 'entered' : ''}`}>
         <div className="creator-signature">
-          create with 🌿 by Anuj Rai
+          Created with 🌿 by Anuj Rai
         </div>
         {hasEntered && (
           <span className="ambient-indicator">
