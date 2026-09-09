@@ -1,0 +1,46 @@
+:root {
+  /* Color Palette - Restrained Cinematic Late-Night Atmosphere */
+  --bg-near-black: #0B0A08;
+  --bg-dark-brown: #17120D;
+  --accent-gold: #B8894A;
+  --accent-gold-hover: #D4A35F;
+  --text-cream: #E8D7B5;
+  --accent-red: #7C2D24;
+  --text-muted: #A3937C;
+  --border-gold-subtle: rgba(184, 137, 74, 0.25);
+  --border-gold-glow: rgba(184, 137, 74, 0.5);
+
+  /* Typography */
+  --font-hindi-display: 'Rozha One', 'Yatra One', 'Noto Serif Devanagari', serif;
+  --font-hindi-body: 'Noto Serif Devanagari', serif;
+  --font-english: 'Cinzel', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  color-scheme: dark;
+  background-color: var(--bg-near-black);
+  color: var(--text-cream);
+  font-family: var(--font-hindi-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  background-color: var(--bg-near-black);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
