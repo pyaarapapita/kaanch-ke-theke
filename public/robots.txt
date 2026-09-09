@@ -1,0 +1,6 @@
+# Allow crawling of all content
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: sitemap.xml

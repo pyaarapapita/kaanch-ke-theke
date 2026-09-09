@@ -9,7 +9,7 @@
   justify-content: space-between;
   background-color: var(--bg-near-black);
   color: var(--text-cream);
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* Background Placeholder & Atmospheric Overlay System */
@@ -427,36 +427,29 @@
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-}
-
-.vinyl-disc {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at center, #17120D 30%, #0B0A08 70%, var(--accent-gold) 100%);
-  border: 1px solid var(--border-gold-glow);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  transition: transform 0.3s ease;
 }
 
-.vinyl-disc.spinning {
-  animation: rotateVinyl 8s linear infinite;
+.vinyl-record {
+  width: 44px;
+  height: 44px;
+  display: block;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75);
+  animation: rotateVinyl 7s linear infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+.vinyl-record.playing {
+  animation-play-state: running;
 }
 
 @keyframes rotateVinyl {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-.vinyl-center {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background-color: var(--accent-gold);
-  border: 2px solid #0B0A08;
 }
 
 /* Track Info */
@@ -742,6 +735,50 @@
   }
 }
 
+/* Informational About Section */
+.about-section {
+  position: relative;
+  z-index: 10;
+  padding: 3.5rem 1.5rem 2.5rem;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
 
+.about-content {
+  max-width: 680px;
+  background: rgba(17, 14, 10, 0.68);
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: 6px;
+  padding: 1.85rem 2.25rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(232, 215, 181, 0.1);
+  transition: border-color 0.3s ease;
+}
 
+.about-content:hover {
+  border-color: var(--border-gold-glow);
+}
 
+.about-title {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 0.85rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+.about-description {
+  font-family: var(--font-hindi-body);
+  font-size: clamp(0.92rem, 1.6vw, 1.05rem);
+  color: var(--text-cream);
+  opacity: 0.92;
+  line-height: 1.75;
+  letter-spacing: 0.3px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}

@@ -58,11 +58,42 @@ export function MusicPlayer({
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="cinematic-player">
-        {/* Artwork / Vinyl Badge */}
-        <div className="player-artwork">
-          <div className={`vinyl-disc ${isPlaying ? 'spinning' : ''}`}>
-            <div className="vinyl-center" />
-          </div>
+        {/* Artwork / Vinyl Record Badge */}
+        <div className="player-artwork" title={isPlaying ? 'संगीत चालू है (Vinyl Spinning)' : 'संगीत रुका हुआ है (Vinyl Paused)'}>
+          <svg
+            className={`vinyl-record ${isPlaying ? 'playing' : ''}`}
+            viewBox="0 0 100 100"
+            width="44"
+            height="44"
+            aria-hidden="true"
+          >
+            {/* Outer Vinyl Edge */}
+            <circle cx="50" cy="50" r="48" fill="#120F0C" stroke="var(--accent-gold)" strokeWidth="1.2" strokeOpacity="0.7" />
+
+            {/* Record Grooves (Subtle concentric rings) */}
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#26201A" strokeWidth="1" opacity="0.85" />
+            <circle cx="50" cy="50" r="36" fill="none" stroke="#1A1511" strokeWidth="1.5" />
+            <circle cx="50" cy="50" r="31" fill="none" stroke="#2E251E" strokeWidth="0.8" opacity="0.9" />
+            <circle cx="50" cy="50" r="26" fill="none" stroke="#1D1814" strokeWidth="1" />
+            <circle cx="50" cy="50" r="21" fill="none" stroke="#332921" strokeWidth="0.8" opacity="0.7" />
+
+            {/* Sheen Highlight */}
+            <path d="M 16 16 L 84 84" stroke="rgba(232, 215, 181, 0.09)" strokeWidth="14" strokeLinecap="round" />
+
+            {/* Center Gold/Red Label */}
+            <circle cx="50" cy="50" r="15" fill="url(#vinylLabelGrad)" stroke="var(--accent-red)" strokeWidth="1" />
+
+            {/* Center Spindle Hole */}
+            <circle cx="50" cy="50" r="4" fill="#0B0A08" stroke="var(--accent-gold)" strokeWidth="0.8" />
+
+            <defs>
+              <radialGradient id="vinylLabelGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#D4A35F" />
+                <stop offset="65%" stopColor="var(--accent-gold)" />
+                <stop offset="100%" stopColor="var(--accent-red)" />
+              </radialGradient>
+            </defs>
+          </svg>
         </div>
 
         {/* Track Details */}

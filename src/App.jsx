@@ -10,6 +10,7 @@ import './App.css'
 
 function App() {
   const [hasEntered, setHasEntered] = useState(false)
+  const [showAbout, setShowAbout] = useState(false)
   const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID))
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [fetchedMetadata, setFetchedMetadata] = useState({})
@@ -145,6 +146,7 @@ function App() {
 
   const handleEnterTheka = useCallback(() => {
     setHasEntered(true)
+    setShowAbout(false)
 
     if (currentPlaylist?.youtubePlaylistId) {
       console.log('[App] handleEnterTheka playing playlist:', currentPlaylist.name, currentPlaylist.youtubePlaylistId)
@@ -196,7 +198,24 @@ function App() {
             activePlaylistId={currentPlaylist?.id}
             onSelectPlaylist={handleSelectPlaylist}
           />
-          <a href="#about" className="nav-link" onClick={(e) => e.preventDefault()}>बारे में</a>
+          <a
+            href="#about"
+            className="nav-link"
+            onClick={(e) => {
+              e.preventDefault()
+              setShowAbout((prev) => {
+                const nextState = !prev
+                if (nextState) {
+                  setTimeout(() => {
+                    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
+                  }, 50)
+                }
+                return nextState
+              })
+            }}
+          >
+            बारे में
+          </a>
         </nav>
       </header>
 
@@ -204,15 +223,15 @@ function App() {
       <main className="hero">
         <div className="hero-content">
           <div className="title-wrapper">
-            <motion.p 
+            <motion.p
               className="hero-opening-quote"
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 0.65, y: 0 }}
+              animate={{ opacity: 0.80, y: 0 }}
               transition={{ duration: 1.2, delay: 0.2 }}
             >
               अपने किरदार से महकता है इंसान , चरित्र पवित्र करने का इत्र नहीं आता
             </motion.p>
-            <motion.h1 
+            <motion.h1
               className="main-title"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -220,7 +239,7 @@ function App() {
             >
               काँच के ठेके
             </motion.h1>
-            <motion.p 
+            <motion.p
               className="subtitle-english"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.95 }}
@@ -229,14 +248,14 @@ function App() {
               KAANCH KE THEKE
             </motion.p>
           </div>
-          
-          <motion.p 
+
+          <motion.p
             className="tagline"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.8 }}
           >
-            आज कुछ पुराना सुनते हैं...
+            ये समय का मेला है, मैं अकेला ही सही...
           </motion.p>
 
           <div className="cta-wrapper">
@@ -255,7 +274,7 @@ function App() {
                 </motion.button>
               )}
             </AnimatePresence>
-            
+
             {hasEntered && !currentSong?.youtubeId && !currentPlaylist?.youtubePlaylistId && (
               <span className="ambient-status-note">संगीत सूची तैयार की जा रही है...</span>
             )}
@@ -278,6 +297,28 @@ function App() {
             onNext={handleNextSong}
             onPrevious={handlePreviousSong}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Informational About Section for SEO & Brand Story */}
+      <AnimatePresence>
+        {showAbout && (
+          <motion.section
+            id="about"
+            className="about-section"
+            aria-label="काँच के ठेके के बारे में"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 15 }}
+            transition={{ duration: 0.35 }}
+          >
+            <div className="about-content">
+              <h2 className="about-title">महफ़िल का अपना म्यूज़िक</h2>
+              <p className="about-description">
+                काँच के ठेके दोस्तों की महफ़िल और सुहानी शामों के लिए एक रेडी-मेड बॉलीवुड म्यूज़िक अनुभव है। यहाँ आपको पुराने, नॉस्टैल्जिक और मिक्स्ड हिंदी गानों का बेहतरीन संगम मिलता है—बिना खुद प्लेलिस्ट बनाने की झंझट के। बस अपनी पसंद का मूड चुनें और गानों का लुत्फ़ उठाएं।
+              </p>
+            </div>
+          </motion.section>
         )}
       </AnimatePresence>
 
