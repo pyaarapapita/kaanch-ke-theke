@@ -52,7 +52,7 @@ export function MoodSelector({ playlists = [], activePlaylistId, onSelectPlaylis
         className={`mood-toggle-btn ${isOpen ? 'active' : ''}`}
         onClick={toggleMenu}
         aria-expanded={isOpen}
-        aria-label="मून चुनें (Select Mood)"
+        aria-label="मूड चुनें (Select Mood)"
       >
         मूड
       </button>

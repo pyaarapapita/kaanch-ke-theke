@@ -9,6 +9,7 @@ function formatTime(seconds) {
 }
 
 export function MusicPlayer({
+  hasEntered = false,
   currentSong,
   isPlaying,
   currentTime = 0,
@@ -52,10 +53,13 @@ export function MusicPlayer({
   return (
     <motion.div
       className="cinematic-player-wrapper"
-      initial={{ y: 60, x: '-50%', opacity: 0 }}
-      animate={{ y: 0, x: '-50%', opacity: 1 }}
-      exit={{ y: 60, x: '-50%', opacity: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      initial={false}
+      animate={hasEntered ? 'visible' : 'hidden'}
+      variants={{
+        hidden: { y: 20, x: '-50%', opacity: 0, scale: 0.99, pointerEvents: 'none' },
+        visible: { y: 0, x: '-50%', opacity: 1, scale: 1, pointerEvents: 'auto' }
+      }}
+      transition={{ duration: 0.5, delay: hasEntered ? 0.25 : 0, ease: [0.25, 1, 0.5, 1] }}
     >
       <div className="cinematic-player">
         {/* Artwork / Vinyl Record Badge */}

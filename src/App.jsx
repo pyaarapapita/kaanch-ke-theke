@@ -174,7 +174,7 @@ function App() {
   }, [currentPlaylist, playPlaylistId, currentSongIndex, playlistSongs, playSongId])
 
   return (
-    <div className="landing-container">
+    <div className={`landing-container ${hasEntered ? 'is-entered' : ''}`}>
       {/* Hidden YouTube IFrame Player Instance */}
       <YouTubePlayer containerRef={containerRef} />
 
@@ -183,6 +183,7 @@ function App() {
         <div className="bg-image" />
         <div className="ambient-glow" />
         <div className="overlay-vignette" />
+        <div className="overlay-listening-darken" />
         <div className="film-grain" />
       </div>
 
@@ -220,8 +221,8 @@ function App() {
       </header>
 
       {/* Hero Content */}
-      <main className="hero">
-        <div className="hero-content">
+      <main className={`hero ${hasEntered ? 'is-entered' : ''}`}>
+        <div className={`hero-content ${hasEntered ? 'receded' : ''}`}>
           <div className="title-wrapper">
             <motion.p
               className="hero-opening-quote"
@@ -282,23 +283,20 @@ function App() {
         </div>
       </main>
 
-      {/* Custom Floating Music Player (Appears upon entrance) */}
-      <AnimatePresence>
-        {hasEntered && (
-          <MusicPlayer
-            currentSong={currentSong}
-            isPlaying={isPlaying}
-            currentTime={currentTime}
-            duration={duration}
-            volume={volume}
-            togglePlay={togglePlay}
-            seekTo={seekTo}
-            setVolume={setVolume}
-            onNext={handleNextSong}
-            onPrevious={handlePreviousSong}
-          />
-        )}
-      </AnimatePresence>
+      {/* Custom Floating Music Player (Persistent DOM container with visual transition) */}
+      <MusicPlayer
+        hasEntered={hasEntered}
+        currentSong={currentSong}
+        isPlaying={isPlaying}
+        currentTime={currentTime}
+        duration={duration}
+        volume={volume}
+        togglePlay={togglePlay}
+        seekTo={seekTo}
+        setVolume={setVolume}
+        onNext={handleNextSong}
+        onPrevious={handlePreviousSong}
+      />
 
       {/* Informational About Section for SEO & Brand Story */}
       <AnimatePresence>

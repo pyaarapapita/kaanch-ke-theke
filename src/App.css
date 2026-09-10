@@ -34,7 +34,7 @@
   }
 }
 
-/* Thematic Background Image */
+/* Thematic Background Image & Cinematic Layer Transition */
 .bg-image {
   position: absolute;
   inset: -10px;
@@ -42,15 +42,23 @@
   background-size: cover;
   background-position: center 40%;
   background-repeat: no-repeat;
-  filter: brightness(0.72) contrast(1.1) saturate(0.95);
-  transform: scale(1.02);
+  filter: brightness(0.68) contrast(1.08) saturate(0.95);
+  transform: scale(1.02) translate3d(0, 0, 0);
   animation: slowBackgroundDrift 30s ease-in-out infinite alternate;
+  will-change: transform;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* State B: Deeper, closer, intimate listening state treatment */
+.landing-container.is-entered .bg-image {
+  animation: none;
+  transform: scale(1.08) translate3d(0, -12px, 0);
 }
 
 @keyframes ambientPulse {
-  0% { opacity: 0.85; }
+  0% { opacity: 0.82; }
   50% { opacity: 1; }
-  100% { opacity: 0.85; }
+  100% { opacity: 0.82; }
 }
 
 /* Ambient Light Glow - Enhancing warm amber & dark red practical lamp tones */
@@ -62,6 +70,7 @@
     radial-gradient(circle at 75% 75%, rgba(124, 45, 36, 0.14) 0%, transparent 55%),
     radial-gradient(circle at 25% 85%, rgba(23, 18, 13, 0.75) 0%, transparent 65%);
   animation: ambientPulse 12s ease-in-out infinite;
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Heavy Cinematic Vignette - Ensures contrast for centered text */
@@ -69,6 +78,26 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 50% 45%, rgba(11, 10, 8, 0.35) 0%, rgba(11, 10, 8, 0.75) 65%, rgba(7, 6, 5, 0.96) 95%);
+  transition: background 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.landing-container.is-entered .overlay-vignette {
+  background: radial-gradient(circle at 50% 45%, rgba(8, 7, 5, 0.55) 0%, rgba(8, 7, 5, 0.85) 55%, rgba(5, 4, 3, 0.98) 95%);
+}
+
+/* GPU Composited Listening Darken Layer */
+.overlay-listening-darken {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 5, 4, 0.52);
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.landing-container.is-entered .overlay-listening-darken {
+  opacity: 1;
 }
 
 /* Subtle Film Grain Noise Overlay */
@@ -172,6 +201,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: transform 0.9s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.9s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform, opacity;
+}
+
+/* Receded state when camera moves deeper into the room */
+.hero-content.receded {
+  transform: translate3d(0, -16px, 0) scale(0.96);
+  opacity: 0.42;
+}
+
+.hero-content.receded:hover {
+  opacity: 0.78;
 }
 
 .title-wrapper {
@@ -182,11 +223,12 @@
   font-family: var(--font-hindi-display);
   font-size: clamp(0.85rem, 1.8vw, 1.05rem);
   color: var(--accent-gold);
-  opacity: 0.65;
+  opacity: 0.72;
   letter-spacing: 0.75px;
   margin-bottom: 0.75rem;
-  line-height: 1.5;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  line-height: 1.6;
+  max-width: 640px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
 }
 
 .main-title {
@@ -197,25 +239,24 @@
   line-height: 1.08;
   letter-spacing: -0.5px;
   text-shadow: 
-    0 0 40px rgba(184, 137, 74, 0.3),
-    0 4px 30px rgba(0, 0, 0, 0.98),
+    0 4px 24px rgba(0, 0, 0, 0.98),
     0 2px 8px rgba(0, 0, 0, 0.9);
 }
 
 .subtitle-english {
   font-family: var(--font-english);
-  font-size: clamp(0.75rem, 1.8vw, 1.05rem);
+  font-size: clamp(0.75rem, 1.8vw, 1.02rem);
   font-weight: 600;
   color: var(--accent-gold);
-  letter-spacing: 7px;
+  letter-spacing: 5px;
   margin-top: 0.5rem;
-  opacity: 0.95;
+  opacity: 0.9;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 
 .tagline {
   font-family: var(--font-hindi-body);
-  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-size: clamp(1.1rem, 2.2vw, 1.45rem);
   font-weight: 500;
   color: #D6C5A9;
   letter-spacing: 0.75px;
@@ -329,18 +370,24 @@
 /* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
   .bg-image,
-  .ambient-glow {
-    animation: none !important;
-  }
+  .ambient-glow,
+  .overlay-vignette,
+  .hero-content,
   .cta-button {
-    transition: none !important;
+    animation: none !important;
+    transition: opacity 0.3s ease !important;
+    transform: none !important;
   }
 }
 
 /* Responsive Rules for Mobile and Tablet */
 @media (max-width: 768px) {
+  .bg-image {
+    background-position: 65% 35%;
+  }
+
   .header {
-    padding: 1.5rem 1.5rem;
+    padding: 1.25rem 1.25rem;
   }
 
   .brand {
@@ -352,11 +399,11 @@
   .brand-title-english {
     margin-left: 0;
     font-size: 0.6rem;
-    letter-spacing: 2px;
+    letter-spacing: 2.2px;
   }
 
   .nav-links {
-    gap: 1.25rem;
+    gap: 1.15rem;
   }
 
   .nav-link {
@@ -364,27 +411,58 @@
   }
 
   .hero {
-    padding: 1.5rem 1rem;
+    padding: 1.25rem 0.85rem;
   }
 
   .hero-opening-quote {
-    font-size: 0.85rem;
-    margin-bottom: 0.5rem;
+    font-size: clamp(0.82rem, 3.8vw, 0.98rem);
+    line-height: 1.55;
+    margin-bottom: 0.65rem;
     padding: 0 0.5rem;
+    max-width: 92%;
+  }
+
+  .main-title {
+    font-size: clamp(2.4rem, 9.5vw, 4.2rem);
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle-english {
+    font-size: clamp(0.65rem, 2.5vw, 0.85rem);
+    letter-spacing: 3.5px;
   }
 
   .tagline {
-    margin-bottom: 2.25rem;
+    font-size: clamp(0.98rem, 3.8vw, 1.25rem);
+    margin-bottom: 2rem;
   }
 
   .cta-button {
     width: 100%;
-    max-width: 280px;
-    padding: 0.95rem 2rem;
+    max-width: 270px;
+    padding: 0.9rem 1.8rem;
   }
 
   .footer-atmosphere {
-    padding: 1.25rem 1rem 2rem;
+    padding: 1rem 1rem 1.8rem;
+  }
+
+  .footer-atmosphere.entered {
+    padding-bottom: 6.25rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .bg-image {
+    background-position: 68% 35%;
+  }
+
+  .main-title {
+    font-size: clamp(2.2rem, 9.8vw, 3.6rem);
+  }
+
+  .subtitle-english {
+    letter-spacing: 2.5px;
   }
 }
 

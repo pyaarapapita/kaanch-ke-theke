@@ -3,4 +3,5 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: sitemap.xml
+Sitemap: https://kaanch-ke-theke.pages.dev/sitemap.xml
+
