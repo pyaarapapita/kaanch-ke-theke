@@ -8,8 +8,9 @@ function formatTime(seconds) {
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-export function MusicPlayer({
+export const MusicPlayer = React.memo(function MusicPlayer({
   hasEntered = false,
+  isScrolled = false,
   currentSong,
   isPlaying,
   currentTime = 0,
@@ -49,17 +50,18 @@ export function MusicPlayer({
   const songTitle = currentSong?.title || 'काँच के ठेके';
   const songArtist = currentSong?.artist || 'आज कुछ पुराना सुनते हैं';
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const isVisible = hasEntered && !isScrolled;
 
   return (
     <motion.div
-      className="cinematic-player-wrapper"
+      className={`cinematic-player-wrapper ${isScrolled ? 'is-scrolled-hidden' : ''}`}
       initial={false}
-      animate={hasEntered ? 'visible' : 'hidden'}
+      animate={isVisible ? 'visible' : 'hidden'}
       variants={{
         hidden: { y: 20, x: '-50%', opacity: 0, scale: 0.99, pointerEvents: 'none' },
         visible: { y: 0, x: '-50%', opacity: 1, scale: 1, pointerEvents: 'auto' }
       }}
-      transition={{ duration: 0.5, delay: hasEntered ? 0.25 : 0, ease: [0.25, 1, 0.5, 1] }}
+      transition={{ duration: 0.4, delay: isVisible ? 0.15 : 0, ease: [0.25, 1, 0.5, 1] }}
     >
       <div className="cinematic-player">
         {/* Artwork / Vinyl Record Badge */}
@@ -209,4 +211,4 @@ export function MusicPlayer({
       </div>
     </motion.div>
   );
-}
+});

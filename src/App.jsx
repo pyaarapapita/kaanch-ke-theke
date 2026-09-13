@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { getPlaylistById, DEFAULT_PLAYLIST_ID, PLAYLISTS } from './data/playlists'
 import { useYouTubePlayer } from './hooks/useYouTubePlayer'
@@ -8,15 +8,67 @@ import { MoodSelector } from './components/MoodSelector'
 import { fetchPlaylistMetadata } from './utils/youtubeMetadata'
 import './App.css'
 
+// Configuration for external profile/support links
+const SITE_CONFIG = {
+  INSTAGRAM_URL: 'https://www.instagram.com/ironically_anujj',
+  BUY_ME_A_COFFEE_URL: 'https://buymeacoffee.com/kaanchketheke'
+}
+
 function App() {
   const [hasEntered, setHasEntered] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID))
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [fetchedMetadata, setFetchedMetadata] = useState({})
 
+  const aboutBtnRef = useRef(null)
+  const closeBtnRef = useRef(null)
+
   const isPlaylistMode = Boolean(currentPlaylist?.youtubePlaylistId)
   const playlistSongs = currentPlaylist?.songs || []
+
+  // Scroll position tracking to control header navigation visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0
+      setIsScrolled(scrollTop > 60)
+    }
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true, capture: true })
+    document.addEventListener('scroll', handleScroll, { passive: true, capture: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll, { capture: true })
+      document.removeEventListener('scroll', handleScroll, { capture: true })
+    }
+  }, [])
+
+  // Modal body scroll-locking, Escape key handling & focus management
+  useEffect(() => {
+    if (showAbout) {
+      const originalOverflow = window.getComputedStyle(document.body).overflow
+      document.body.style.overflow = 'hidden'
+
+      const focusTimer = setTimeout(() => {
+        closeBtnRef.current?.focus()
+      }, 50)
+
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          setShowAbout(false)
+        }
+      }
+      window.addEventListener('keydown', handleKeyDown)
+
+      return () => {
+        clearTimeout(focusTimer)
+        document.body.style.overflow = originalOverflow
+        window.removeEventListener('keydown', handleKeyDown)
+      }
+    } else {
+      aboutBtnRef.current?.focus()
+    }
+  }, [showAbout])
 
   // Fetch playlist metadata automatically on mount / playlist change
   useEffect(() => {
@@ -52,8 +104,6 @@ function App() {
     youtubeId: !isPlaylistMode ? (playlistSongs[currentSongIndex]?.youtubeId || '') : '',
     playlistId: isPlaylistMode ? (currentPlaylist.youtubePlaylistId || '') : '',
     onSongEnd: () => {
-      // In playlist mode, YouTube automatically advances natively.
-      // Do NOT trigger manual advance to prevent double skipping.
       if (!isPlaylistMode) {
         handleNextSong()
       }
@@ -187,41 +237,61 @@ function App() {
         <div className="film-grain" />
       </div>
 
-      {/* Minimal Header */}
-      <header className="header">
+      {/* Header with Fixed Position & Top-Right Navigation Controls */}
+      <header className={`header ${isScrolled ? 'is-scrolled' : ''}`}>
         <div className="brand">
           <span className="brand-title-hindi">काँच के ठेके</span>
           <span className="brand-title-english">KAANCH KE THEKE</span>
         </div>
-        <nav className="nav-links">
+        <nav className={`nav-links ${isScrolled ? 'is-scrolled-hidden' : ''}`}>
+          {/* Control 1: Support Button (Fades out smoothly on scroll together with nav) */}
+          <div className="support-nav-item">
+            {SITE_CONFIG.BUY_ME_A_COFFEE_URL ? (
+              <a
+                href={SITE_CONFIG.BUY_ME_A_COFFEE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-support-btn"
+                aria-label="मेरी अगली बोतल के लिए (Support Creator)"
+              >
+                मेरी अगली बोतल के लिए 🍾
+              </a>
+            ) : (
+              <button
+                type="button"
+                className="nav-support-btn disabled-nav-support"
+                disabled
+                aria-disabled="true"
+                aria-label="मेरी अगली बोतल के लिए (Support Creator)"
+              >
+                मेरी अगली बोतल के लिए 🍾
+              </button>
+            )}
+          </div>
+
+          {/* Control 2: Mood Selector */}
           <MoodSelector
             playlists={PLAYLISTS}
             activePlaylistId={currentPlaylist?.id}
             onSelectPlaylist={handleSelectPlaylist}
           />
-          <a
-            href="#about"
-            className="nav-link"
-            onClick={(e) => {
-              e.preventDefault()
-              setShowAbout((prev) => {
-                const nextState = !prev
-                if (nextState) {
-                  setTimeout(() => {
-                    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })
-                  }, 50)
-                }
-                return nextState
-              })
-            }}
+
+          {/* Control 3: Baare Mein Link */}
+          <button
+            ref={aboutBtnRef}
+            type="button"
+            className="nav-link nav-link-btn"
+            aria-expanded={showAbout}
+            aria-controls="about-modal"
+            onClick={() => setShowAbout((prev) => !prev)}
           >
             बारे में
-          </a>
+          </button>
         </nav>
       </header>
 
-      {/* Hero Content */}
-      <main className={`hero ${hasEntered ? 'is-entered' : ''}`}>
+      {/* Hero Section */}
+      <section className={`hero ${hasEntered ? 'is-entered' : ''}`}>
         <div className={`hero-content ${hasEntered ? 'receded' : ''}`}>
           <div className="title-wrapper">
             <motion.p
@@ -281,11 +351,100 @@ function App() {
             )}
           </div>
         </div>
-      </main>
+      </section>
+
+      {/* Post-Entry Extended Editorial Content Flow */}
+      {hasEntered && (
+        <motion.div
+          className="post-entry-editorial-flow"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+        >
+          {/* Section 1: About the Site */}
+          <section className="editorial-section story-section" aria-label="काँच के ठेके की कहानी">
+            <div className="editorial-container">
+              <div className="editorial-visual-panel">
+                <img
+                  src="/backgrounds/editorial-story.png"
+                  alt="काँच के ठेके की महफ़िल - पुराने गिलास, लालटेन और विनाइल रिकॉर्ड"
+                  className="editorial-img"
+                  loading="lazy"
+                />
+                <div className="visual-overlay-vignette" />
+              </div>
+
+              <div className="editorial-content-panel">
+                <div className="editorial-badge-row">
+                  <span className="editorial-badge">THE STORY BEHIND THE THEKA</span>
+                  <span className="editorial-meta">A PERSONAL CREATIVE PROJECT</span>
+                </div>
+                <h2 className="editorial-title">एक छोटी-सी महफ़िल, कुछ पुरानी धुनें</h2>
+                <p className="editorial-desc">
+                  काँच के ठेके एक छोटी-सी डिजिटल महफ़िल है—पुराने हिंदी गीतों, बीती शामों और उन यादों के नाम जो किसी धुन के साथ वापस लौट आती हैं। इसे इस एहसास के लिए बनाया गया है कि कभी-कभी एक गाना, एक ख़ामोश रात और थोड़ी-सी तन्हाई ही काफ़ी होती है।
+                </p>
+                <button
+                  type="button"
+                  className="editorial-action-link"
+                  onClick={() => setShowAbout(true)}
+                >
+                  कहानी पढ़ें →
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 2: Instagram */}
+          <section className="editorial-section instagram-section" aria-label="इन्स्टाग्राम से जुड़ें">
+            <div className="editorial-container reverse-container">
+              <div className="editorial-content-panel">
+                <div className="editorial-badge-row">
+                  <span className="editorial-badge">BEYOND THE PLAYLIST</span>
+                  <span className="editorial-meta">FIND THE CREATOR ELSEWHERE</span>
+                </div>
+                <h2 className="editorial-title">महफ़िल स्क्रीन से बाहर भी जारी है</h2>
+                <p className="editorial-desc">
+                  अगर इस छोटी-सी महफ़िल ने आपको कुछ देर ठहरने पर मजबूर किया, तो Instagram पर भी मिलिए। वहाँ इस प्रोजेक्ट के पीछे की सोच, छोटे creative experiments, updates और आने वाली नई चीज़ों की झलक मिलेगी।
+                </p>
+                {SITE_CONFIG.INSTAGRAM_URL ? (
+                  <a
+                    href={SITE_CONFIG.INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="editorial-action-link instagram-link"
+                  >
+                    Instagram पर मिलें →
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className="editorial-action-link disabled-link"
+                    disabled
+                    aria-disabled="true"
+                  >
+                    Instagram (शीघ्र उपलब्ध)
+                  </button>
+                )}
+              </div>
+
+              <div className="editorial-visual-panel">
+                <img
+                  src="/backgrounds/editorial-instagram.png"
+                  alt="रेट्रो कैसेट प्लेयर, कैमरा और शाम का सुकून"
+                  className="editorial-img"
+                  loading="lazy"
+                />
+                <div className="visual-overlay-vignette" />
+              </div>
+            </div>
+          </section>
+        </motion.div>
+      )}
 
       {/* Custom Floating Music Player (Persistent DOM container with visual transition) */}
       <MusicPlayer
         hasEntered={hasEntered}
+        isScrolled={isScrolled}
         currentSong={currentSong}
         isPlaying={isPlaying}
         currentTime={currentTime}
@@ -298,25 +457,47 @@ function App() {
         onPrevious={handlePreviousSong}
       />
 
-      {/* Informational About Section for SEO & Brand Story */}
+      {/* Accessible "Baare Mein" Dialog Modal */}
       <AnimatePresence>
         {showAbout && (
-          <motion.section
-            id="about"
-            className="about-section"
-            aria-label="काँच के ठेके के बारे में"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 15 }}
-            transition={{ duration: 0.35 }}
+          <motion.div
+            className="modal-backdrop"
+            onClick={() => setShowAbout(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
           >
-            <div className="about-content">
-              <h2 className="about-title">महफ़िल का अपना म्यूज़िक</h2>
-              <p className="about-description">
-                काँच के ठेके दोस्तों की महफ़िल और सुहानी शामों के लिए एक रेडी-मेड बॉलीवुड म्यूज़िक अनुभव है। यहाँ आपको पुराने, नॉस्टैल्जिक और मिक्स्ड हिंदी गानों का बेहतरीन संगम मिलता है—बिना खुद प्लेलिस्ट बनाने की झंझट के। बस अपनी पसंद का मूड चुनें और गानों का लुत्फ़ उठाएं।
-              </p>
-            </div>
-          </motion.section>
+            <motion.div
+              id="about-modal"
+              className="modal-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="about-title"
+              aria-describedby="about-desc"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, y: 15, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <button
+                ref={closeBtnRef}
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setShowAbout(false)}
+                aria-label="बंद करें (Close)"
+              >
+                ✕
+              </button>
+              <div className="about-content">
+                <h2 id="about-title" className="about-title">महफ़िल का अपना म्यूज़िक</h2>
+                <p id="about-desc" className="about-description">
+                  काँच के ठेके दोस्तों की महफ़िल और सुहानी शामों के लिए एक रेडी-मेड बॉलीवुड म्यूज़िक अनुभव है। यहाँ आपको पुराने, नॉस्टैल्जिक और मिक्स्ड हिंदी गानों का बेहतरीन संगम मिलता है—बिना खुद प्लेलिस्ट बनाने की झंझट के। बस अपनी पसंद का मूड चुनें और गानों का लुत्फ़ उठाएं।
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 

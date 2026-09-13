@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export function MoodSelector({ playlists = [], activePlaylistId, onSelectPlaylist }) {
+export const MoodSelector = React.memo(function MoodSelector({ playlists = [], activePlaylistId, onSelectPlaylist }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
@@ -94,4 +94,4 @@ export function MoodSelector({ playlists = [], activePlaylistId, onSelectPlaylis
       </AnimatePresence>
     </div>
   );
-}
+});
