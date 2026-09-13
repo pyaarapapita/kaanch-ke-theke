@@ -43,7 +43,7 @@ function App() {
     }
   }, [])
 
-  // Modal body scroll-locking, Escape key handling & focus management
+  // Modal body scroll-locking & Escape key handling
   useEffect(() => {
     if (showAbout) {
       const originalOverflow = window.getComputedStyle(document.body).overflow
@@ -65,8 +65,6 @@ function App() {
         document.body.style.overflow = originalOverflow
         window.removeEventListener('keydown', handleKeyDown)
       }
-    } else {
-      aboutBtnRef.current?.focus()
     }
   }, [showAbout])
 

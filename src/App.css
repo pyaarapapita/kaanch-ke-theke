@@ -235,6 +235,27 @@
   transition: color 0.3s ease, letter-spacing 0.3s ease, text-shadow 0.3s ease;
 }
 
+.nav-link,
+.nav-link-btn,
+.nav-support-btn,
+.mood-toggle-btn {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-link:focus,
+.nav-link-btn:focus,
+.nav-link:focus-visible,
+.nav-link-btn:focus-visible,
+.nav-support-btn:focus,
+.nav-support-btn:focus-visible,
+.mood-toggle-btn:focus,
+.mood-toggle-btn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .nav-link-btn {
   background: transparent;
   border: none;
@@ -535,6 +556,19 @@
 }
 
 @media (max-width: 430px) {
+  .header {
+    padding: 0.95rem 0.75rem;
+  }
+
+  .nav-links {
+    gap: 0.55rem;
+  }
+
+  .nav-support-btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
   .bg-image {
     background-position: 68% 35%;
   }
