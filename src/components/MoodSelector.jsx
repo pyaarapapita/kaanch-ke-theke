@@ -68,28 +68,24 @@ export function MoodSelector({ playlists = [], activePlaylistId, onSelectPlaylis
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
             <div className="mood-dropdown-header">
-              <span className="mood-dropdown-title">मूड चुनिए</span>
+              <span className="mood-dropdown-title" id="mood-dropdown-title">मूड चुनिए</span>
             </div>
 
-            <div className="mood-options-list">
+            <div className="mood-options-list" role="listbox" aria-labelledby="mood-dropdown-title">
               {playlists.map((playlist) => {
                 const isSelected = playlist.id === activePlaylistId;
                 return (
-                  <div
+                  <button
                     key={playlist.id}
+                    type="button"
                     className={`mood-option-item ${isSelected ? 'selected' : ''}`}
                     onClick={() => handleSelect(playlist.id)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        handleSelect(playlist.id);
-                      }
-                    }}
+                    role="option"
+                    aria-selected={isSelected}
                   >
                     <span className="mood-option-title">{playlist.name}</span>
                     <span className="mood-option-desc">{playlist.description}</span>
-                  </div>
+                  </button>
                 );
               })}
             </div>

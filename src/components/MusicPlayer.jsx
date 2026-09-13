@@ -101,7 +101,7 @@ export function MusicPlayer({
         </div>
 
         {/* Track Details */}
-        <div className="player-track-info">
+        <div className="player-track-info" aria-live="polite" aria-atomic="true">
           <span className="player-song-title" title={songTitle}>
             {songTitle}
           </span>
