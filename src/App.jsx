@@ -28,12 +28,21 @@ function App() {
   const isPlaylistMode = Boolean(currentPlaylist?.youtubePlaylistId)
   const playlistSongs = currentPlaylist?.songs || []
 
-  // Scroll position tracking to control header navigation visibility
+  // Scroll position tracking to control complete header panel & MusicPlayer visibility
   useEffect(() => {
+    let ticking = false
+
     const handleScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0
-      setIsScrolled(scrollTop > 60)
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollTop = window.scrollY || document.documentElement?.scrollTop || document.body?.scrollTop || window.pageYOffset || 0
+          setIsScrolled(scrollTop > 20)
+          ticking = false
+        })
+        ticking = true
+      }
     }
+
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true, capture: true })
     document.addEventListener('scroll', handleScroll, { passive: true, capture: true })
@@ -41,6 +50,14 @@ function App() {
       window.removeEventListener('scroll', handleScroll, { capture: true })
       document.removeEventListener('scroll', handleScroll, { capture: true })
     }
+  }, [])
+
+  const handleLogoClick = useCallback(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReduced ? 'auto' : 'smooth'
+    })
   }, [])
 
   // Modal body scroll-locking & Escape key handling
@@ -236,13 +253,18 @@ function App() {
       </div>
 
       {/* Header with Fixed Position & Top-Right Navigation Controls */}
-      <header className={`header ${isScrolled ? 'is-scrolled' : ''}`}>
-        <div className="brand">
+      <header className={`header ${isScrolled ? 'is-scrolled-hidden' : ''}`}>
+        <button
+          type="button"
+          className="brand brand-btn"
+          onClick={handleLogoClick}
+          aria-label="काँच के ठेके — ऊपर जाएँ"
+        >
           <span className="brand-title-hindi">काँच के ठेके</span>
           <span className="brand-title-english">KAANCH KE THEKE</span>
-        </div>
-        <nav className={`nav-links ${isScrolled ? 'is-scrolled-hidden' : ''}`}>
-          {/* Control 1: Support Button (Fades out smoothly on scroll together with nav) */}
+        </button>
+        <nav className="nav-links">
+          {/* Control 1: Support Button */}
           <div className="support-nav-item">
             {SITE_CONFIG.BUY_ME_A_COFFEE_URL ? (
               <a

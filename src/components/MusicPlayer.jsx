@@ -58,7 +58,7 @@ export const MusicPlayer = React.memo(function MusicPlayer({
       initial={false}
       animate={isVisible ? 'visible' : 'hidden'}
       variants={{
-        hidden: { y: 20, x: '-50%', opacity: 0, scale: 0.99, pointerEvents: 'none' },
+        hidden: { y: 80, x: '-50%', opacity: 0, scale: 0.98, pointerEvents: 'none' },
         visible: { y: 0, x: '-50%', opacity: 1, scale: 1, pointerEvents: 'auto' }
       }}
       transition={{ duration: 0.4, delay: isVisible ? 0.15 : 0, ease: [0.25, 1, 0.5, 1] }}
