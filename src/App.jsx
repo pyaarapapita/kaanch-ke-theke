@@ -546,7 +546,7 @@ function App() {
                   <a
                     href={SITE_CONFIG.INSTAGRAM_URL}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="me noopener noreferrer"
                     className="editorial-action-link instagram-link"
                   >
                     Instagram पर मिलें →
