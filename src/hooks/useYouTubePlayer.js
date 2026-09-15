@@ -63,24 +63,36 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(100);
   const [currentVideoId, setCurrentVideoId] = useState('');
+  const [videoTitle, setVideoTitle] = useState('');
+  const [videoAuthor, setVideoAuthor] = useState('');
   const [error, setError] = useState(null);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
-  // Helper to extract and update current video ID
-  const updateCurrentVideoId = useCallback(() => {
+  // Helper to extract and update current video data
+  const updateVideoData = useCallback(() => {
     if (playerRef.current && typeof playerRef.current.getVideoData === 'function') {
       try {
-        const vId = playerRef.current.getVideoData()?.video_id || '';
+        const vData = playerRef.current.getVideoData() || {};
+        const vId = vData.video_id || '';
+        const vTitle = vData.title || '';
+        const vAuthor = vData.author || '';
+
         if (vId && vId !== currentVideoId) {
           setCurrentVideoId(vId);
         }
+        if (vTitle && vTitle !== videoTitle) {
+          setVideoTitle(vTitle);
+        }
+        if (vAuthor && vAuthor !== videoAuthor) {
+          setVideoAuthor(vAuthor);
+        }
       } catch {
-        // Ignore transient video_id access errors
+        // Ignore transient video_data access errors
       }
     }
-  }, [currentVideoId]);
+  }, [currentVideoId, videoTitle, videoAuthor]);
 
-  // Poll current playback time, duration, and current video ID while playing
+  // Poll current playback time, duration, and current video data while playing
   useEffect(() => {
     let timer = null;
     if (isPlaying && playerRef.current && typeof playerRef.current.getCurrentTime === 'function') {
@@ -88,12 +100,9 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
         try {
           const curr = playerRef.current.getCurrentTime() || 0;
           const dur = playerRef.current.getDuration() || 0;
-          const vId = playerRef.current.getVideoData()?.video_id || '';
           setCurrentTime(curr);
           setDuration(dur);
-          if (vId && vId !== currentVideoId) {
-            setCurrentVideoId(vId);
-          }
+          updateVideoData();
         } catch {
           // Ignore transient playback access errors
         }
@@ -102,7 +111,7 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [isPlaying, currentVideoId]);
+  }, [isPlaying, updateVideoData]);
 
   const onSongEndRef = useRef(onSongEnd);
   const onErrorCallbackRef = useRef(onErrorCallback);
@@ -274,7 +283,7 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   useEffect(() => {
     if (!isReady || !playerRef.current || playlistId) return;
     console.log('[YouTube Player] youtubeId prop updated to:', youtubeId, 'lastPlayedId:', lastPlayedIdRef.current);
-    
+
     // Avoid overriding active loadVideoById call with cueVideoById
     if (youtubeId && lastPlayedIdRef.current === youtubeId) {
       console.log('[YouTube Player] youtubeId matches lastPlayedId, skipping cueVideoById override');
@@ -461,6 +470,8 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
     duration,
     volume,
     currentVideoId,
+    videoTitle,
+    videoAuthor,
     error,
     autoplayBlocked,
     play,

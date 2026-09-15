@@ -5,7 +5,7 @@ import { useYouTubePlayer } from './hooks/useYouTubePlayer'
 import { YouTubePlayer } from './components/YouTubePlayer'
 import { MusicPlayer } from './components/MusicPlayer'
 import { MoodSelector } from './components/MoodSelector'
-import { fetchPlaylistMetadata } from './utils/youtubeMetadata'
+import { fetchPlaylistMetadata, fetchSingleVideoMetadata } from './utils/youtubeMetadata'
 import './App.css'
 
 // Configuration for external profile/support links
@@ -16,6 +16,8 @@ const SITE_CONFIG = {
 
 function App() {
   const [hasEntered, setHasEntered] = useState(false)
+  const [isVideoTransitioning, setIsVideoTransitioning] = useState(false)
+  const [isVideoFinished, setIsVideoFinished] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID))
@@ -24,6 +26,7 @@ function App() {
 
   const aboutBtnRef = useRef(null)
   const closeBtnRef = useRef(null)
+  const videoRef = useRef(null)
 
   const isPlaylistMode = Boolean(currentPlaylist?.youtubePlaylistId)
   const playlistSongs = currentPlaylist?.songs || []
@@ -108,6 +111,8 @@ function App() {
     duration,
     volume,
     currentVideoId,
+    videoTitle,
+    videoAuthor,
     playSongId,
     playPlaylistId,
     nextVideo,
@@ -152,7 +157,22 @@ function App() {
     }
   }, [togglePlay])
 
-  // Resolve currentSong dynamically
+  // Fetch single video metadata fallback via oEmbed when currentVideoId is missing in fetchedMetadata
+  useEffect(() => {
+    let isMounted = true
+    if (currentVideoId && !fetchedMetadata[currentVideoId]) {
+      fetchSingleVideoMetadata(currentVideoId).then((meta) => {
+        if (isMounted && meta && meta.title) {
+          setFetchedMetadata((prev) => (prev[currentVideoId] ? prev : { ...prev, [currentVideoId]: meta }))
+        }
+      })
+    }
+    return () => {
+      isMounted = false
+    }
+  }, [currentVideoId])
+
+  // Resolve currentSong dynamically with multiple title fallback layers
   let currentSong = null
   if (isPlaylistMode) {
     if (currentVideoId) {
@@ -160,12 +180,19 @@ function App() {
         currentSong = fetchedMetadata[currentVideoId]
       } else {
         const matchedSong = playlistSongs.find((s) => s.youtubeId === currentVideoId)
-        if (matchedSong) {
+        if (matchedSong && matchedSong.title) {
           currentSong = matchedSong
+        } else if (videoTitle) {
+          currentSong = {
+            id: `yt-${currentVideoId}`,
+            title: videoTitle,
+            artist: videoAuthor || 'YouTube',
+            youtubeId: currentVideoId
+          }
         } else {
           currentSong = {
             id: `yt-${currentVideoId}`,
-            title: 'अज्ञात गीत',
+            title: 'काँच के ठेके',
             artist: 'YouTube',
             youtubeId: currentVideoId
           }
@@ -262,19 +289,83 @@ function App() {
     }
   }, [currentPlaylist, playPlaylistId, currentSongIndex, playlistSongs, playSongId])
 
+  const handleStartEntryTransition = useCallback(() => {
+    if (isVideoTransitioning || isVideoFinished || hasEntered) return
+    setIsVideoTransitioning(true)
+    setShowAbout(false)
+  }, [isVideoTransitioning, isVideoFinished, hasEntered])
+
+  const handleVideoEnded = useCallback(() => {
+    if (videoRef.current) {
+      try {
+        videoRef.current.pause()
+      } catch (e) {
+        console.warn('[App] Error pausing video at end:', e)
+      }
+    }
+    setIsVideoFinished(true)
+    setIsVideoTransitioning(false)
+    handleEnterTheka()
+  }, [handleEnterTheka])
+
+  const handleVideoError = useCallback((err) => {
+    console.warn('[App] Entry video load error:', err)
+    setIsVideoFinished(true)
+    setIsVideoTransitioning(false)
+    handleEnterTheka()
+  }, [handleEnterTheka])
+
+  useEffect(() => {
+    if (isVideoTransitioning && videoRef.current) {
+      videoRef.current.currentTime = 0
+      const playPromise = videoRef.current.play()
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('[App] Video play request failed:', err)
+          setIsVideoFinished(true)
+          setIsVideoTransitioning(false)
+          handleEnterTheka()
+        })
+      }
+    }
+  }, [isVideoTransitioning, handleEnterTheka])
+
   return (
     <div className={`landing-container ${hasEntered ? 'is-entered' : ''}`}>
       {/* Hidden YouTube IFrame Player Instance */}
       <YouTubePlayer containerRef={containerRef} />
 
-      {/* Background Layer: Atmospheric background image with cinematic gradient & vignette overlay */}
-      <div className="bg-placeholder" aria-hidden="true">
-        <div className="bg-image" />
-        <div className="ambient-glow" />
-        <div className="overlay-vignette" />
-        <div className="overlay-listening-darken" />
-        <div className="film-grain" />
-      </div>
+      {/* Background Layer A: Static background image shown before button click */}
+      {!isVideoTransitioning && !isVideoFinished && (
+        <div className="bg-placeholder" aria-hidden="true">
+          <div className="bg-image" />
+          <div className="ambient-glow" />
+          <div className="overlay-vignette" />
+          <div className="film-grain" />
+        </div>
+      )}
+
+      {/* Background Layer B: Full-screen video transition overlay that freezes on final frame as background */}
+      {(isVideoTransitioning || isVideoFinished) && (
+        <div
+          className={`video-entry-overlay ${isVideoTransitioning ? 'playing-overlay' : 'frozen-bg'}`}
+          aria-hidden="true"
+        >
+          <video
+            ref={videoRef}
+            className="cinematic-entry-video"
+            src="/shopkeeper-entry.mp4"
+            autoPlay
+            muted
+            playsInline
+            onEnded={handleVideoEnded}
+            onError={handleVideoError}
+          />
+          <div className="ambient-glow" />
+          <div className="overlay-vignette" />
+          <div className="film-grain" />
+        </div>
+      )}
 
       {/* Header with Fixed Position & Top-Right Navigation Controls */}
       <header className={`header ${isScrolled ? 'is-scrolled-hidden' : ''}`}>
@@ -341,7 +432,7 @@ function App() {
             <motion.p
               className="hero-opening-quote"
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 0.80, y: 0 }}
+              animate={{ opacity: 0.95, y: 0 }}
               transition={{ duration: 1.2, delay: 0.2 }}
             >
               अपने किरदार से महकता है इंसान , चरित्र पवित्र करने का इत्र नहीं आता
@@ -379,7 +470,8 @@ function App() {
                 <motion.button
                   type="button"
                   className="cta-button"
-                  onClick={handleEnterTheka}
+                  onClick={handleStartEntryTransition}
+                  disabled={isVideoTransitioning}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -10 }}
