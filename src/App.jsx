@@ -128,6 +128,30 @@ function App() {
     }
   })
 
+  // Keyboard Spacebar shortcut for Play/Pause toggle
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.code === 'Space') {
+        const target = event.target
+        const tagName = target?.tagName?.toLowerCase()
+        const isInput = tagName === 'input' || tagName === 'textarea' || tagName === 'select'
+        const isEditable = target?.isContentEditable || target?.getAttribute('contenteditable') === 'true' || target?.getAttribute('contenteditable') === ''
+
+        if (isInput || isEditable) {
+          return
+        }
+
+        event.preventDefault()
+        togglePlay()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [togglePlay])
+
   // Resolve currentSong dynamically
   let currentSong = null
   if (isPlaylistMode) {
