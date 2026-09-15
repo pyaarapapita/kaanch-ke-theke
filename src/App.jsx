@@ -63,18 +63,18 @@ function App() {
     })
   }, [])
 
-  // Modal body scroll-locking & Escape key handling
+  // Prevent main page scrolling until user clicks "ठेके में प्रवेश करें" & handle modal scroll-locking
   useEffect(() => {
-    if (showAbout) {
+    if (!hasEntered || showAbout) {
       const originalOverflow = window.getComputedStyle(document.body).overflow
       document.body.style.overflow = 'hidden'
 
       const focusTimer = setTimeout(() => {
-        closeBtnRef.current?.focus()
+        if (showAbout) closeBtnRef.current?.focus()
       }, 50)
 
       const handleKeyDown = (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' && showAbout) {
           setShowAbout(false)
         }
       }
@@ -86,7 +86,7 @@ function App() {
         window.removeEventListener('keydown', handleKeyDown)
       }
     }
-  }, [showAbout])
+  }, [hasEntered, showAbout])
 
   // Fetch playlist metadata automatically on mount / playlist change
   useEffect(() => {
@@ -113,6 +113,7 @@ function App() {
     currentVideoId,
     videoTitle,
     videoAuthor,
+    error,
     playSongId,
     playPlaylistId,
     nextVideo,
@@ -368,7 +369,7 @@ function App() {
       )}
 
       {/* Header with Fixed Position & Top-Right Navigation Controls */}
-      <header className={`header ${isScrolled ? 'is-scrolled-hidden' : ''}`}>
+      <header className={`header ${isScrolled ? 'is-scrolled' : ''}`}>
         <button
           type="button"
           className="brand brand-btn"
@@ -429,14 +430,6 @@ function App() {
       <section className={`hero ${hasEntered ? 'is-entered' : ''}`}>
         <div className={`hero-content ${hasEntered ? 'receded' : ''}`}>
           <div className="title-wrapper">
-            <motion.p
-              className="hero-opening-quote"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 0.95, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.2 }}
-            >
-              अपने किरदार से महकता है इंसान , चरित्र पवित्र करने का इत्र नहीं आता
-            </motion.p>
             <motion.h1
               className="main-title"
               initial={{ opacity: 0, y: 15 }}
@@ -461,7 +454,7 @@ function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.8 }}
           >
-            ये समय का मेला है, मैं अकेला ही सही...
+            अपने किरदार से महकता है इंसान , चरित्र पवित्र करने का इत्र नहीं आता
           </motion.p>
 
           <div className="cta-wrapper">
@@ -489,93 +482,145 @@ function App() {
         </div>
       </section>
 
-      {/* Post-Entry Extended Editorial Content Flow */}
-      {hasEntered && (
-        <motion.div
-          className="post-entry-editorial-flow"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-        >
-          {/* Section 1: About the Site */}
-          <section className="editorial-section story-section" aria-label="काँच के ठेके की कहानी">
-            <div className="editorial-container">
-              <div className="editorial-visual-panel">
-                <img
-                  src="/backgrounds/editorial-story.png"
-                  alt="काँच के ठेके की महफ़िल - पुराने गिलास, लालटेन और विनाइल रिकॉर्ड"
-                  className="editorial-img"
-                  loading="lazy"
-                />
-                <div className="visual-overlay-vignette" />
-              </div>
+      {/* Extended Editorial Content Flow & Playlist Overview (DOM Accessible for SEO & Crawlers) */}
+      <motion.div
+        className={`post-entry-editorial-flow ${hasEntered ? 'is-entered-visible' : 'initial-hidden-seo'}`}
+        initial={false}
+        animate={{ opacity: hasEntered ? 1 : 0.85, y: hasEntered ? 0 : 20 }}
+        transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+      >
+        {/* Section 1: About the Site */}
+        <section className="editorial-section story-section" aria-label="काँच के ठेके की कहानी">
+          <div className="editorial-container">
+            <div className="editorial-visual-panel">
+              <img
+                src="/backgrounds/editorial-story.png"
+                alt="काँच के ठेके की महफ़िल - पुराने गिलास, लालटेन और विनाइल रिकॉर्ड"
+                className="editorial-img"
+                loading="lazy"
+                width="520"
+                height="390"
+              />
+              <div className="visual-overlay-vignette" />
+            </div>
 
-              <div className="editorial-content-panel">
-                <div className="editorial-badge-row">
-                  <span className="editorial-badge">THE STORY BEHIND THE THEKA</span>
-                  <span className="editorial-meta">A PERSONAL CREATIVE PROJECT</span>
-                </div>
-                <h2 className="editorial-title">एक छोटी-सी महफ़िल, कुछ पुरानी धुनें</h2>
-                <p className="editorial-desc">
-                  काँच के ठेके एक छोटी-सी डिजिटल महफ़िल है—पुराने हिंदी गीतों, बीती शामों और उन यादों के नाम जो किसी धुन के साथ वापस लौट आती हैं। इसे इस एहसास के लिए बनाया गया है कि कभी-कभी एक गाना, एक ख़ामोश रात और थोड़ी-सी तन्हाई ही काफ़ी होती है।
-                </p>
+            <div className="editorial-content-panel">
+              <div className="editorial-badge-row">
+                <span className="editorial-badge">THE STORY BEHIND THE THEKA</span>
+                <span className="editorial-meta">A PERSONAL CREATIVE PROJECT</span>
+              </div>
+              <h2 className="editorial-title">एक छोटी-सी महफ़िल, कुछ पुरानी धुनें</h2>
+              <p className="editorial-desc">
+                काँच के ठेके एक छोटी-सी डिजिटल महफ़िल है—पुराने हिंदी गीतों, बीती शामों और उन यादों के नाम जो किसी धुन के साथ वापस लौट आती हैं। इसे इस एहसास के लिए बनाया गया है कि कभी-कभी एक गाना, एक ख़ामोश रात और थोड़ी-सी तन्हाई ही काफ़ी होती है।
+              </p>
+              <button
+                type="button"
+                className="editorial-action-link"
+                onClick={() => setShowAbout(true)}
+              >
+                कहानी पढ़ें →
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 2: Playlists Overview for Search Engines & Visitors */}
+        <section className="editorial-section playlists-section" aria-label="चुनिंदा हिंदी म्यूज़िक प्लेलिस्ट्स">
+          <div className="editorial-container">
+            <div className="editorial-content-panel full-width-panel">
+              <div className="editorial-badge-row">
+                <span className="editorial-badge">CURATED PLAYLISTS</span>
+                <span className="editorial-meta">RETRO BOLLYWOOD MUSIC</span>
+              </div>
+              <h2 className="editorial-title">चुनिंदा बॉलीवुड प्लेलिस्ट्स (Curated Playlists)</h2>
+              <div className="playlists-editorial-grid">
+                {PLAYLISTS.map((pl) => {
+                  const isCurrent = currentPlaylist?.id === pl.id
+                  const isUpcoming = Boolean(pl.isUpcoming)
+                  return (
+                    <button
+                      key={pl.id}
+                      type="button"
+                      className={`playlist-card-item ${isCurrent ? 'active-card' : ''} ${isUpcoming ? 'upcoming-card' : ''}`}
+                      onClick={() => !isUpcoming && handleSelectPlaylist(pl.id)}
+                      aria-current={isCurrent ? 'true' : undefined}
+                      disabled={isUpcoming}
+                    >
+                      <div className="playlist-card-header">
+                        <h3 className="playlist-card-title">{pl.name}</h3>
+                        {isCurrent && (
+                          <span className="active-equalizer-badge" title="सक्रिय प्लेलिस्ट">
+                            <span className="eq-bar bar-1" />
+                            <span className="eq-bar bar-2" />
+                            <span className="eq-bar bar-3" />
+                            <span className="active-badge-text">सक्रिय</span>
+                          </span>
+                        )}
+                        {isUpcoming && (
+                          <span className="upcoming-badge" title="शीघ्र उपलब्ध">
+                            शीघ्र उपलब्ध
+                          </span>
+                        )}
+                      </div>
+                      <p className="playlist-card-desc">{pl.description}</p>
+                      <span className="playlist-card-meta">
+                        {isUpcoming ? 'शीघ्र उपलब्ध • Upcoming' : `${pl.songs?.length || 0} चुनिंदा गीत`}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3: Instagram & Community */}
+        <section className="editorial-section instagram-section" aria-label="इन्स्टाग्राम से जुड़ें">
+          <div className="editorial-container reverse-container">
+            <div className="editorial-content-panel">
+              <div className="editorial-badge-row">
+                <span className="editorial-badge">BEYOND THE PLAYLIST</span>
+                <span className="editorial-meta">FIND THE CREATOR ELSEWHERE</span>
+              </div>
+              <h2 className="editorial-title">महफ़िल स्क्रीन से बाहर भी जारी है</h2>
+              <p className="editorial-desc">
+                अगर इस छोटी-सी महफ़िल ने आपको कुछ देर ठहरने पर मजबूर किया, तो Instagram पर भी मिलिए। वहाँ इस प्रोजेक्ट के पीछे की सोच, छोटे creative experiments, updates और आने वाली नई चीज़ों की झलक मिलेगी।
+              </p>
+              {SITE_CONFIG.INSTAGRAM_URL ? (
+                <a
+                  href={SITE_CONFIG.INSTAGRAM_URL}
+                  target="_blank"
+                  rel="me noopener noreferrer"
+                  className="editorial-action-link instagram-link"
+                >
+                  Instagram पर मिलें →
+                </a>
+              ) : (
                 <button
                   type="button"
-                  className="editorial-action-link"
-                  onClick={() => setShowAbout(true)}
+                  className="editorial-action-link disabled-link"
+                  disabled
+                  aria-disabled="true"
                 >
-                  कहानी पढ़ें →
+                  Instagram (शीघ्र उपलब्ध)
                 </button>
-              </div>
+              )}
             </div>
-          </section>
 
-          {/* Section 2: Instagram */}
-          <section className="editorial-section instagram-section" aria-label="इन्स्टाग्राम से जुड़ें">
-            <div className="editorial-container reverse-container">
-              <div className="editorial-content-panel">
-                <div className="editorial-badge-row">
-                  <span className="editorial-badge">BEYOND THE PLAYLIST</span>
-                  <span className="editorial-meta">FIND THE CREATOR ELSEWHERE</span>
-                </div>
-                <h2 className="editorial-title">महफ़िल स्क्रीन से बाहर भी जारी है</h2>
-                <p className="editorial-desc">
-                  अगर इस छोटी-सी महफ़िल ने आपको कुछ देर ठहरने पर मजबूर किया, तो Instagram पर भी मिलिए। वहाँ इस प्रोजेक्ट के पीछे की सोच, छोटे creative experiments, updates और आने वाली नई चीज़ों की झलक मिलेगी।
-                </p>
-                {SITE_CONFIG.INSTAGRAM_URL ? (
-                  <a
-                    href={SITE_CONFIG.INSTAGRAM_URL}
-                    target="_blank"
-                    rel="me noopener noreferrer"
-                    className="editorial-action-link instagram-link"
-                  >
-                    Instagram पर मिलें →
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    className="editorial-action-link disabled-link"
-                    disabled
-                    aria-disabled="true"
-                  >
-                    Instagram (शीघ्र उपलब्ध)
-                  </button>
-                )}
-              </div>
-
-              <div className="editorial-visual-panel">
-                <img
-                  src="/backgrounds/editorial-instagram.png"
-                  alt="रेट्रो कैसेट प्लेयर, कैमरा और शाम का सुकून"
-                  className="editorial-img"
-                  loading="lazy"
-                />
-                <div className="visual-overlay-vignette" />
-              </div>
+            <div className="editorial-visual-panel">
+              <img
+                src="/backgrounds/editorial-instagram.png"
+                alt="रेट्रो कैसेट प्लेयर, कैमरा और शाम का सुकून"
+                className="editorial-img"
+                loading="lazy"
+                width="520"
+                height="390"
+              />
+              <div className="visual-overlay-vignette" />
             </div>
-          </section>
-        </motion.div>
-      )}
+          </div>
+        </section>
+      </motion.div>
 
       {/* Custom Floating Music Player (Persistent DOM container with visual transition) */}
       <MusicPlayer
@@ -591,6 +636,7 @@ function App() {
         setVolume={setVolume}
         onNext={handleNextSong}
         onPrevious={handlePreviousSong}
+        playbackError={error}
       />
 
       {/* Accessible "Baare Mein" Dialog Modal */}

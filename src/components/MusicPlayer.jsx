@@ -20,7 +20,8 @@ export const MusicPlayer = React.memo(function MusicPlayer({
   seekTo,
   setVolume,
   onNext,
-  onPrevious
+  onPrevious,
+  playbackError = null
 }) {
   const [isMuted, setIsMuted] = useState(false);
   const [prevVolume, setPrevVolume] = useState(100);
@@ -51,6 +52,11 @@ export const MusicPlayer = React.memo(function MusicPlayer({
   const songArtist = currentSong?.artist || 'आज कुछ पुराना सुनते हैं';
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   const isVisible = hasEntered && !isScrolled;
+
+  const currentMins = Math.floor(currentTime / 60);
+  const currentSecs = Math.floor(currentTime % 60);
+  const timeValueText = currentMins > 0 ? `${currentMins} मिनट ${currentSecs} सेकंड` : `${currentSecs} सेकंड`;
+  const volumeValueText = `${isMuted ? 0 : volume} प्रतिशत`;
 
   return (
     <motion.div
@@ -102,7 +108,7 @@ export const MusicPlayer = React.memo(function MusicPlayer({
           </svg>
         </div>
 
-        {/* Track Details */}
+        {/* Track Details & Optional Error Notice */}
         <div className="player-track-info" aria-live="polite" aria-atomic="true">
           <span className="player-song-title" title={songTitle}>
             {songTitle}
@@ -110,6 +116,11 @@ export const MusicPlayer = React.memo(function MusicPlayer({
           <span className="player-song-artist" title={songArtist}>
             {songArtist}
           </span>
+          {playbackError && (
+            <span className="player-error-tag" title="ग़ना चलाने में समस्या आई">
+              पुनः प्रयास करें
+            </span>
+          )}
         </div>
 
         {/* Center Section: Playback Controls & Progress Bar */}
@@ -168,6 +179,7 @@ export const MusicPlayer = React.memo(function MusicPlayer({
                 value={currentTime || 0}
                 onChange={handleSeekChange}
                 aria-label="गीत की प्रगति (Playback Progress)"
+                aria-valuetext={timeValueText}
                 style={{
                   background: `linear-gradient(to right, var(--accent-gold) 0%, var(--accent-gold) ${progressPercent}%, rgba(232, 215, 181, 0.2) ${progressPercent}%, rgba(232, 215, 181, 0.2) 100%)`
                 }}
@@ -203,6 +215,7 @@ export const MusicPlayer = React.memo(function MusicPlayer({
             value={isMuted ? 0 : volume}
             onChange={handleVolumeChange}
             aria-label="आवाज़ का स्तर (Volume Level)"
+            aria-valuetext={volumeValueText}
             style={{
               background: `linear-gradient(to right, var(--accent-gold) 0%, var(--accent-gold) ${isMuted ? 0 : volume}%, rgba(232, 215, 181, 0.2) ${isMuted ? 0 : volume}%, rgba(232, 215, 181, 0.2) 100%)`
             }}

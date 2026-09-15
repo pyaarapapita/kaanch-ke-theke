@@ -49,7 +49,7 @@ export const MoodSelector = React.memo(function MoodSelector({ playlists = [], a
       <button
         ref={buttonRef}
         type="button"
-        className={`mood-toggle-btn ${isOpen ? 'active' : ''}`}
+        className={`nav-link nav-link-btn mood-toggle-btn ${isOpen ? 'active' : ''}`}
         onClick={toggleMenu}
         aria-expanded={isOpen}
         aria-label="मूड चुनें (Select Mood)"
@@ -74,16 +74,21 @@ export const MoodSelector = React.memo(function MoodSelector({ playlists = [], a
             <div className="mood-options-list" role="listbox" aria-labelledby="mood-dropdown-title">
               {playlists.map((playlist) => {
                 const isSelected = playlist.id === activePlaylistId;
+                const isUpcoming = Boolean(playlist.isUpcoming);
                 return (
                   <button
                     key={playlist.id}
                     type="button"
-                    className={`mood-option-item ${isSelected ? 'selected' : ''}`}
-                    onClick={() => handleSelect(playlist.id)}
+                    className={`mood-option-item ${isSelected ? 'selected' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                    onClick={() => !isUpcoming && handleSelect(playlist.id)}
                     role="option"
                     aria-selected={isSelected}
+                    disabled={isUpcoming}
                   >
-                    <span className="mood-option-title">{playlist.name}</span>
+                    <div className="mood-option-header-row">
+                      <span className="mood-option-title">{playlist.name}</span>
+                      {isUpcoming && <span className="mood-upcoming-badge">शीघ्र</span>}
+                    </div>
                     <span className="mood-option-desc">{playlist.description}</span>
                   </button>
                 );

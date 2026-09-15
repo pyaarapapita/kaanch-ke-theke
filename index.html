@@ -36,7 +36,7 @@
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&amp;family=Noto+Serif+Devanagari:wght@400;600;700;900&amp;family=Rozha+One&amp;display=swap"
     rel="stylesheet">
 
-  <!-- WebSite & MusicPlaylist Structured Data (JSON-LD) -->
+  <!-- WebSite, WebPage & MusicPlaylist Structured Data (JSON-LD) -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -46,8 +46,8 @@
           "@id": "https://kaanch-ke-theke.pages.dev/#website",
           "url": "https://kaanch-ke-theke.pages.dev/",
           "name": "काँच के ठेके | Kaanch Ke Theke",
-          "alternateName": ["Kaanch Ke Theke", "KaanchKeTheke"],
-          "description": "Explore Kaanch Ke Theke, a nostalgic digital lounge of retro Bollywood music, timeless classic songs, and midnight mood playlists.",
+          "alternateName": ["Kaanch Ke Theke", "kaanch ke theke", "काँच के ठेके", "Kaanch Ke Theke Music", "Kaanch Ke Theke Playlists"],
+          "description": "Explore Kaanch Ke Theke, a nostalgic digital lounge of retro Bollywood music, classic Hindi songs, and midnight mood playlists inspired by Indian thekas.",
           "inLanguage": ["hi", "en"]
         },
         {
@@ -60,16 +60,71 @@
           },
           "about": {
             "@type": "Thing",
-            "name": "Retro Bollywood Music Playlists"
+            "name": "Retro Bollywood Music & Nostalgic Hindi Songs"
           },
           "inLanguage": ["hi", "en"]
         },
         {
-          "@type": "MusicPlaylist",
-          "name": "काँच के ठेके - चुनिंदा हिंदी महफ़िल प्लेलिस्ट्स",
-          "url": "https://kaanch-ke-theke.pages.dev/",
-          "genre": "Retro Bollywood, Hindi Classics, Nostalgia",
-          "description": "दोस्तों की महफ़िल और सुहानी शामों के लिए रेडी-मेड बॉलीवुड म्यूज़िक अनुभव।"
+          "@type": "ItemList",
+          "@id": "https://kaanch-ke-theke.pages.dev/#playlists",
+          "name": "काँच के ठेके - चुनिंदा हिंदी म्यूज़िक प्लेलिस्ट्स (Curated Playlists)",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "MusicPlaylist",
+                "name": "90s की बोतल",
+                "genre": "90s Retro Bollywood Classics",
+                "description": "आज कुछ पुराना सुनते हैं — ९० के दौर के सदाबहार नग़मे।",
+                "numTracks": 9
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "MusicPlaylist",
+                "name": "दर्द-ए-दिल",
+                "genre": "Hindi Sad Songs & Melancholy Melodies",
+                "description": "टूटे दिल और बीती यादों के नाम एक ख़ामोश शाम।",
+                "numTracks": 4
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "item": {
+                "@type": "MusicPlaylist",
+                "name": "महफ़िल",
+                "genre": "Late Night Ghazals & Vintage Tavern Songs",
+                "description": "ग़ज़लों और पुराने तराने की एक सुहानी बैठक।",
+                "numTracks": 3
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 4,
+              "item": {
+                "@type": "MusicPlaylist",
+                "name": "बारिश और यादें",
+                "genre": "Monsoon Nostalgia & Classic Rain Songs",
+                "description": "बूंदों की टिप-टिप और पुराने बॉलीवुड मानसून ट्रैक्स।",
+                "numTracks": 3
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 5,
+              "item": {
+                "@type": "MusicPlaylist",
+                "name": "रात का नशा",
+                "genre": "Midnight Vintage Bollywood Classics",
+                "description": "आधी रात की तन्हाई और मदहोश कर देने वाले विंटेज क्लासिक्स।",
+                "numTracks": 3
+              }
+            }
+          ]
         }
       ]
     }
