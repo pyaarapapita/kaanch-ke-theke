@@ -6,6 +6,7 @@ import { YouTubePlayer } from './components/YouTubePlayer'
 import { MusicPlayer } from './components/MusicPlayer'
 import { MoodSelector } from './components/MoodSelector'
 import { fetchPlaylistMetadata } from './utils/youtubeMetadata'
+import { VisitorCounter } from './components/VisitorCounter'
 import './App.css'
 
 // Configuration for external profile/support links
@@ -308,8 +309,8 @@ function App() {
       {/* Hidden YouTube IFrame Player Instance */}
       <YouTubePlayer containerRef={containerRef} />
 
-      {/* Background Layer A: Static background image shown before button click */}
-      {!isVideoTransitioning && !isVideoFinished && (
+      {/* Background Layer A: Static background image shown before entry video finishes */}
+      {!isVideoFinished && (
         <div className="bg-placeholder" aria-hidden="true">
           <div className="bg-image" />
           <div className="ambient-glow" />
@@ -419,7 +420,7 @@ function App() {
 
           <div className="cta-wrapper">
             <AnimatePresence mode="wait">
-              {!hasEntered && (
+              {!hasEntered && !isVideoTransitioning && (
                 <motion.button
                   type="button"
                   className="cta-button"
@@ -428,7 +429,7 @@ function App() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.35 }}
                 >
                   ठेके में प्रवेश करें
                 </motion.button>
@@ -637,6 +638,7 @@ function App() {
         <div className="creator-signature">
           Created with 🌿 by Anuj Rai
         </div>
+        <VisitorCounter />
         {hasEntered && (
           <span className="ambient-indicator">
             {`वर्तमान मूड: ${currentPlaylist?.name || '९० का दौर'}`}
