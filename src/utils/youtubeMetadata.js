@@ -72,30 +72,3 @@ export async function fetchPlaylistMetadata(playlistId) {
   }
 }
 
-const singleVideoCache = new Map();
-
-export async function fetchSingleVideoMetadata(videoId) {
-  if (!videoId) return null;
-  if (singleVideoCache.has(videoId)) {
-    return singleVideoCache.get(videoId);
-  }
-
-  try {
-    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
-    const response = await fetch(oembedUrl);
-    if (response.ok) {
-      const data = await response.json();
-      const meta = {
-        id: videoId,
-        title: data.title || 'अज्ञात गीत',
-        artist: data.author_name || 'YouTube',
-        youtubeId: videoId
-      };
-      singleVideoCache.set(videoId, meta);
-      return meta;
-    }
-  } catch (err) {
-    console.warn('[YouTube oEmbed] Fallback fetch error for videoId:', videoId, err);
-  }
-  return null;
-}

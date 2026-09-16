@@ -1,11 +1,11 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { getPlaylistById, DEFAULT_PLAYLIST_ID, PLAYLISTS } from './data/playlists'
 import { useYouTubePlayer } from './hooks/useYouTubePlayer'
 import { YouTubePlayer } from './components/YouTubePlayer'
 import { MusicPlayer } from './components/MusicPlayer'
 import { MoodSelector } from './components/MoodSelector'
-import { fetchPlaylistMetadata, fetchSingleVideoMetadata } from './utils/youtubeMetadata'
+import { fetchPlaylistMetadata } from './utils/youtubeMetadata'
 import './App.css'
 
 // Configuration for external profile/support links
@@ -29,7 +29,7 @@ function App() {
   const videoRef = useRef(null)
 
   const isPlaylistMode = Boolean(currentPlaylist?.youtubePlaylistId)
-  const playlistSongs = currentPlaylist?.songs || []
+  const playlistSongs = useMemo(() => currentPlaylist?.songs || [], [currentPlaylist])
 
   // Scroll position tracking to control complete header panel & MusicPlayer visibility
   useEffect(() => {
@@ -56,11 +56,24 @@ function App() {
   }, [])
 
   const handleLogoClick = useCallback(() => {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    window.scrollTo({
-      top: 0,
-      behavior: prefersReduced ? 'auto' : 'smooth'
-    })
+    const currentScroll = window.pageYOffset || window.scrollY || document.documentElement?.scrollTop || document.body?.scrollTop || 0
+    if (currentScroll > 10) {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const scrollConfig = { top: 0, left: 0, behavior: prefersReduced ? 'auto' : 'smooth' }
+      try {
+        window.scrollTo(scrollConfig)
+      } catch {
+        window.scrollTo(0, 0)
+      }
+      if (document.documentElement && document.documentElement.scrollTop > 0) {
+        try { document.documentElement.scrollTo(scrollConfig) } catch { document.documentElement.scrollTop = 0 }
+      }
+      if (document.body && document.body.scrollTop > 0) {
+        try { document.body.scrollTo(scrollConfig) } catch { document.body.scrollTop = 0 }
+      }
+    } else {
+      window.location.reload()
+    }
   }, [])
 
   // Prevent main page scrolling until user clicks "ठेके में प्रवेश करें" & handle modal scroll-locking
@@ -158,47 +171,19 @@ function App() {
     }
   }, [togglePlay])
 
-  // Fetch single video metadata fallback via oEmbed when currentVideoId is missing in fetchedMetadata
-  useEffect(() => {
-    let isMounted = true
-    if (currentVideoId && !fetchedMetadata[currentVideoId]) {
-      fetchSingleVideoMetadata(currentVideoId).then((meta) => {
-        if (isMounted && meta && meta.title) {
-          setFetchedMetadata((prev) => (prev[currentVideoId] ? prev : { ...prev, [currentVideoId]: meta }))
-        }
-      })
-    }
-    return () => {
-      isMounted = false
-    }
-  }, [currentVideoId])
 
-  // Resolve currentSong dynamically with multiple title fallback layers
-  let currentSong = null
+  // Resolve currentSong dynamically
+  let currentSong
   if (isPlaylistMode) {
     if (currentVideoId) {
-      if (fetchedMetadata[currentVideoId]) {
-        currentSong = fetchedMetadata[currentVideoId]
-      } else {
-        const matchedSong = playlistSongs.find((s) => s.youtubeId === currentVideoId)
-        if (matchedSong && matchedSong.title) {
-          currentSong = matchedSong
-        } else if (videoTitle) {
-          currentSong = {
-            id: `yt-${currentVideoId}`,
-            title: videoTitle,
-            artist: videoAuthor || 'YouTube',
-            youtubeId: currentVideoId
-          }
-        } else {
-          currentSong = {
-            id: `yt-${currentVideoId}`,
-            title: 'काँच के ठेके',
-            artist: 'YouTube',
-            youtubeId: currentVideoId
-          }
+      currentSong = fetchedMetadata[currentVideoId] ||
+        playlistSongs.find((s) => s.youtubeId === currentVideoId) ||
+        {
+          id: `yt-${currentVideoId}`,
+          title: videoTitle || 'काँच के ठेके',
+          artist: videoAuthor || 'YouTube',
+          youtubeId: currentVideoId
         }
-      }
     } else {
       currentSong = playlistSongs[0] || null
     }
@@ -249,10 +234,7 @@ function App() {
         playPlaylistId(selected.youtubePlaylistId)
       } else {
         const songs = selected?.songs || []
-        const firstPlayableIndex = songs.findIndex((s) => Boolean(s.youtubeId))
-        const targetIndex = firstPlayableIndex !== -1 ? firstPlayableIndex : 0
-        setCurrentSongIndex(targetIndex)
-        const targetSong = songs[targetIndex]
+        const targetSong = songs.find((s) => Boolean(s.youtubeId)) || songs[0]
         if (targetSong?.youtubeId) {
           console.log('[App] handleSelectPlaylist playing song:', targetSong.title, targetSong.youtubeId)
           playSongId(targetSong.youtubeId)
@@ -269,17 +251,7 @@ function App() {
       console.log('[App] handleEnterTheka playing playlist:', currentPlaylist.name, currentPlaylist.youtubePlaylistId)
       playPlaylistId(currentPlaylist.youtubePlaylistId)
     } else {
-      let targetIndex = currentSongIndex
-      let targetSong = playlistSongs[targetIndex]
-
-      if (!targetSong?.youtubeId) {
-        const firstPlayableIndex = playlistSongs.findIndex((s) => Boolean(s.youtubeId))
-        if (firstPlayableIndex !== -1) {
-          targetIndex = firstPlayableIndex
-          targetSong = playlistSongs[firstPlayableIndex]
-          setCurrentSongIndex(firstPlayableIndex)
-        }
-      }
+      const targetSong = playlistSongs[currentSongIndex] || playlistSongs.find((s) => Boolean(s.youtubeId))
 
       if (targetSong?.youtubeId) {
         console.log('[App] handleEnterTheka triggering playSongId:', targetSong.title, targetSong.youtubeId)
@@ -382,27 +354,15 @@ function App() {
         <nav className="nav-links">
           {/* Control 1: Support Button */}
           <div className="support-nav-item">
-            {SITE_CONFIG.BUY_ME_A_COFFEE_URL ? (
-              <a
-                href={SITE_CONFIG.BUY_ME_A_COFFEE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-support-btn"
-                aria-label="मेरी अगली बोतल के लिए (Support Creator)"
-              >
-                मेरी अगली बोतल के लिए 🍾
-              </a>
-            ) : (
-              <button
-                type="button"
-                className="nav-support-btn disabled-nav-support"
-                disabled
-                aria-disabled="true"
-                aria-label="मेरी अगली बोतल के लिए (Support Creator)"
-              >
-                मेरी अगली बोतल के लिए 🍾
-              </button>
-            )}
+            <a
+              href={SITE_CONFIG.BUY_ME_A_COFFEE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="nav-support-btn"
+              aria-label="मेरी अगली बोतल के लिए (Support Creator)"
+            >
+              मेरी अगली बोतल के लिए 🍾
+            </a>
           </div>
 
           {/* Control 2: Mood Selector */}
@@ -506,8 +466,8 @@ function App() {
 
             <div className="editorial-content-panel">
               <div className="editorial-badge-row">
-                <span className="editorial-badge">THE STORY BEHIND THE THEKA</span>
-                <span className="editorial-meta">A PERSONAL CREATIVE PROJECT</span>
+                <span className="editorial-badge">The Story Behind The Theka</span>
+                <span className="editorial-meta">A Personal Creative Project</span>
               </div>
               <h2 className="editorial-title">एक छोटी-सी महफ़िल, कुछ पुरानी धुनें</h2>
               <p className="editorial-desc">
@@ -529,8 +489,8 @@ function App() {
           <div className="editorial-container">
             <div className="editorial-content-panel full-width-panel">
               <div className="editorial-badge-row">
-                <span className="editorial-badge">CURATED PLAYLISTS</span>
-                <span className="editorial-meta">RETRO BOLLYWOOD MUSIC</span>
+                <span className="editorial-badge">Curated Playlists</span>
+                <span className="editorial-meta">Retro Bollywood Music</span>
               </div>
               <h2 className="editorial-title">चुनिंदा बॉलीवुड प्लेलिस्ट्स (Curated Playlists)</h2>
               <div className="playlists-editorial-grid">
@@ -579,32 +539,21 @@ function App() {
           <div className="editorial-container reverse-container">
             <div className="editorial-content-panel">
               <div className="editorial-badge-row">
-                <span className="editorial-badge">BEYOND THE PLAYLIST</span>
-                <span className="editorial-meta">FIND THE CREATOR ELSEWHERE</span>
+                <span className="editorial-badge">Beyond The Playlist</span>
+                <span className="editorial-meta">Find The Creator Elsewhere</span>
               </div>
               <h2 className="editorial-title">महफ़िल स्क्रीन से बाहर भी जारी है</h2>
               <p className="editorial-desc">
                 अगर इस छोटी-सी महफ़िल ने आपको कुछ देर ठहरने पर मजबूर किया, तो Instagram पर भी मिलिए। वहाँ इस प्रोजेक्ट के पीछे की सोच, छोटे creative experiments, updates और आने वाली नई चीज़ों की झलक मिलेगी।
               </p>
-              {SITE_CONFIG.INSTAGRAM_URL ? (
-                <a
-                  href={SITE_CONFIG.INSTAGRAM_URL}
-                  target="_blank"
-                  rel="me noopener noreferrer"
-                  className="editorial-action-link instagram-link"
-                >
-                  Instagram पर मिलें →
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  className="editorial-action-link disabled-link"
-                  disabled
-                  aria-disabled="true"
-                >
-                  Instagram (शीघ्र उपलब्ध)
-                </button>
-              )}
+              <a
+                href={SITE_CONFIG.INSTAGRAM_URL}
+                target="_blank"
+                rel="me noopener noreferrer"
+                className="editorial-action-link instagram-link"
+              >
+                Instagram पर मिलें →
+              </a>
             </div>
 
             <div className="editorial-visual-panel">

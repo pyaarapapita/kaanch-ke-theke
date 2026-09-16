@@ -37,15 +37,6 @@ function loadYouTubeIframeApi() {
   return apiLoadingPromise;
 }
 
-const STATE_NAMES = {
-  '-1': 'UNSTARTED',
-  '0': 'ENDED',
-  '1': 'PLAYING',
-  '2': 'PAUSED',
-  '3': 'BUFFERING',
-  '5': 'CUED'
-};
-
 export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, onError: onErrorCallback } = {}) {
   const containerRef = useRef(null);
   const playerRef = useRef(null);
@@ -57,8 +48,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
 
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isEnded, setIsEnded] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(100);
@@ -66,7 +55,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   const [videoTitle, setVideoTitle] = useState('');
   const [videoAuthor, setVideoAuthor] = useState('');
   const [error, setError] = useState(null);
-  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
   // Helper to extract and update current video data
   const updateVideoData = useCallback(() => {
@@ -194,7 +182,7 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
           onStateChange: (event) => {
             if (!isMounted) return;
             const state = event.data;
-            console.log(`[YouTube Player] onStateChange: ${state} (${STATE_NAMES[state] || 'UNKNOWN'})`);
+            console.log(`[YouTube Player] onStateChange: ${state}`);
 
             try {
               const vId = event.target.getVideoData()?.video_id || '';
@@ -205,16 +193,10 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
 
             if (state === YT.PlayerState.PLAYING) {
               setIsPlaying(true);
-              setIsPaused(false);
-              setIsEnded(false);
-              setAutoplayBlocked(false);
             } else if (state === YT.PlayerState.PAUSED) {
               setIsPlaying(false);
-              setIsPaused(true);
             } else if (state === YT.PlayerState.ENDED) {
               setIsPlaying(false);
-              setIsPaused(false);
-              setIsEnded(true);
               if (typeof onSongEndRef.current === 'function') {
                 onSongEndRef.current();
               }
@@ -277,6 +259,7 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
         playerRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update video when youtubeId prop changes
@@ -300,8 +283,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
           console.log('[YouTube Player] Player currently stopped/paused, calling cueVideoById for:', youtubeId);
           playerRef.current.cueVideoById(youtubeId);
         }
-        setIsEnded(false);
-        setError(null);
       } catch (err) {
         console.warn('[YouTube Player] Error during cue/loadVideoById:', err);
       }
@@ -313,10 +294,11 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
       } catch {
         // Ignore stop failure
       }
-      setIsPlaying(false);
-      setIsPaused(false);
-      setCurrentTime(0);
-      setDuration(0);
+      queueMicrotask(() => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        setDuration(0);
+      });
     }
   }, [youtubeId, playlistId, isReady, isPlaying]);
 
@@ -333,8 +315,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
         playerRef.current.cuePlaylist({ listType: 'playlist', list: playlistId, index: 0 });
       }
       lastPlayedIdRef.current = playlistId;
-      setIsEnded(false);
-      setError(null);
     } catch (err) {
       console.warn('[YouTube Player] Error during playlist cue/load:', err);
     }
@@ -353,11 +333,9 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
         console.log('[YouTube Player] Executing playerRef.current.loadVideoById for targetId:', targetId);
         playerRef.current.loadVideoById(targetId);
         pendingSongIdRef.current = null;
-        setIsEnded(false);
         setError(null);
       } catch (err) {
         console.error('[YouTube Player] Exception during loadVideoById:', err);
-        setAutoplayBlocked(true);
       }
     } else {
       console.log('[YouTube Player] Player not fully ready yet, queueing pending targetId:', targetId);
@@ -381,11 +359,9 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
           index
         });
         pendingPlaylistRef.current = null;
-        setIsEnded(false);
         setError(null);
       } catch (err) {
         console.error('[YouTube Player] Exception during loadPlaylist:', err);
-        setAutoplayBlocked(true);
       }
     } else {
       console.log('[YouTube Player] Player not fully ready yet, queueing pending playlist targetId:', targetPlaylistId);
@@ -462,10 +438,7 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
 
   return {
     containerRef,
-    isReady,
     isPlaying,
-    isPaused,
-    isEnded,
     currentTime,
     duration,
     volume,
@@ -473,13 +446,10 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
     videoTitle,
     videoAuthor,
     error,
-    autoplayBlocked,
-    play,
     playSongId,
     playPlaylistId,
     nextVideo,
     previousVideo,
-    pause,
     togglePlay,
     seekTo,
     setVolume

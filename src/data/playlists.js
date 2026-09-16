@@ -71,32 +71,7 @@ export const PLAYLISTS = [
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
     isUpcoming: true,
-    songs: [
-      {
-        id: 'song-dard-001',
-        title: 'Yeh Jo Mohabbat Hai',
-        artist: 'Kishore Kumar',
-        youtubeId: 'TFgodv_aaYo'
-      },
-      {
-        id: 'song-dard-002',
-        title: 'Chingari Koi Bhadke',
-        artist: 'Kishore Kumar, RD Burman',
-        youtubeId: '9gP4dM8P__k'
-      },
-      {
-        id: 'song-dard-003',
-        title: 'Kabhi Kabhie Mere Dil Mein',
-        artist: 'Mukesh, Khayyam',
-        youtubeId: 'v8JtQ_M6x38'
-      },
-      {
-        id: 'song-dard-004',
-        title: 'Tujhse Naraz Nahin Zindagi',
-        artist: 'Lata Mangeshkar, Gulzar',
-        youtubeId: '80j44zB_0q4'
-      }
-    ]
+    songs: []
   },
   {
     id: 'mahfil',
@@ -105,26 +80,7 @@ export const PLAYLISTS = [
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
     isUpcoming: true,
-    songs: [
-      {
-        id: 'song-mahfil-001',
-        title: 'Jhuki Jhuki Si Nazar',
-        artist: 'Jagjit Singh',
-        youtubeId: '8S7S9l27o24'
-      },
-      {
-        id: 'song-mahfil-002',
-        title: 'Hoshwalon Ko Khabar Kya',
-        artist: 'Jagjit Singh',
-        youtubeId: 'MvG3T-v6yUk'
-      },
-      {
-        id: 'song-mahfil-003',
-        title: 'Chupke Chupke Raat Din',
-        artist: 'Ghulam Ali',
-        youtubeId: 'Y8xL_S4qQMo'
-      }
-    ]
+    songs: []
   },
   {
     id: 'barish-aur-yaadein',
@@ -133,26 +89,7 @@ export const PLAYLISTS = [
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
     isUpcoming: true,
-    songs: [
-      {
-        id: 'song-rain-001',
-        title: 'Barsaat Ke Mausam Mein',
-        artist: 'Kumar Sanu, Roop Kumar Rathod',
-        youtubeId: 'c6F8YDsS7CI'
-      },
-      {
-        id: 'song-rain-002',
-        title: 'Rimjhim Gire Sawan',
-        artist: 'Kishore Kumar, RD Burman',
-        youtubeId: 'P1J4l-rP300'
-      },
-      {
-        id: 'song-rain-003',
-        title: 'Roop Tera Mastana',
-        artist: 'Kishore Kumar',
-        youtubeId: 'p4qXl2j1wJg'
-      }
-    ]
+    songs: []
   },
   {
     id: 'raat-ka-nasha',
@@ -161,29 +98,8 @@ export const PLAYLISTS = [
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
     isUpcoming: true,
-    songs: [
-      {
-        id: 'song-raat-001',
-        title: 'Mujhe Peene Ka Shauk Nahi',
-        artist: 'Alka Yagnik',
-        youtubeId: 'gDGO5DXqcYI'
-      },
-      {
-        id: 'song-raat-002',
-        title: 'Do Ghut Mujhe Bhi Pila De',
-        artist: 'RD Burman',
-        youtubeId: 'UANG8_P224w'
-      },
-      {
-        id: 'song-raat-003',
-        title: 'Mujhko Peena Hai Peene Do',
-        artist: 'Mohd Aziz',
-        youtubeId: 'Ax5jPATJM1A'
-      }
-    ]
+    songs: []
   }
 ];
 
-export const getPlaylistById = (id) => {
-  return PLAYLISTS.find((p) => p.id === id) || PLAYLISTS[0];
-};
+export const getPlaylistById = (id) => PLAYLISTS.find((p) => p.id === id) || PLAYLISTS[0];
