@@ -1,1 +1,6 @@
-/*    /index.html    200
+# Static assets bypass SPA rewrite
+/sitemap.xml    /sitemap.xml    200
+/robots.txt     /robots.txt     200
+
+# SPA fallback routing
+/*              /index.html     200
