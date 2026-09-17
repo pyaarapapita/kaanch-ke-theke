@@ -1127,6 +1127,22 @@
   .volume-slider {
     width: 42px;
   }
+
+  .player-error-tag.player-retry-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.68rem;
+  }
+
+  .player-loading-state {
+    font-size: 0.68rem;
+  }
+
+  .player-auto-skip-message {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+  }
 }
 
 /* Mood Selector Styles */
@@ -1690,6 +1706,53 @@
   border-radius: 4px;
   margin-top: 0.15rem;
   display: inline-block;
+}
+
+.player-error-tag.player-retry-btn {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+}
+
+.player-error-tag.player-retry-btn:hover {
+  background: rgba(124, 45, 36, 0.55);
+  border-color: rgba(124, 45, 36, 0.8);
+  color: #FFF5E1;
+}
+
+.player-error-tag.player-retry-btn:focus-visible {
+  outline: 2px solid var(--accent-gold) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 10px rgba(184, 137, 74, 0.5) !important;
+}
+
+.player-loading-state {
+  font-family: var(--font-hindi-body);
+  font-size: 0.72rem;
+  color: var(--accent-gold);
+  opacity: 0.85;
+  display: inline-block;
+  margin-top: 0.15rem;
+  letter-spacing: 0.3px;
+}
+
+.player-auto-skip-message {
+  font-family: var(--font-hindi-body);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.9;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(184, 137, 74, 0.12);
+  border: 1px solid rgba(184, 137, 74, 0.25);
+  border-radius: 4px;
+  display: inline-block;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .playlist-card-desc {

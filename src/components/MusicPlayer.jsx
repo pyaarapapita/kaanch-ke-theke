@@ -21,7 +21,11 @@ export const MusicPlayer = React.memo(function MusicPlayer({
   setVolume,
   onNext,
   onPrevious,
-  playbackError = null
+  playbackError = null,
+  isReady = true,
+  isLoadingMetadata = false,
+  autoSkipMessage = null,
+  onRetry = null
 }) {
   const [isMuted, setIsMuted] = useState(false);
   const [prevVolume, setPrevVolume] = useState(100);
@@ -110,18 +114,47 @@ export const MusicPlayer = React.memo(function MusicPlayer({
 
         {/* Track Details & Optional Error Notice */}
         <div className="player-track-info" aria-live="polite" aria-atomic="true">
-          <span className="player-song-title" title={songTitle}>
-            {songTitle}
-          </span>
-          <span className="player-song-artist" title={songArtist}>
-            {songArtist}
-          </span>
-          {playbackError && (
+          {!isReady && (
+            <span className="player-loading-state" aria-live="polite">
+              बोतल खोली जा रही है...
+            </span>
+          )}
+          {isLoadingMetadata && !playbackError && (
+            <span className="player-loading-state" aria-live="polite">
+              नई बोतल की जानकारी आ रही है...
+            </span>
+          )}
+          {(isReady && !isLoadingMetadata) || playbackError ? (
+            <>
+              <span className="player-song-title" title={songTitle}>
+                {songTitle}
+              </span>
+              <span className="player-song-artist" title={songArtist}>
+                {songArtist}
+              </span>
+            </>
+          ) : null}
+          {playbackError && onRetry && (
+            <button
+              type="button"
+              className="player-error-tag player-retry-btn"
+              onClick={onRetry}
+              aria-label="पुनः प्रयास करें"
+            >
+              पुनः प्रयास करें
+            </button>
+          )}
+          {playbackError && !onRetry && (
             <span className="player-error-tag" title="ग़ना चलाने में समस्या आई">
               पुनः प्रयास करें
             </span>
           )}
         </div>
+        {autoSkipMessage && (
+          <div className="player-auto-skip-message" aria-live="polite" role="status">
+            {autoSkipMessage}
+          </div>
+        )}
 
         {/* Center Section: Playback Controls & Progress Bar */}
         <div className="player-center-controls">

@@ -389,16 +389,8 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
     }
   }, []);
 
-  const play = useCallback(() => {
-    if (playlistId) {
-      playPlaylistId(playlistId);
-    } else {
-      playSongId(youtubeId);
-    }
-  }, [playlistId, youtubeId, playPlaylistId, playSongId]);
-
   const pause = useCallback(() => {
-    if (!playerRef.current) return;
+    if (!playerRef.current || typeof playerRef.current.pauseVideo !== 'function') return;
     try {
       console.log('[YouTube Player] Invoking pauseVideo');
       playerRef.current.pauseVideo();
@@ -407,13 +399,31 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
     }
   }, []);
 
+  const resume = useCallback(() => {
+    if (playerRef.current && typeof playerRef.current.playVideo === 'function' && lastPlayedIdRef.current) {
+      try {
+        console.log('[YouTube Player] Invoking playVideo to resume playback');
+        playerRef.current.playVideo();
+      } catch (err) {
+        console.error('[YouTube Player] Exception during playVideo:', err);
+      }
+    } else {
+      console.log('[YouTube Player] No active track playing/loaded yet, loading initial track');
+      if (playlistId) {
+        playPlaylistId(playlistId);
+      } else if (youtubeId) {
+        playSongId(youtubeId);
+      }
+    }
+  }, [playlistId, youtubeId, playPlaylistId, playSongId]);
+
   const togglePlay = useCallback(() => {
     if (isPlaying) {
       pause();
     } else {
-      play();
+      resume();
     }
-  }, [isPlaying, play, pause]);
+  }, [isPlaying, pause, resume]);
 
   const seekTo = useCallback((seconds) => {
     if (!playerRef.current) return;
@@ -436,8 +446,16 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
     }
   }, []);
 
+  const retryCurrent = useCallback(() => {
+    if (currentVideoId) {
+      playSongId(currentVideoId);
+      setError(null);
+    }
+  }, [currentVideoId, playSongId]);
+
   return {
     containerRef,
+    isReady,
     isPlaying,
     currentTime,
     duration,
@@ -452,6 +470,7 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
     previousVideo,
     togglePlay,
     seekTo,
-    setVolume
+    setVolume,
+    retryCurrent
   };
 }

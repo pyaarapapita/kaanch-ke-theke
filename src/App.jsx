@@ -24,6 +24,8 @@ function App() {
   const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID))
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [fetchedMetadata, setFetchedMetadata] = useState({})
+  const [isLoadingMetadata, setIsLoadingMetadata] = useState(false)
+  const [autoSkipMessage, setAutoSkipMessage] = useState(null)
 
   const aboutBtnRef = useRef(null)
   const closeBtnRef = useRef(null)
@@ -107,10 +109,16 @@ function App() {
     let isMounted = true
     const plId = currentPlaylist?.youtubePlaylistId
     if (plId) {
+      setIsLoadingMetadata(true)
       fetchPlaylistMetadata(plId).then((metadataMap) => {
-        if (isMounted && metadataMap && Object.keys(metadataMap).length > 0) {
-          setFetchedMetadata(metadataMap)
+        if (isMounted) {
+          setIsLoadingMetadata(false)
+          if (metadataMap && Object.keys(metadataMap).length > 0) {
+            setFetchedMetadata(metadataMap)
+          }
         }
+      }).catch(() => {
+        if (isMounted) setIsLoadingMetadata(false)
       })
     }
     return () => {
@@ -120,6 +128,7 @@ function App() {
 
   const {
     containerRef,
+    isReady,
     isPlaying,
     currentTime,
     duration,
@@ -134,7 +143,8 @@ function App() {
     previousVideo,
     togglePlay,
     seekTo,
-    setVolume
+    setVolume,
+    retryCurrent
   } = useYouTubePlayer({
     youtubeId: !isPlaylistMode ? (playlistSongs[currentSongIndex]?.youtubeId || '') : '',
     playlistId: isPlaylistMode ? (currentPlaylist.youtubePlaylistId || '') : '',
@@ -145,6 +155,10 @@ function App() {
     },
     onError: (err) => {
       console.warn('[App] Playback error notice:', err)
+      if (err?.code === 101 || err?.code === 150) {
+        setAutoSkipMessage('ये गाना नहीं बज पाया... अगली बोतल खोलते हैं।')
+        setTimeout(() => setAutoSkipMessage(null), 3000)
+      }
     }
   })
 
@@ -587,6 +601,10 @@ function App() {
         onNext={handleNextSong}
         onPrevious={handlePreviousSong}
         playbackError={error}
+        isReady={isReady}
+        isLoadingMetadata={isLoadingMetadata}
+        autoSkipMessage={autoSkipMessage}
+        onRetry={retryCurrent}
       />
 
       {/* Accessible "Baare Mein" Dialog Modal */}
