@@ -253,13 +253,14 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
 
     if (youtubeId) {
       try {
-        playerRef.current.loadVideoById(youtubeId);
-        if (isPlaying && typeof playerRef.current.playVideo === 'function') {
-          playerRef.current.playVideo();
+        if (isPlaying && typeof playerRef.current.loadVideoById === 'function') {
+          playerRef.current.loadVideoById(youtubeId);
+        } else if (typeof playerRef.current.cueVideoById === 'function') {
+          playerRef.current.cueVideoById(youtubeId);
         }
         lastPlayedIdRef.current = youtubeId;
       } catch (err) {
-        console.warn('[YouTube Player] Error during loadVideoById:', err);
+        console.warn('[YouTube Player] Error during video update:', err);
       }
     }
   }, [youtubeId, isReady, isPlaying]);

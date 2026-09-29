@@ -54,8 +54,10 @@ function App() {
     }
 
     if (location.pathname === '/playlists') {
+      setHasEntered(true)
       setShowPlaylistsModal(true)
     } else if (location.pathname.startsWith('/playlists/')) {
+      setHasEntered(true)
       setShowPlaylistsModal(true)
       const targetId = location.pathname.replace('/playlists/', '').trim()
       if (targetId) {
@@ -296,15 +298,7 @@ function App() {
     if (isVideoTransitioning || isVideoFinished || hasEntered) return
     setIsVideoTransitioning(true)
     setShowAbout(false)
-
-    // Fire playback synchronously on user click gesture so browser unlocks audio autoplay
-    const songToPlay = playlistSongs[currentSongIndex] || playlistSongs[0]
-    if (songToPlay?.youtubeId) {
-      playSongId(songToPlay.youtubeId)
-    } else if (currentPlaylist?.youtubePlaylistId) {
-      playPlaylistId(currentPlaylist.youtubePlaylistId)
-    }
-  }, [isVideoTransitioning, isVideoFinished, hasEntered, playlistSongs, currentSongIndex, currentPlaylist, playSongId, playPlaylistId])
+  }, [isVideoTransitioning, isVideoFinished, hasEntered])
 
   const handleVideoEnded = useCallback(() => {
     if (videoRef.current) {
@@ -399,14 +393,16 @@ function App() {
 
         {/* Desktop Navigation Links */}
         <nav className="nav-links desktop-nav">
-          <button
-            type="button"
-            className="nav-link nav-link-btn"
-            onClick={() => setShowPlaylistsModal(true)}
-            aria-label="प्लेलिस्ट्स (Playlists Modal)"
-          >
-            प्लेलिस्ट्स
-          </button>
+          {hasEntered && (
+            <button
+              type="button"
+              className="nav-link nav-link-btn"
+              onClick={() => setShowPlaylistsModal(true)}
+              aria-label="प्लेलिस्ट्स (Playlists Modal)"
+            >
+              प्लेलिस्ट्स
+            </button>
+          )}
 
           <div className="support-nav-item">
             <a
@@ -420,11 +416,13 @@ function App() {
             </a>
           </div>
 
-          <MoodSelector
-            playlists={PLAYLISTS}
-            activePlaylistId={currentPlaylist?.id}
-            onSelectPlaylist={handleSelectPlaylist}
-          />
+          {hasEntered && (
+            <MoodSelector
+              playlists={PLAYLISTS}
+              activePlaylistId={currentPlaylist?.id}
+              onSelectPlaylist={handleSelectPlaylist}
+            />
+          )}
 
           <button
             ref={aboutBtnRef}
@@ -487,20 +485,22 @@ function App() {
 
               <div className="mobile-drawer-body">
                 <div className="mobile-nav-action-grid">
-                  <button
-                    type="button"
-                    className="mobile-nav-card-btn"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false)
-                      setShowPlaylistsModal(true)
-                    }}
-                  >
-                    <span className="mobile-card-icon">📻</span>
-                    <div className="mobile-card-text">
-                      <span className="mobile-card-title">प्लेलिस्ट्स</span>
-                      <span className="mobile-card-sub">सभी ५ चुनिंदा प्लेलिस्ट्स</span>
-                    </div>
-                  </button>
+                  {hasEntered && (
+                    <button
+                      type="button"
+                      className="mobile-nav-card-btn"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false)
+                        setShowPlaylistsModal(true)
+                      }}
+                    >
+                      <span className="mobile-card-icon">📻</span>
+                      <div className="mobile-card-text">
+                        <span className="mobile-card-title">प्लेलिस्ट्स</span>
+                        <span className="mobile-card-sub">सभी ५ चुनिंदा प्लेलिस्ट्स</span>
+                      </div>
+                    </button>
+                  )}
 
                   <button
                     type="button"
@@ -530,38 +530,40 @@ function App() {
                 </a>
 
                 {/* Integrated Mobile Mood Selector */}
-                <div className="mobile-mood-wrapper">
-                  <div className="mobile-mood-header">
-                    <span className="mobile-mood-title">मूड चुनिए (Mood Selector)</span>
+                {hasEntered && (
+                  <div className="mobile-mood-wrapper">
+                    <div className="mobile-mood-header">
+                      <span className="mobile-mood-title">मूड चुनिए (Mood Selector)</span>
+                    </div>
+                    <div className="mobile-mood-list">
+                      {PLAYLISTS.map((pl) => {
+                        const isSelected = pl.id === currentPlaylist?.id
+                        const isUpcoming = Boolean(pl.isUpcoming)
+                        return (
+                          <button
+                            key={pl.id}
+                            type="button"
+                            className={`mobile-mood-item ${isSelected ? 'selected' : ''} ${isUpcoming ? 'upcoming' : ''}`}
+                            onClick={() => {
+                              if (!isUpcoming) {
+                                handleSelectPlaylist(pl.id)
+                                setIsMobileMenuOpen(false)
+                              }
+                            }}
+                            disabled={isUpcoming}
+                          >
+                            <div className="mobile-mood-item-row">
+                              <span className="mobile-mood-name">{pl.name}</span>
+                              {isSelected && <span className="mobile-active-dot">● सक्रिय</span>}
+                              {isUpcoming && <span className="mobile-upcoming-chip">शीघ्र</span>}
+                            </div>
+                            <span className="mobile-mood-desc">{pl.description}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
                   </div>
-                  <div className="mobile-mood-list">
-                    {PLAYLISTS.map((pl) => {
-                      const isSelected = pl.id === currentPlaylist?.id
-                      const isUpcoming = Boolean(pl.isUpcoming)
-                      return (
-                        <button
-                          key={pl.id}
-                          type="button"
-                          className={`mobile-mood-item ${isSelected ? 'selected' : ''} ${isUpcoming ? 'upcoming' : ''}`}
-                          onClick={() => {
-                            if (!isUpcoming) {
-                              handleSelectPlaylist(pl.id)
-                              setIsMobileMenuOpen(false)
-                            }
-                          }}
-                          disabled={isUpcoming}
-                        >
-                          <div className="mobile-mood-item-row">
-                            <span className="mobile-mood-name">{pl.name}</span>
-                            {isSelected && <span className="mobile-active-dot">● सक्रिय</span>}
-                            {isUpcoming && <span className="mobile-upcoming-chip">शीघ्र</span>}
-                          </div>
-                          <span className="mobile-mood-desc">{pl.description}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

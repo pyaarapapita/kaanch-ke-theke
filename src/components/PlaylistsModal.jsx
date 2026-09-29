@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PLAYLISTS } from '../data/playlists'
 
-export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlaylist, onPlaySong }) {
-  const [activeTabId, setActiveTabId] = useState(() => currentPlaylist?.id || PLAYLISTS[0]?.id)
+export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlaylist, onPlaySong, playlists = PLAYLISTS }) {
+  const [activeTabId, setActiveTabId] = useState(() => currentPlaylist?.id || playlists[0]?.id)
 
   useEffect(() => {
     if (currentPlaylist?.id) {
@@ -25,7 +25,7 @@ export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlayl
 
   if (!isOpen) return null
 
-  const selectedPl = PLAYLISTS.find((p) => p.id === activeTabId) || PLAYLISTS[0]
+  const selectedPl = playlists.find((p) => p.id === activeTabId) || playlists[0]
   const isCurrentActive = currentPlaylist?.id === selectedPl.id
 
   return (
@@ -66,7 +66,7 @@ export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlayl
 
           {/* Playlist Tabs */}
           <div className="playlist-modal-tabs">
-            {PLAYLISTS.map((pl) => {
+            {playlists.map((pl) => {
               const isSelected = pl.id === activeTabId
               const isPlayingThis = currentPlaylist?.id === pl.id
               return (

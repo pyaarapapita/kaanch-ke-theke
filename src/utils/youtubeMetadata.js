@@ -6,12 +6,12 @@
 const metadataCache = new Map();
 
 export async function fetchPlaylistMetadata(playlistId) {
-  if (!playlistId) return {};
+  if (!playlistId) return { items: [], lookupMap: {} };
 
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   if (!apiKey || apiKey === 'PASTE_MY_API_KEY_HERE') {
     console.warn('[YouTube Data API] Missing or unconfigured VITE_YOUTUBE_API_KEY in .env.local');
-    return {};
+    return { items: [], lookupMap: {} };
   }
 
   if (metadataCache.has(playlistId)) {
@@ -20,6 +20,7 @@ export async function fetchPlaylistMetadata(playlistId) {
   }
 
   const lookupMap = {};
+  const itemsList = [];
   let pageToken = '';
 
   try {
@@ -45,30 +46,33 @@ export async function fetchPlaylistMetadata(playlistId) {
       items.forEach((item) => {
         const snippet = item.snippet || {};
         const videoId = snippet.resourceId?.videoId || item.contentDetails?.videoId;
-        if (!videoId) return;
+        if (!videoId || snippet.title === 'Private video' || snippet.title === 'Deleted video') return;
 
         const title = snippet.title || 'अज्ञात गीत';
-        // Channel/Artist name from API snippet
-        const artist = snippet.videoOwnerChannelTitle || snippet.channelTitle || 'YouTube';
+        let artist = snippet.videoOwnerChannelTitle || snippet.channelTitle || 'YouTube';
+        artist = artist.replace(/\s*-\s*Topic$/, '').trim();
 
-        lookupMap[videoId] = {
+        const songObj = {
           id: videoId,
           title: title,
           artist: artist,
           youtubeId: videoId,
-          playlistIndex: snippet.position ?? 0
+          playlistIndex: snippet.position ?? itemsList.length
         };
+
+        lookupMap[videoId] = songObj;
+        itemsList.push(songObj);
       });
 
       pageToken = data.nextPageToken || '';
     } while (pageToken);
 
-    console.log(`[YouTube Data API] Successfully fetched ${Object.keys(lookupMap).length} playlist items for ${playlistId}`);
-    metadataCache.set(playlistId, lookupMap);
-    return lookupMap;
+    console.log(`[YouTube Data API] Successfully fetched ${itemsList.length} playlist items for ${playlistId}`);
+    const result = { items: itemsList, lookupMap };
+    metadataCache.set(playlistId, result);
+    return result;
   } catch (err) {
     console.error('[YouTube Data API] Exception during metadata fetch:', err);
-    return lookupMap;
+    return { items: itemsList, lookupMap };
   }
 }
-

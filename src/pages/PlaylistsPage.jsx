@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { PLAYLISTS } from '../data/playlists'
 
-export function PlaylistsPage({ currentPlaylist, onSelectPlaylist }) {
+export function PlaylistsPage({ currentPlaylist, onSelectPlaylist, playlists = PLAYLISTS }) {
   useEffect(() => {
     const pageTitle = 'हिंदी म्यूज़िक प्लेलिस्ट्स | Kaanch Ke Theke — Curated Playlists'
     const pageDesc = 'काँच के ठेके की सभी चुनिंदा बॉलीवुड प्लेलिस्ट्स—90s के सदाबहार गाने, ग़ज़लें, दर्द-ए-दिल और रेट्रो हिंदी क्लासिक्स।'
@@ -82,7 +82,7 @@ export function PlaylistsPage({ currentPlaylist, onSelectPlaylist }) {
             </p>
 
             <div className="playlists-editorial-grid">
-              {PLAYLISTS.map((pl) => {
+              {playlists.map((pl) => {
                 const isCurrent = currentPlaylist?.id === pl.id
                 const isUpcoming = Boolean(pl.isUpcoming)
 
