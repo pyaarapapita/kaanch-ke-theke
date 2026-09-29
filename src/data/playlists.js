@@ -3,8 +3,8 @@ export const DEFAULT_PLAYLIST_ID = '90s';
 export const PLAYLISTS = [
   {
     id: '90s',
-    name: '90s की बोतल',
-    description: 'आज कुछ पुराना सुनते हैं — ९० के दौर के सदाबहार नग़मे।',
+    name: '90s Ki Botal 🍾',
+    description: 'Purani yaadein, late night mood aur 90s ke iconic bangers.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: 'PLDol6WidI4Uo',
     songs: [
@@ -12,49 +12,49 @@ export const PLAYLISTS = [
         id: 'song-90s-001',
         title: 'Kya Hua Tera Wada',
         artist: 'Mohammed Rafi',
-        youtubeId: 'B-d3j4o2_54'
+        youtubeId: 'cIVkYSm7Orw'
       },
       {
         id: 'song-90s-002',
         title: 'Main Zindagi Ka Saath Nibhata Chala Gaya',
         artist: 'Mohammed Rafi',
-        youtubeId: 'W8-n8x1_RRE'
+        youtubeId: '8xLGdI9_jak'
       },
       {
         id: 'song-90s-003',
         title: 'Mujhko Peena Hai Peene Do',
         artist: 'Mohd Aziz',
-        youtubeId: 'Ax5jPATJM1A'
+        youtubeId: 'ZDsneGdOdaQ'
       },
       {
         id: 'song-90s-004',
         title: 'Yeh Jo Mohabbat Hai',
         artist: 'Kishore Kumar',
-        youtubeId: 'TFgodv_aaYo'
+        youtubeId: '5-lRnMrz6Ok'
       },
       {
         id: 'song-90s-005',
         title: 'Barsaat Ke Mausam Mein',
         artist: 'Kumar Sanu, Roop Kumar Rathod',
-        youtubeId: 'c6F8YDsS7CI'
+        youtubeId: 'Q_cq8__k--M'
       },
       {
         id: 'song-90s-006',
         title: 'Mujhe Peene Ka Shauk Nahi',
         artist: 'Alka Yagnik',
-        youtubeId: 'gDGO5DXqcYI'
+        youtubeId: '7DgiWQSN-jQ'
       },
       {
         id: 'song-90s-007',
         title: 'Peele Peele O Morey Raja',
         artist: 'Tirangaa',
-        youtubeId: 'EDBiqdb84rM'
+        youtubeId: 'ZAK8L8jQSeQ'
       },
       {
         id: 'song-90s-008',
         title: 'Aapka Kya Hoga (Dhanno)',
         artist: 'Mika Singh, Sunidhi Chauhan',
-        youtubeId: 'F9Aha2-uTso'
+        youtubeId: 'gcVbtUGLDNk'
       },
       {
         id: 'song-90s-009',
@@ -66,8 +66,8 @@ export const PLAYLISTS = [
   },
   {
     id: 'dard-e-dil',
-    name: 'दर्द-ए-दिल',
-    description: 'टूटे दिल और बीती यादों के नाम एक ख़ामोश शाम।',
+    name: 'Dard-e-Dil Vibe 💔',
+    description: 'Sip, regret & repeat — toote dil waalon ka dedicated corner.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
     isUpcoming: true,
@@ -75,8 +75,8 @@ export const PLAYLISTS = [
   },
   {
     id: 'mahfil',
-    name: 'महफ़िल',
-    description: 'ग़ज़लों और पुराने तराने की एक सुहानी बैठक।',
+    name: 'Ghazal & Mahfil 🌙',
+    description: 'Retro ghazals aur shaam ki peaceful baithak.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
     isUpcoming: true,
@@ -84,8 +84,8 @@ export const PLAYLISTS = [
   },
   {
     id: 'barish-aur-yaadein',
-    name: 'बारिश और यादें',
-    description: 'बूंदों की टिप-टिप और पुराने बॉलीवुड मानसून ट्रैक्स।',
+    name: 'Monsoon Memories 🌧️',
+    description: 'Baarish ki tip-tip aur iconic retro monsoon tracks.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
     isUpcoming: true,
@@ -93,8 +93,8 @@ export const PLAYLISTS = [
   },
   {
     id: 'raat-ka-nasha',
-    name: 'रात का नशा',
-    description: 'आधी रात की तन्हाई और मदहोश कर देने वाले विंटेज क्लासिक्स।',
+    name: 'Midnight Nasha 🌌',
+    description: 'Aadhi raat ki tanhai aur madhosh vintage hits.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
     isUpcoming: true,

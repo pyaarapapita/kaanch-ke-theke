@@ -56,6 +56,13 @@ button, a, input, select, textarea, [role="button"] {
 
 html {
   scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html, body {
+    scroll-behavior: auto !important;
+  }
 }
 
 html, body {
@@ -63,6 +70,8 @@ html, body {
   min-height: 100%;
   overflow-x: hidden;
   background-color: var(--bg-near-black);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 #root {

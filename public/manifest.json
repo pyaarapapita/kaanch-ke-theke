@@ -1,0 +1,19 @@
+{
+  "short_name": "Kaanch Ke Theke",
+  "name": "काँच के ठेके | Kaanch Ke Theke — Retro Bollywood Music",
+  "description": "पुराने बॉलीवुड गानों, यादों और महफ़िल का एक सिनेमाई संगीत अनुभव। 90s के सदाबहार नग़मे और रेट्रो हिंदी क्लासिक्स।",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#120c0a",
+  "theme_color": "#120c0a",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "hi"
+}

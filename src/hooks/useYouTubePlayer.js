@@ -207,40 +207,20 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
             const errCode = event.data;
             console.error(`[YouTube Player] onError fired with error code: ${errCode}`);
 
-            // Handle embedding errors 101 or 150 in playlist mode
-            if (playlistId && (errCode === 101 || errCode === 150)) {
-              try {
-                const pIndex = playerRef.current?.getPlaylistIndex?.() ?? -1;
-                const playlist = playerRef.current?.getPlaylist?.() || [];
-                const playlistLength = playlist.length;
-                const now = Date.now();
-
-                console.warn(`[YouTube Player] Embedding blocked (error ${errCode}) at playlist index ${pIndex}`);
-
-                // Guard against duplicate skip calls for the same index within 2 seconds
-                if (lastSkippedIndexRef.current === pIndex && (now - lastSkippedTimeRef.current < 2000)) {
-                  console.warn(`[YouTube Player] Skip loop protection active: already skipped index ${pIndex}`);
-                } else {
-                  lastSkippedIndexRef.current = pIndex;
-                  lastSkippedTimeRef.current = now;
-
-                  // End of playlist guard
-                  if (playlistLength > 0 && pIndex >= playlistLength - 1) {
-                    console.warn(`[YouTube Player] Blocked track is final playlist item (index ${pIndex} of ${playlistLength}). Halting auto-advance.`);
-                  } else {
-                    console.log(`[YouTube Player] Auto-skipping non-embeddable track at index ${pIndex} -> calling nextVideo()`);
-                    playerRef.current?.nextVideo?.();
-                  }
-                }
-              } catch (skipErr) {
-                console.error('[YouTube Player] Error during auto-skip handling:', skipErr);
-              }
-            }
-
             const errObj = { code: errCode, message: `YouTube Player error code: ${errCode}` };
             setError(errObj);
             if (typeof onErrorCallbackRef.current === 'function') {
               onErrorCallbackRef.current(errObj);
+            }
+
+            // Auto-advance to next track on embed restriction error
+            if (errCode === 101 || errCode === 150 || errCode === 2 || errCode === 5) {
+              console.warn('[YouTube Player] Auto-advancing from unplayable track');
+              setTimeout(() => {
+                if (typeof onSongEndRef.current === 'function') {
+                  onSongEndRef.current();
+                }
+              }, 1200);
             }
           }
         }
@@ -264,61 +244,25 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
 
   // Update video when youtubeId prop changes
   useEffect(() => {
-    if (!isReady || !playerRef.current || playlistId) return;
+    if (!isReady || !playerRef.current) return;
     console.log('[YouTube Player] youtubeId prop updated to:', youtubeId, 'lastPlayedId:', lastPlayedIdRef.current);
 
-    // Avoid overriding active loadVideoById call with cueVideoById
     if (youtubeId && lastPlayedIdRef.current === youtubeId) {
-      console.log('[YouTube Player] youtubeId matches lastPlayedId, skipping cueVideoById override');
       return;
     }
 
     if (youtubeId) {
       try {
-        if (isPlaying) {
-          console.log('[YouTube Player] Player currently playing, calling loadVideoById for:', youtubeId);
-          playerRef.current.loadVideoById(youtubeId);
-          lastPlayedIdRef.current = youtubeId;
-        } else {
-          console.log('[YouTube Player] Player currently stopped/paused, calling cueVideoById for:', youtubeId);
-          playerRef.current.cueVideoById(youtubeId);
+        playerRef.current.loadVideoById(youtubeId);
+        if (isPlaying && typeof playerRef.current.playVideo === 'function') {
+          playerRef.current.playVideo();
         }
+        lastPlayedIdRef.current = youtubeId;
       } catch (err) {
-        console.warn('[YouTube Player] Error during cue/loadVideoById:', err);
+        console.warn('[YouTube Player] Error during loadVideoById:', err);
       }
-    } else {
-      try {
-        if (typeof playerRef.current.stopVideo === 'function') {
-          playerRef.current.stopVideo();
-        }
-      } catch {
-        // Ignore stop failure
-      }
-      queueMicrotask(() => {
-        setIsPlaying(false);
-        setCurrentTime(0);
-        setDuration(0);
-      });
     }
-  }, [youtubeId, playlistId, isReady, isPlaying]);
-
-  // Update playlist when playlistId prop changes
-  useEffect(() => {
-    if (!isReady || !playerRef.current || !playlistId) return;
-    console.log('[YouTube Player] playlistId prop updated to:', playlistId, 'lastPlayedId:', lastPlayedIdRef.current);
-    if (lastPlayedIdRef.current === playlistId) return;
-
-    try {
-      if (isPlaying) {
-        playerRef.current.loadPlaylist({ listType: 'playlist', list: playlistId, index: 0 });
-      } else {
-        playerRef.current.cuePlaylist({ listType: 'playlist', list: playlistId, index: 0 });
-      }
-      lastPlayedIdRef.current = playlistId;
-    } catch (err) {
-      console.warn('[YouTube Player] Error during playlist cue/load:', err);
-    }
-  }, [playlistId, isReady, isPlaying]);
+  }, [youtubeId, isReady, isPlaying]);
 
   // Playback Control API
   const playSongId = useCallback((idToPlay) => {
@@ -332,8 +276,12 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
       try {
         console.log('[YouTube Player] Executing playerRef.current.loadVideoById for targetId:', targetId);
         playerRef.current.loadVideoById(targetId);
+        if (typeof playerRef.current.playVideo === 'function') {
+          playerRef.current.playVideo();
+        }
         pendingSongIdRef.current = null;
         setError(null);
+        setIsPlaying(true);
       } catch (err) {
         console.error('[YouTube Player] Exception during loadVideoById:', err);
       }
@@ -358,6 +306,9 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
           list: targetPlaylistId,
           index
         });
+        if (typeof playerRef.current.playVideo === 'function') {
+          playerRef.current.playVideo();
+        }
         pendingPlaylistRef.current = null;
         setError(null);
       } catch (err) {
