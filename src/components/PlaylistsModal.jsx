@@ -4,12 +4,14 @@ import { PLAYLISTS } from '../data/playlists'
 
 export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlaylist, onPlaySong, playlists = PLAYLISTS }) {
   const [activeTabId, setActiveTabId] = useState(() => currentPlaylist?.id || playlists[0]?.id)
+  const [prevPlaylistId, setPrevPlaylistId] = useState(() => currentPlaylist?.id)
 
-  useEffect(() => {
+  if (currentPlaylist?.id !== prevPlaylistId) {
+    setPrevPlaylistId(currentPlaylist?.id)
     if (currentPlaylist?.id) {
       setActiveTabId(currentPlaylist.id)
     }
-  }, [currentPlaylist?.id])
+  }
 
   useEffect(() => {
     if (!isOpen) return
