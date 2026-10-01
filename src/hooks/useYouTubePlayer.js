@@ -43,8 +43,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   const pendingSongIdRef = useRef(null);
   const pendingPlaylistRef = useRef(null);
   const lastPlayedIdRef = useRef(null);
-  const lastSkippedIndexRef = useRef(-1);
-  const lastSkippedTimeRef = useRef(0);
 
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);

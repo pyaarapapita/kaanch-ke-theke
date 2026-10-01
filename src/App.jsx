@@ -32,6 +32,7 @@ function App() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID))
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
+  // eslint-disable-next-line no-unused-vars
   const [fetchedMetadata, setFetchedMetadata] = useState({})
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false)
   const [autoSkipMessage, setAutoSkipMessage] = useState(null)
@@ -40,18 +41,15 @@ function App() {
   const closeBtnRef = useRef(null)
   const videoRef = useRef(null)
 
+  // eslint-disable-next-line no-unused-vars
   const isPlaylistMode = Boolean(currentPlaylist?.youtubePlaylistId)
   const playlistSongs = useMemo(() => currentPlaylist?.songs || [], [currentPlaylist])
 
-  // Synchronize route URL parameter with active playlist state and handle smooth scroll to top on navigation
-  useEffect(() => {
+  // Close mobile menu and show playlists modal on route change
+  const [prevPathname, setPrevPathname] = useState(location.pathname)
+  if (location.pathname !== prevPathname) {
+    setPrevPathname(location.pathname)
     setIsMobileMenuOpen(false)
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    try {
-      window.scrollTo({ top: 0, left: 0, behavior: prefersReduced ? 'auto' : 'smooth' })
-    } catch {
-      window.scrollTo(0, 0)
-    }
 
     if (location.pathname === '/playlists') {
       setHasEntered(true)
@@ -64,20 +62,38 @@ function App() {
         const pl = getPlaylistById(targetId)
         if (pl && pl.id !== currentPlaylist?.id) {
           setCurrentPlaylist(pl)
+          if (pl.youtubePlaylistId) {
+            setIsLoadingMetadata(true)
+          }
         }
       }
     }
-  }, [location.pathname, currentPlaylist?.id])
+  }
+
+  // Handle smooth scroll to top on navigation
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: prefersReduced ? 'auto' : 'smooth' })
+    } catch {
+      window.scrollTo(0, 0)
+    }
+  }, [location.pathname])
 
   // Scroll position tracking to control header panel & MusicPlayer visibility
   useEffect(() => {
     let ticking = false
+    let currentIsScrolled = false
 
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const scrollTop = window.scrollY || document.documentElement?.scrollTop || document.body?.scrollTop || window.pageYOffset || 0
-          setIsScrolled(scrollTop > 20)
+          const newIsScrolled = scrollTop > 20
+          if (newIsScrolled !== currentIsScrolled) {
+            currentIsScrolled = newIsScrolled
+            setIsScrolled(newIsScrolled)
+          }
           ticking = false
         })
         ticking = true
@@ -136,7 +152,7 @@ function App() {
     let isMounted = true
     const plId = currentPlaylist?.youtubePlaylistId
     if (plId) {
-      setIsLoadingMetadata(true)
+      // The loading state is now set when the playlist selection happens in click handlers or route changes
       fetchPlaylistMetadata(plId).then((metadataMap) => {
         if (isMounted) {
           setIsLoadingMetadata(false)
@@ -162,14 +178,9 @@ function App() {
     currentTime,
     duration,
     volume,
-    currentVideoId,
-    videoTitle,
-    videoAuthor,
     error,
     playSongId,
     playPlaylistId,
-    nextVideo,
-    previousVideo,
     togglePlay,
     seekTo,
     setVolume,
@@ -272,6 +283,10 @@ function App() {
     setCurrentPlaylist(selected)
     setCurrentSongIndex(0)
     setHasEntered(true)
+
+    if (selected?.youtubePlaylistId) {
+      setIsLoadingMetadata(true)
+    }
 
     const songs = selected?.songs || []
     const targetSong = songs.find((s) => Boolean(s.youtubeId)) || songs[0]
