@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="goldGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D4A35F" />
+      <stop offset="70%" stop-color="#B8894A" />
+      <stop offset="100%" stop-color="#7C2D24" />
+    </radialGradient>
+    <linearGradient id="vinylShine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2A241E" />
+      <stop offset="50%" stop-color="#120F0C" />
+      <stop offset="100%" stop-color="#2A241E" />
+    </linearGradient>
+  </defs>
+  <!-- Vinyl Disc Background -->
+  <circle cx="50" cy="50" r="48" fill="url(#vinylShine)" stroke="#B8894A" stroke-width="2" />
+  <circle cx="50" cy="50" r="40" fill="none" stroke="#B8894A" stroke-width="0.75" stroke-opacity="0.4" />
+  <circle cx="50" cy="50" r="32" fill="none" stroke="#B8894A" stroke-width="0.75" stroke-opacity="0.3" />
+  <circle cx="50" cy="50" r="24" fill="none" stroke="#B8894A" stroke-width="0.75" stroke-opacity="0.25" />
+  <!-- Center Gold/Red Label -->
+  <circle cx="50" cy="50" r="16" fill="url(#goldGlow)" stroke="#7C2D24" stroke-width="1.5" />
+  <circle cx="50" cy="50" r="4.5" fill="#0B0A08" stroke="#B8894A" stroke-width="1" />
+</svg>

@@ -103,4 +103,4 @@ export const PLAYLISTS = [
 ];
 
 export const getPlaylistById = (id, playlistsList = PLAYLISTS) =>
-  playlistsList.find((p) => p.id === id) || playlistsList[0];
+  playlistsList.find((p) => p.id === id) || null;

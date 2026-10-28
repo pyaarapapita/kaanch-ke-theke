@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PLAYLISTS } from '../data/playlists'
 
 export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlaylist, onPlaySong, playlists = PLAYLISTS }) {
-  const [activeTabId, setActiveTabId] = useState(() => currentPlaylist?.id || playlists[0]?.id)
+  const [selectedTabId, setSelectedTabId] = useState(null)
+  const activeTabId = selectedTabId ?? (currentPlaylist?.id || playlists[0]?.id)
 
-  useEffect(() => {
-    if (currentPlaylist?.id) {
-      setActiveTabId(currentPlaylist.id)
-    }
-  }, [currentPlaylist?.id])
+  const handleClose = useCallback(() => {
+    setSelectedTabId(null)
+    onClose()
+  }, [onClose])
 
   useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        onClose()
+        handleClose()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose])
+  }, [isOpen, handleClose])
 
   if (!isOpen) return null
 
@@ -32,7 +32,7 @@ export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlayl
     <AnimatePresence>
       <div
         className="modal-backdrop playlist-modal-backdrop"
-        onClick={onClose}
+        onClick={handleClose}
         role="presentation"
       >
         <motion.div
@@ -57,8 +57,8 @@ export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlayl
             <button
               type="button"
               className="modal-close-btn"
-              onClick={onClose}
-              aria-label="Close"
+              onClick={handleClose}
+              aria-label="बंद करें (Close)"
             >
               ✕
             </button>
@@ -74,7 +74,7 @@ export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlayl
                   key={pl.id}
                   type="button"
                   className={`playlist-tab-btn ${isSelected ? 'active' : ''} ${isPlayingThis ? 'is-playing' : ''}`}
-                  onClick={() => setActiveTabId(pl.id)}
+                  onClick={() => setSelectedTabId(pl.id)}
                 >
                   <span>{pl.name}</span>
                   {isPlayingThis && <span className="tab-playing-dot" title="Now Playing" />}

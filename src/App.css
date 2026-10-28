@@ -50,7 +50,8 @@
 .video-entry-overlay.playing-overlay {
   position: fixed;
   inset: 0;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   height: 100vh;
   height: 100svh;
   z-index: 500;
@@ -172,8 +173,11 @@
 /* Thematic Background Image - Fixed aspect container inside hero viewport */
 .bg-image {
   position: absolute;
-  inset: 0;
   background-image: url('/backgrounds/theka-bg.png');
+  background-image: image-set(
+    url('/backgrounds/theka-bg.webp') type('image/webp'),
+    url('/backgrounds/theka-bg.png') type('image/png')
+  );
   background-size: cover;
   background-position: center 40%;
   background-repeat: no-repeat;
@@ -3554,7 +3558,334 @@ a:active,
   }
 }
 
+/* ==========================================================================
+   Custom 404 Page (पृष्ठ नहीं मिला)
+   ========================================================================== */
+.not-found-page-wrapper {
+  min-height: calc(100vh - 180px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 5rem;
+}
 
+.not-found-section {
+  padding: 2.5rem 1rem;
+  width: 100%;
+}
 
+.not-found-container {
+  max-width: 760px;
+  margin: 0 auto;
+}
 
+.not-found-content-card {
+  background: radial-gradient(circle at 50% 0%, rgba(38, 28, 20, 0.95), rgba(18, 12, 10, 0.96));
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2.25rem;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(184, 137, 74, 0.2);
+  position: relative;
+  overflow: hidden;
+}
 
+.not-found-hero {
+  margin: 1.5rem 0 2rem;
+}
+
+.not-found-numeral {
+  font-family: var(--font-english);
+  font-size: clamp(4.5rem, 14vw, 7.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--accent-gold);
+  text-shadow: 0 0 28px rgba(184, 137, 74, 0.4), 0 4px 12px rgba(0, 0, 0, 0.8);
+  margin-bottom: 0.75rem;
+  user-select: none;
+}
+
+.not-found-title {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.4rem, 4vw, 2.1rem);
+  color: var(--text-cream);
+  margin-bottom: 1rem;
+  line-height: 1.35;
+}
+
+.not-found-shayari {
+  font-family: var(--font-hindi-body);
+  font-size: 1.05rem;
+  color: #D4A35F;
+  font-style: italic;
+  margin: 1.25rem auto;
+  max-width: 540px;
+  line-height: 1.7;
+  padding: 0.75rem 1.25rem;
+  border-left: 2px solid var(--border-gold-glow);
+  border-right: 2px solid var(--border-gold-glow);
+  background: rgba(184, 137, 74, 0.06);
+  border-radius: var(--radius-sm, 4px);
+}
+
+.not-found-desc {
+  font-family: var(--font-hindi-body);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.not-found-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.not-found-primary-btn,
+.not-found-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0.7rem 1.6rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-hindi-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.not-found-primary-btn {
+  background: linear-gradient(135deg, #C29353 0%, var(--accent-gold) 100%);
+  color: #120A06;
+  border: 1px solid #D4A35F;
+  box-shadow: 0 4px 14px rgba(184, 137, 74, 0.35);
+}
+
+.not-found-primary-btn:hover {
+  background: linear-gradient(135deg, #D4A35F 0%, #C29353 100%);
+  color: #0B0604;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(184, 137, 74, 0.5);
+}
+
+.not-found-secondary-btn {
+  background: rgba(26, 19, 15, 0.85);
+  color: var(--text-cream);
+  border: 1px solid var(--border-gold-subtle);
+}
+
+.not-found-secondary-btn:hover {
+  background: rgba(38, 28, 20, 0.95);
+  border-color: var(--border-gold-glow);
+  color: #FFF5E1;
+  transform: translateY(-2px);
+}
+
+.not-found-inline-section {
+  padding: 3rem 1rem;
+}
+
+/* ==========================================================================
+   Feedback Toasts & Alerts (Success / Error States)
+   ========================================================================== */
+.feedback-toast {
+  margin-top: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-hindi-body);
+  font-size: 0.92rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: feedbackSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes feedbackSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedback-success {
+  background: rgba(34, 76, 44, 0.88);
+  border: 1px solid rgba(82, 179, 106, 0.6);
+  color: #E2FCE7;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.feedback-error {
+  background: rgba(94, 28, 23, 0.9);
+  border: 1px solid rgba(214, 82, 73, 0.6);
+  color: #FFE6E4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Share Playlist Button & Header Actions */
+.playlist-detail-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.playlist-header-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.share-playlist-btn {
+  background: rgba(26, 19, 15, 0.85) !important;
+  color: var(--text-cream) !important;
+  border: 1px solid var(--border-gold-subtle) !important;
+}
+
+.share-playlist-btn:hover {
+  background: rgba(42, 31, 23, 0.95) !important;
+  border-color: var(--border-gold-glow) !important;
+  color: #FFF5E1 !important;
+}
+
+/* ==========================================================================
+   Enhanced Atmospheric Footer
+   ========================================================================== */
+.footer-atmosphere {
+  width: 100%;
+  max-width: 100%;
+  background: #0E0907;
+  border-top: 1px solid var(--border-gold-subtle);
+  padding: 3rem 1.5rem 6.5rem;
+  color: var(--text-muted);
+  font-family: var(--font-hindi-body);
+  position: relative;
+  z-index: 10;
+  margin-top: auto;
+}
+
+.footer-content-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  align-items: center;
+  text-align: center;
+}
+
+.footer-brand-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.footer-brand-title {
+  font-family: var(--font-hindi-display);
+  font-size: 1.5rem;
+  color: var(--text-cream);
+  letter-spacing: 0.02em;
+}
+
+.footer-brand-sub {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-width: 500px;
+}
+
+.footer-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.footer-nav-link {
+  color: var(--text-cream);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.footer-nav-link:hover {
+  color: var(--accent-gold);
+}
+
+.footer-support-link {
+  color: #E8D7B5;
+  font-weight: 600;
+}
+
+.footer-support-link:hover {
+  color: #FFD494;
+}
+
+.footer-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: #9E8F7A;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(184, 137, 74, 0.12);
+  width: 100%;
+}
+
+.footer-copyright-row {
+  padding-top: 0.25rem;
+}
+
+.copyright-text {
+  font-size: 0.82rem;
+  color: #827461;
+  margin: 0;
+}
+
+/* Mobile Drawer Clickable Brand Title */
+.mobile-brand-title-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-brand-title-link:hover .brand-title-hindi {
+  color: var(--accent-gold-hover);
+}
+
+/* Responsive Table Wrapper Overflow */
+.songs-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure no root-level horizontal overflow */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}

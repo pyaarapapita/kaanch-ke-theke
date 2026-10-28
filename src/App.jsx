@@ -13,6 +13,7 @@ import './App.css'
 // Dynamic lazy imports for non-critical routes and deferred components
 const PlaylistsPage = lazy(() => import('./pages/PlaylistsPage'))
 const PlaylistDetailPage = lazy(() => import('./pages/PlaylistDetailPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 const PlaylistsModal = lazy(() => import('./components/PlaylistsModal'))
 const VisitorCounter = lazy(() => import('./components/VisitorCounter'))
 
@@ -34,9 +35,8 @@ function App() {
   const [hasOpenedModal, setHasOpenedModal] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID))
+  const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID) || PLAYLISTS[0])
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
-  const [fetchedMetadata, setFetchedMetadata] = useState({})
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false)
   const [autoSkipMessage, setAutoSkipMessage] = useState(null)
 
@@ -44,12 +44,15 @@ function App() {
   const closeBtnRef = useRef(null)
   const videoRef = useRef(null)
 
-  const isPlaylistMode = Boolean(currentPlaylist?.youtubePlaylistId)
   const playlistSongs = useMemo(() => currentPlaylist?.songs || [], [currentPlaylist])
+
+  const handleOpenPlaylistsModal = useCallback(() => {
+    setHasOpenedModal(true)
+    setShowPlaylistsModal(true)
+  }, [])
 
   // Synchronize route URL parameter with active playlist state and handle smooth scroll to top on navigation
   useEffect(() => {
-    setIsMobileMenuOpen(false)
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     try {
       window.scrollTo({ top: 0, left: 0, behavior: prefersReduced ? 'auto' : 'smooth' })
@@ -57,27 +60,24 @@ function App() {
       window.scrollTo(0, 0)
     }
 
-    if (location.pathname === '/playlists') {
-      setHasEntered(true)
-      setShowPlaylistsModal(false)
-    } else if (location.pathname.startsWith('/playlists/')) {
-      setHasEntered(true)
-      setShowPlaylistsModal(false)
-      const targetId = location.pathname.replace('/playlists/', '').trim()
-      if (targetId) {
-        const pl = getPlaylistById(targetId)
-        if (pl && pl.id !== currentPlaylist?.id) {
-          setCurrentPlaylist(pl)
+    Promise.resolve().then(() => {
+      setIsMobileMenuOpen(false)
+      if (location.pathname === '/playlists') {
+        setHasEntered(true)
+        setShowPlaylistsModal(false)
+      } else if (location.pathname.startsWith('/playlists/')) {
+        setHasEntered(true)
+        setShowPlaylistsModal(false)
+        const targetId = location.pathname.replace('/playlists/', '').trim()
+        if (targetId) {
+          const pl = getPlaylistById(targetId)
+          if (pl && pl.id !== currentPlaylist?.id) {
+            setCurrentPlaylist(pl)
+          }
         }
       }
-    }
+    })
   }, [location.pathname, currentPlaylist?.id])
-
-  useEffect(() => {
-    if (showPlaylistsModal && !hasOpenedModal) {
-      setHasOpenedModal(true)
-    }
-  }, [showPlaylistsModal, hasOpenedModal])
 
   // Scroll position tracking to control header panel & MusicPlayer visibility
   useEffect(() => {
@@ -126,8 +126,9 @@ function App() {
       }, 50)
 
       const handleKeyDown = (e) => {
-        if (e.key === 'Escape' && showAbout) {
-          setShowAbout(false)
+        if (e.key === 'Escape') {
+          if (showAbout) setShowAbout(false)
+          if (isMobileMenuOpen) setIsMobileMenuOpen(false)
         }
       }
       window.addEventListener('keydown', handleKeyDown)
@@ -138,20 +139,19 @@ function App() {
         window.removeEventListener('keydown', handleKeyDown)
       }
     }
-  }, [hasEntered, showAbout])
+  }, [hasEntered, showAbout, isMobileMenuOpen])
 
   // Fetch playlist metadata automatically on mount / playlist change
   useEffect(() => {
     let isMounted = true
     const plId = currentPlaylist?.youtubePlaylistId
     if (plId) {
-      setIsLoadingMetadata(true)
-      fetchPlaylistMetadata(plId).then((metadataMap) => {
+      Promise.resolve().then(() => {
+        if (isMounted) setIsLoadingMetadata(true)
+      })
+      fetchPlaylistMetadata(plId).then(() => {
         if (isMounted) {
           setIsLoadingMetadata(false)
-          if (metadataMap && Object.keys(metadataMap).length > 0) {
-            setFetchedMetadata(metadataMap)
-          }
         }
       }).catch(() => {
         if (isMounted) setIsLoadingMetadata(false)
@@ -171,14 +171,9 @@ function App() {
     currentTime,
     duration,
     volume,
-    currentVideoId,
-    videoTitle,
-    videoAuthor,
     error,
     playSongId,
     playPlaylistId,
-    nextVideo,
-    previousVideo,
     togglePlay,
     seekTo,
     setVolume,
@@ -483,14 +478,22 @@ function App() {
 
         {/* Desktop Navigation Links */}
         <nav className="nav-links desktop-nav">
+          <Link
+            to="/playlists"
+            className={`nav-link ${location.pathname === '/playlists' ? 'active' : ''}`}
+            aria-label="सभी प्लेलिस्ट्स (All Playlists)"
+          >
+            प्लेलिस्ट्स
+          </Link>
+
           {hasEntered && (
             <button
               type="button"
               className="nav-link nav-link-btn"
-              onClick={() => setShowPlaylistsModal(true)}
-              aria-label="प्लेलिस्ट्स (Playlists Modal)"
+              onClick={handleOpenPlaylistsModal}
+              aria-label="प्लेलिस्ट डायलॉग (Quick Switch Modal)"
             >
-              प्लेलिस्ट्स
+              मूड स्विच 📻
             </button>
           )}
 
@@ -559,10 +562,18 @@ function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mobile-drawer-header">
-                <div className="mobile-brand-title">
+                <Link
+                  to="/"
+                  className="mobile-brand-title mobile-brand-title-link"
+                  onClick={() => {
+                    handleLogoClick()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  aria-label="काँच के ठेके — मुख्य पृष्ठ पर जाएं"
+                >
                   <span className="brand-title-hindi">काँच के ठेके</span>
                   <span className="mobile-brand-tagline">रेट्रो संगीत &amp; महफ़िल</span>
-                </div>
+                </Link>
                 <button
                   type="button"
                   className="mobile-drawer-close"
@@ -575,19 +586,31 @@ function App() {
 
               <div className="mobile-drawer-body">
                 <div className="mobile-nav-action-grid">
+                  <Link
+                    to="/playlists"
+                    className="mobile-nav-card-btn"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="mobile-card-icon">📻</span>
+                    <div className="mobile-card-text">
+                      <span className="mobile-card-title">सभी प्लेलिस्ट्स</span>
+                      <span className="mobile-card-sub">५ चुनिंदा महफ़िलें</span>
+                    </div>
+                  </Link>
+
                   {hasEntered && (
                     <button
                       type="button"
                       className="mobile-nav-card-btn"
                       onClick={() => {
                         setIsMobileMenuOpen(false)
-                        setShowPlaylistsModal(true)
+                        handleOpenPlaylistsModal()
                       }}
                     >
-                      <span className="mobile-card-icon">📻</span>
+                      <span className="mobile-card-icon">🎛️</span>
                       <div className="mobile-card-text">
-                        <span className="mobile-card-title">प्लेलिस्ट्स</span>
-                        <span className="mobile-card-sub">सभी ५ चुनिंदा प्लेलिस्ट्स</span>
+                        <span className="mobile-card-title">मूड बदलें</span>
+                        <span className="mobile-card-sub">क्विक प्लेलिस्ट डायलॉग</span>
                       </div>
                     </button>
                   )}
@@ -705,12 +728,7 @@ function App() {
 
         <Route
           path="*"
-          element={
-            <PlaylistsPage
-              currentPlaylist={currentPlaylist}
-              onSelectPlaylist={handleSelectPlaylist}
-            />
-          }
+          element={<NotFoundPage />}
         />
       </Routes>
       </Suspense>
@@ -795,17 +813,64 @@ function App() {
 
       {/* Creator signature & atmospheric footer */}
       <footer className={`footer-atmosphere ${hasEntered ? 'entered' : ''}`}>
-        <div className="creator-signature">
-          Created with 🌿 by Anuj Rai
+        <div className="footer-content-container">
+          <div className="footer-brand-summary">
+            <span className="footer-brand-title">काँच के ठेके</span>
+            <span className="footer-brand-sub">नॉस्टैल्जिक बॉलीवुड संगीत, 90s के सदाबहार नग़मे और महफ़िल का सुकून।</span>
+          </div>
+
+          <nav className="footer-nav-links" aria-label="फुटर नेविगेशन">
+            <Link to="/" className="footer-nav-link" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              मुख्य पृष्ठ (Home)
+            </Link>
+            <Link to="/playlists" className="footer-nav-link">
+              प्लेलिस्ट्स (Playlists)
+            </Link>
+            <button
+              type="button"
+              className="footer-nav-link footer-nav-btn"
+              onClick={() => setShowAbout(true)}
+            >
+              बारे में (About)
+            </button>
+            <a
+              href={SITE_CONFIG.BUY_ME_A_COFFEE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-nav-link footer-support-link"
+            >
+              सहयोग करें 🍾
+            </a>
+            <a
+              href={SITE_CONFIG.INSTAGRAM_URL}
+              target="_blank"
+              rel="me noopener noreferrer"
+              className="footer-nav-link"
+            >
+              Instagram
+            </a>
+          </nav>
+
+          <div className="footer-meta-row">
+            <div className="creator-signature">
+              Designed &amp; Developed with 🌿 by Anuj Rai
+            </div>
+            <Suspense fallback={null}>
+              <VisitorCounter />
+            </Suspense>
+            {hasEntered && (
+              <span className="ambient-indicator">
+                {`वर्तमान मूड: ${currentPlaylist?.name || '९० का दौर'}`}
+              </span>
+            )}
+          </div>
+
+          <div className="footer-copyright-row">
+            <p className="copyright-text">
+              © {new Date().getFullYear()} Kaanch Ke Theke (काँच के ठेके). सर्वाधिकार सुरक्षित।
+            </p>
+          </div>
         </div>
-        <Suspense fallback={null}>
-          <VisitorCounter />
-        </Suspense>
-        {hasEntered && (
-          <span className="ambient-indicator">
-            {`वर्तमान मूड: ${currentPlaylist?.name || '९० का दौर'}`}
-          </span>
-        )}
       </footer>
     </div>
   )

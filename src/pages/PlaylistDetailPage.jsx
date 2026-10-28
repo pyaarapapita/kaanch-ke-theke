@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getPlaylistById } from '../data/playlists'
 
@@ -6,6 +6,21 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
   const { id } = useParams()
   const navigate = useNavigate()
   const playlist = getPlaylistById(id)
+  const [copyFeedback, setCopyFeedback] = useState(null)
+
+  const handleShare = async () => {
+    try {
+      if (navigator.clipboard && window.location.href) {
+        await navigator.clipboard.writeText(window.location.href)
+        setCopyFeedback({ type: 'success', message: '✓ प्लेलिस्ट का लिंक कॉपी हो गया!' })
+      } else {
+        setCopyFeedback({ type: 'error', message: 'लिंक कॉपी नहीं हो सका। कृपया URL मैन्युअली कॉपी करें।' })
+      }
+    } catch {
+      setCopyFeedback({ type: 'error', message: 'क्लिपबोर्ड एक्सेस की अनुमति नहीं मिली।' })
+    }
+    setTimeout(() => setCopyFeedback(null), 3500)
+  }
 
   useEffect(() => {
     let metaDesc = document.querySelector('meta[name="description"]')
@@ -57,19 +72,32 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
       <div className="page-content-wrapper">
         <nav className="breadcrumb-nav" aria-label="Breadcrumb">
           <ol className="breadcrumb-list">
-            <li className="breadcrumb-item"><Link to="/">मुख्य पृष्ठ</Link></li>
+            <li className="breadcrumb-item"><Link to="/">मुख्य पृष्ठ (Home)</Link></li>
             <li className="breadcrumb-separator">/</li>
-            <li className="breadcrumb-item"><Link to="/playlists">प्लेलिस्ट्स</Link></li>
+            <li className="breadcrumb-item"><Link to="/playlists">प्लेलिस्ट्स (Playlists)</Link></li>
+            <li className="breadcrumb-separator">/</li>
+            <li className="breadcrumb-item active" aria-current="page">त्रुटि</li>
           </ol>
         </nav>
-        <section className="editorial-section">
+        <section className="editorial-section not-found-inline-section" aria-label="प्लेलिस्ट त्रुटि">
           <div className="editorial-container">
-            <div className="editorial-content-panel">
-              <h1 className="editorial-title">यह प्लेलिस्ट उपलब्ध नहीं है</h1>
-              <p className="editorial-desc">माफ़ करें, आप जिस प्लेलिस्ट की तलाश कर रहे हैं वह मौजूद नहीं है।</p>
-              <button type="button" className="editorial-action-link" onClick={() => navigate('/playlists')}>
-                सभी प्लेलिस्ट्स देखें →
-              </button>
+            <div className="editorial-content-panel not-found-content-card" role="alert">
+              <div className="not-found-badge-row">
+                <span className="editorial-badge">अनुपलब्ध • Not Found</span>
+                <span className="editorial-meta">त्रुटि</span>
+              </div>
+              <h1 className="editorial-title not-found-title">यह प्लेलिस्ट उपलब्ध नहीं है</h1>
+              <p className="editorial-desc not-found-desc">
+                माफ़ करें, आप जिस प्लेलिस्ट की तलाश कर रहे हैं वह मौजूद नहीं है या हटा दी गई है।
+              </p>
+              <div className="not-found-actions">
+                <button type="button" className="not-found-primary-btn" onClick={() => navigate('/playlists')}>
+                  सभी प्लेलिस्ट्स देखें →
+                </button>
+                <Link to="/" className="not-found-secondary-btn">
+                  मुख्य पृष्ठ पर जाएं
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -107,21 +135,42 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
             </div>
 
             <div className="playlist-detail-header-row">
-              <div>
+              <div className="playlist-detail-title-group">
                 <h1 className="editorial-title page-main-heading">{playlist.name}</h1>
                 <p className="editorial-desc">{playlist.description}</p>
               </div>
 
-              {!isUpcoming && (
+              <div className="playlist-header-actions-group">
                 <button
                   type="button"
-                  className="editorial-action-link play-playlist-hero-btn"
-                  onClick={() => onSelectPlaylist(playlist.id)}
+                  className="editorial-action-link share-playlist-btn"
+                  onClick={handleShare}
+                  aria-label="प्लेलिस्ट लिंक कॉपी करें"
                 >
-                  {isCurrentPlaylist ? 'सक्रिय प्लेलिस्ट (Playing)' : 'यह प्लेलिस्ट बजाएं ▶'}
+                  🔗 लिंक साझा करें
                 </button>
-              )}
+
+                {!isUpcoming && (
+                  <button
+                    type="button"
+                    className="editorial-action-link play-playlist-hero-btn"
+                    onClick={() => onSelectPlaylist(playlist.id)}
+                  >
+                    {isCurrentPlaylist ? 'सक्रिय प्लेलिस्ट (Playing)' : 'यह प्लेलिस्ट बजाएं ▶'}
+                  </button>
+                )}
+              </div>
             </div>
+
+            {copyFeedback && (
+              <div
+                className={`feedback-toast ${copyFeedback.type === 'success' ? 'feedback-success' : 'feedback-error'}`}
+                role={copyFeedback.type === 'success' ? 'status' : 'alert'}
+                aria-live="polite"
+              >
+                {copyFeedback.message}
+              </div>
+            )}
 
             {/* Songs Table / List */}
             {playlist.songs && playlist.songs.length > 0 ? (

@@ -286,15 +286,18 @@ export const HomePageView = React.memo(function HomePageView({
         <section className="editorial-section story-section" aria-label="काँच के ठेके के बारे में">
           <div className="editorial-container">
             <div className="editorial-visual-panel">
-              <img
-                src="/backgrounds/editorial-story.png"
-                alt="पुराने विनाइल रिकॉर्ड और क्लासिक हिंदी संगीत का माहौल"
-                className="editorial-img"
-                loading="lazy"
-                decoding="async"
-                width="520"
-                height="390"
-              />
+              <picture>
+                <source srcSet="/backgrounds/editorial-story.webp" type="image/webp" />
+                <img
+                  src="/backgrounds/editorial-story.png"
+                  alt="पुराने विनाइल रिकॉर्ड और क्लासिक हिंदी संगीत का माहौल"
+                  className="editorial-img"
+                  loading="lazy"
+                  decoding="async"
+                  width="520"
+                  height="390"
+                />
+              </picture>
               <div className="visual-overlay-vignette" />
             </div>
 
@@ -324,15 +327,18 @@ export const HomePageView = React.memo(function HomePageView({
             {/* Instagram Card */}
             <div className="community-card instagram-community-card">
               <div className="community-card-visual">
-                <img
-                  src="/backgrounds/editorial-instagram.png"
-                  alt="रेट्रो कैसेट प्लेयर, कैमरा और शाम का सुकून"
-                  className="community-card-img"
-                  loading="lazy"
-                  decoding="async"
-                  width="520"
-                  height="260"
-                />
+                <picture>
+                  <source srcSet="/backgrounds/editorial-instagram.webp" type="image/webp" />
+                  <img
+                    src="/backgrounds/editorial-instagram.png"
+                    alt="रेट्रो कैसेट प्लेयर, कैमरा और शाम का सुकून"
+                    className="community-card-img"
+                    loading="lazy"
+                    decoding="async"
+                    width="520"
+                    height="260"
+                  />
+                </picture>
                 <div className="visual-overlay-vignette" />
               </div>
               <div className="community-card-body">
