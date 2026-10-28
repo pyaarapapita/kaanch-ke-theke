@@ -14,7 +14,6 @@ export const HomePageView = React.memo(function HomePageView({
   currentPlaylist,
   playlistSongs = [],
   currentSongIndex = 0,
-  currentSong,
   isPlaying = false,
   handleStartEntryTransition,
   handleSelectPlaylist,
@@ -71,27 +70,6 @@ export const HomePageView = React.memo(function HomePageView({
                 </motion.button>
               )}
             </AnimatePresence>
-
-            {hasEntered && (
-              <button
-                type="button"
-                className="hero-now-playing-pill"
-                onClick={() => {
-                  const tracklistEl = document.getElementById('active-tracklist-section')
-                  if (tracklistEl) {
-                    tracklistEl.scrollIntoView({ behavior: 'smooth' })
-                  }
-                }}
-                aria-label="सक्रिय महफ़िल की गीत सूची पर जाएं"
-              >
-                <span className="live-pill-dot" />
-                <span className="live-pill-label">बज रहा है:</span>
-                <span className="live-pill-track">
-                  {currentSong?.title || currentPlaylist?.name}
-                </span>
-                <span className="live-pill-cue">गीत सूची देखें ↓</span>
-              </button>
-            )}
           </div>
         </div>
       </section>
@@ -360,8 +338,20 @@ export const HomePageView = React.memo(function HomePageView({
 
             {/* Support Creator Card */}
             <div className="community-card support-community-card">
-              <div className="community-card-icon-header">
-                <span className="support-bottle-icon" role="img" aria-label="Champagne Bottle">🍾</span>
+              <div className="community-card-visual">
+                <picture>
+                  <source srcSet="/backgrounds/theka-bg.webp" type="image/webp" />
+                  <img
+                    src="/backgrounds/theka-bg.png"
+                    alt="काँच के ठेके की अगली बोतल — सहयोग"
+                    className="community-card-img"
+                    loading="lazy"
+                    decoding="async"
+                    width="520"
+                    height="260"
+                  />
+                </picture>
+                <div className="visual-overlay-vignette" />
               </div>
               <div className="community-card-body">
                 <span className="editorial-badge">Support The Theka</span>
