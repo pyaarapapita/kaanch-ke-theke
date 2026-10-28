@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "project": {
+    "name": "kaanch-ke-theke",
+    "productType": null,
+    "stack": [
+      "react",
+      "vite"
+    ]
+  },
+  "sources": {
+    "tokens": [
+      "src/index.css",
+      "src/app.css"
+    ],
+    "components": [],
+    "assets": [
+      "src/assets"
+    ],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "light",
+    "colors": {
+      "--accent-gold": {
+        "value": "#B8894A",
+        "source": "src/index.css"
+      },
+      "--accent-gold-hover": {
+        "value": "#D4A35F",
+        "source": "src/index.css"
+      },
+      "--accent-red": {
+        "value": "#7C2D24",
+        "source": "src/index.css"
+      },
+      "--text-muted": {
+        "value": "#A3937C",
+        "source": "src/index.css"
+      },
+      "--border-gold-subtle": {
+        "value": "rgba(184, 137, 74, 0.25)",
+        "source": "src/index.css"
+      },
+      "--border-gold-glow": {
+        "value": "rgba(184, 137, 74, 0.5)",
+        "source": "src/index.css"
+      },
+      "--focus-gold-ring": {
+        "value": "2px solid #B8894A",
+        "source": "src/index.css"
+      }
+    },
+    "typography": {
+      "--text-cream": {
+        "value": "#E8D7B5",
+        "source": "src/index.css"
+      },
+      "--font-hindi-display": {
+        "value": "'Rozha One', 'Noto Serif Devanagari', serif",
+        "source": "src/index.css"
+      },
+      "--font-hindi-body": {
+        "value": "'Noto Serif Devanagari', serif",
+        "source": "src/index.css"
+      },
+      "--font-english": {
+        "value": "'Cinzel', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        "source": "src/index.css"
+      }
+    },
+    "spacing": {},
+    "radius": {
+      "--radius-xs": {
+        "value": "4px",
+        "source": "src/index.css"
+      },
+      "--radius-md": {
+        "value": "8px",
+        "source": "src/index.css"
+      },
+      "--radius-lg": {
+        "value": "12px",
+        "source": "src/index.css"
+      },
+      "--radius-pill": {
+        "value": "20px",
+        "source": "src/index.css"
+      },
+      "--radius-circle": {
+        "value": "50%",
+        "source": "src/index.css"
+      }
+    },
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [],
+  "evidence": [
+    {
+      "fact": "design.colorMode:light",
+      "source": "src/index.css, src/app.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/app.css"
+    },
+    {
+      "fact": "design.tokens",
+      "source": "src/index.css"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:vite",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-10-28T19:12:53.791Z"
+}

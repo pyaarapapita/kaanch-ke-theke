@@ -141,3 +141,5 @@ export function PlaylistsPage({ currentPlaylist, onSelectPlaylist, playlists = P
     </div>
   )
 }
+
+export default PlaylistsPage

@@ -55,7 +55,7 @@ export const MusicPlayer = React.memo(function MusicPlayer({
   const songTitle = currentSong?.title || 'काँच के ठेके';
   const songArtist = currentSong?.artist || 'आज कुछ पुराना सुनते हैं';
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const isVisible = hasEntered && !isScrolled;
+  const isVisible = hasEntered;
 
   const currentMins = Math.floor(currentTime / 60);
   const currentSecs = Math.floor(currentTime % 60);
@@ -64,7 +64,7 @@ export const MusicPlayer = React.memo(function MusicPlayer({
 
   return (
     <motion.div
-      className={`cinematic-player-wrapper ${isScrolled ? 'is-scrolled-hidden' : ''}`}
+      className={`cinematic-player-wrapper ${isScrolled ? 'is-scrolled-docked' : ''}`}
       initial={false}
       animate={isVisible ? 'visible' : 'hidden'}
       variants={{
@@ -73,7 +73,7 @@ export const MusicPlayer = React.memo(function MusicPlayer({
       }}
       transition={{ duration: 0.4, delay: isVisible ? 0.15 : 0, ease: [0.25, 1, 0.5, 1] }}
     >
-      <div className="cinematic-player">
+      <div className={`cinematic-player ${isScrolled ? 'docked' : ''}`}>
         {/* Artwork / Vinyl Record Badge */}
         <div className="player-artwork" title={isPlaying ? 'संगीत चालू है (Vinyl Spinning)' : 'संगीत रुका हुआ है (Vinyl Paused)'}>
           <svg

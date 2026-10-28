@@ -87,3 +87,5 @@ export function VisitorCounter({ className = '' }) {
     </div>
   )
 }
+
+export default VisitorCounter

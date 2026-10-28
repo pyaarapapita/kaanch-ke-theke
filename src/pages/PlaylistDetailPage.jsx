@@ -143,6 +143,7 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
                           <td className="col-num">{index + 1}</td>
                           <td className="col-title">
                             <span className="song-title-text">{song.title}</span>
+                            <span className="mobile-only-artist">{song.artist}</span>
                           </td>
                           <td className="col-artist">
                             <span className="song-artist-text">{song.artist}</span>
@@ -184,3 +185,5 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
     </div>
   )
 }
+
+export default PlaylistDetailPage

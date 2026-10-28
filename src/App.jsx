@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo, lazy, Suspense } from 'react'
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { getPlaylistById, DEFAULT_PLAYLIST_ID, PLAYLISTS } from './data/playlists'
@@ -6,12 +6,15 @@ import { useYouTubePlayer } from './hooks/useYouTubePlayer'
 import { YouTubePlayer } from './components/YouTubePlayer'
 import { MusicPlayer } from './components/MusicPlayer'
 import { MoodSelector } from './components/MoodSelector'
+import { HomePageView } from './components/HomePageView'
 import { fetchPlaylistMetadata } from './utils/youtubeMetadata'
-import { VisitorCounter } from './components/VisitorCounter'
-import { PlaylistsPage } from './pages/PlaylistsPage'
-import { PlaylistDetailPage } from './pages/PlaylistDetailPage'
-import { PlaylistsModal } from './components/PlaylistsModal'
 import './App.css'
+
+// Dynamic lazy imports for non-critical routes and deferred components
+const PlaylistsPage = lazy(() => import('./pages/PlaylistsPage'))
+const PlaylistDetailPage = lazy(() => import('./pages/PlaylistDetailPage'))
+const PlaylistsModal = lazy(() => import('./components/PlaylistsModal'))
+const VisitorCounter = lazy(() => import('./components/VisitorCounter'))
 
 // Configuration for external profile/support links
 const SITE_CONFIG = {
@@ -28,6 +31,7 @@ function App() {
   const [isVideoFinished, setIsVideoFinished] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [showPlaylistsModal, setShowPlaylistsModal] = useState(false)
+  const [hasOpenedModal, setHasOpenedModal] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID))
@@ -55,10 +59,10 @@ function App() {
 
     if (location.pathname === '/playlists') {
       setHasEntered(true)
-      setShowPlaylistsModal(true)
+      setShowPlaylistsModal(false)
     } else if (location.pathname.startsWith('/playlists/')) {
       setHasEntered(true)
-      setShowPlaylistsModal(true)
+      setShowPlaylistsModal(false)
       const targetId = location.pathname.replace('/playlists/', '').trim()
       if (targetId) {
         const pl = getPlaylistById(targetId)
@@ -69,6 +73,12 @@ function App() {
     }
   }, [location.pathname, currentPlaylist?.id])
 
+  useEffect(() => {
+    if (showPlaylistsModal && !hasOpenedModal) {
+      setHasOpenedModal(true)
+    }
+  }, [showPlaylistsModal, hasOpenedModal])
+
   // Scroll position tracking to control header panel & MusicPlayer visibility
   useEffect(() => {
     let ticking = false
@@ -76,8 +86,9 @@ function App() {
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          const scrollTop = window.scrollY || document.documentElement?.scrollTop || document.body?.scrollTop || window.pageYOffset || 0
-          setIsScrolled(scrollTop > 20)
+          const scrollTop = window.scrollY || document.documentElement?.scrollTop || 0
+          const scrolled = scrollTop > 20
+          setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev))
           ticking = false
         })
         ticking = true
@@ -85,11 +96,9 @@ function App() {
     }
 
     handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true, capture: true })
-    document.addEventListener('scroll', handleScroll, { passive: true, capture: true })
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
-      window.removeEventListener('scroll', handleScroll, { capture: true })
-      document.removeEventListener('scroll', handleScroll, { capture: true })
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
@@ -236,13 +245,18 @@ function App() {
     }
   }, [togglePlay])
 
-  // Resolve currentSong dynamically
-  const currentSong = playlistSongs[currentSongIndex] || {
-    id: 'default-song',
-    title: 'काँच के ठेके',
-    artist: 'आज कुछ पुराना सुनते हैं',
-    youtubeId: 'Ax5jPATJM1A'
-  }
+  // Resolve currentSong dynamically with memoization
+  const currentSong = useMemo(() => {
+    return playlistSongs[currentSongIndex] || {
+      id: 'default-song',
+      title: 'काँच के ठेके',
+      artist: 'आज कुछ पुराना सुनते हैं',
+      youtubeId: 'Ax5jPATJM1A'
+    }
+  }, [playlistSongs, currentSongIndex])
+
+  const [isSkippingIntro, setIsSkippingIntro] = useState(false)
+  const isSkippingRef = useRef(false)
 
   const handlePlaySong = useCallback((songId, playlistId = null) => {
     setHasEntered(true)
@@ -300,21 +314,81 @@ function App() {
     setShowAbout(false)
   }, [isVideoTransitioning, isVideoFinished, hasEntered])
 
-  const handleVideoEnded = useCallback(() => {
+  const completeEntryTransition = useCallback(() => {
+    if (isVideoFinished || hasEntered) return
+    isSkippingRef.current = false
+    setIsSkippingIntro(false)
     if (videoRef.current) {
       try { videoRef.current.pause() } catch (e) { console.warn(e) }
     }
     setIsVideoFinished(true)
     setIsVideoTransitioning(false)
     handleEnterTheka()
-  }, [handleEnterTheka])
+  }, [isVideoFinished, hasEntered, handleEnterTheka])
+
+  const handleVideoEnded = useCallback(() => {
+    const vid = videoRef.current
+    if (vid && vid.duration && !isNaN(vid.duration) && vid.duration > 0.1) {
+      try {
+        vid.pause()
+        vid.currentTime = Math.max(0, vid.duration - 0.08)
+      } catch (e) {
+        console.warn(e)
+      }
+    }
+    completeEntryTransition()
+  }, [completeEntryTransition])
 
   const handleVideoError = useCallback((err) => {
     console.warn('[App] Entry video load error:', err)
-    setIsVideoFinished(true)
-    setIsVideoTransitioning(false)
-    handleEnterTheka()
-  }, [handleEnterTheka])
+    completeEntryTransition()
+  }, [completeEntryTransition])
+
+  const handleSkipIntro = useCallback(() => {
+    if (isVideoFinished || hasEntered || isSkippingRef.current) return
+    isSkippingRef.current = true
+    setIsSkippingIntro(true)
+
+    const vid = videoRef.current
+    if (vid) {
+      const finalize = () => {
+        if (!isSkippingRef.current) return
+        try { vid.pause() } catch (e) { console.warn(e) }
+        completeEntryTransition()
+      }
+
+      if (vid.duration && !isNaN(vid.duration) && vid.duration > 0.1) {
+        try {
+          vid.pause()
+          // Seek directly to the end frame showing counter with bottle placed down
+          const targetTime = Math.max(0, vid.duration - 0.08)
+          vid.currentTime = targetTime
+          vid.addEventListener('seeked', finalize, { once: true })
+          setTimeout(finalize, 90)
+          return
+        } catch (err) {
+          console.warn('[App] Seek video to end failed on skip:', err)
+        }
+      } else {
+        const onLoadedMeta = () => {
+          try {
+            vid.pause()
+            const targetTime = Math.max(0, (vid.duration || 1) - 0.08)
+            vid.currentTime = targetTime
+            vid.addEventListener('seeked', finalize, { once: true })
+            setTimeout(finalize, 90)
+          } catch {
+            finalize()
+          }
+        }
+        vid.addEventListener('loadedmetadata', onLoadedMeta, { once: true })
+        setTimeout(finalize, 250)
+        return
+      }
+    }
+
+    completeEntryTransition()
+  }, [isVideoFinished, hasEntered, completeEntryTransition])
 
   useEffect(() => {
     if (isVideoTransitioning && videoRef.current) {
@@ -323,20 +397,15 @@ function App() {
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
           console.warn('[App] Video play request failed:', err)
-          setIsVideoFinished(true)
-          setIsVideoTransitioning(false)
-          handleEnterTheka()
+          completeEntryTransition()
         })
       }
     }
-  }, [isVideoTransitioning, handleEnterTheka])
+  }, [isVideoTransitioning, completeEntryTransition])
 
   const handleClosePlaylistsModal = useCallback(() => {
     setShowPlaylistsModal(false)
-    if (location.pathname.startsWith('/playlists')) {
-      navigate('/')
-    }
-  }, [location.pathname, navigate])
+  }, [])
 
   return (
     <div className={`landing-container ${hasEntered ? 'is-entered' : ''}`}>
@@ -357,18 +426,39 @@ function App() {
       {(isVideoTransitioning || isVideoFinished) && (
         <div
           className={`video-entry-overlay ${isVideoTransitioning ? 'playing-overlay' : 'frozen-bg'}`}
-          aria-hidden="true"
+          aria-hidden={!isVideoTransitioning}
         >
           <video
             ref={videoRef}
             className="cinematic-entry-video"
             src="/shopkeeper-entry.mp4"
+            preload="auto"
             autoPlay
             muted
             playsInline
             onEnded={handleVideoEnded}
             onError={handleVideoError}
           />
+
+          {/* Accessible Skip Intro Button during Video Playback */}
+          {isVideoTransitioning && (
+            <motion.button
+              type="button"
+              className={`video-skip-btn ${isSkippingIntro ? 'is-skipping' : ''}`}
+              onClick={handleSkipIntro}
+              disabled={isSkippingIntro}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25, delay: 0.2 }}
+              aria-label="परिचय छोड़ें (Skip Intro)"
+            >
+              <span className="skip-text-hindi">छोड़ें</span>
+              <span className="skip-text-english">(Skip)</span>
+              <span className="skip-arrow" aria-hidden="true">→</span>
+            </motion.button>
+          )}
+
           <div className="ambient-glow" />
           <div className="overlay-vignette" />
           <div className="film-grain" />
@@ -571,212 +661,24 @@ function App() {
       </AnimatePresence>
 
       {/* Primary Application Routes */}
-      <Routes>
+      <Suspense fallback={<div className="route-loading-fallback" aria-hidden="true" />}>
+        <Routes>
         <Route
           path="/"
           element={
-            <>
-              {/* Hero Section */}
-              <section className={`hero ${hasEntered ? 'is-entered' : ''}`}>
-                <div className={`hero-content ${hasEntered ? 'receded' : ''}`}>
-                  <div className="title-wrapper">
-                    <motion.h1
-                      className="main-title"
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 1.2, delay: 0.4 }}
-                    >
-                      काँच के ठेके
-                    </motion.h1>
-                    <motion.p
-                      className="subtitle-english"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.95 }}
-                      transition={{ duration: 1.2, delay: 0.6 }}
-                    >
-                      KAANCH KE THEKE — Retro Bollywood Music &amp; Nostalgic Melodies
-                    </motion.p>
-                  </div>
-
-                  <motion.p
-                    className="tagline"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1.2, delay: 0.8 }}
-                  >
-                    अपने किरदार से महकता है इंसान , चरित्र पवित्र करने का इत्र नहीं आता
-                  </motion.p>
-
-                  <div className="cta-wrapper">
-                    <AnimatePresence mode="wait">
-                      {!hasEntered && !isVideoTransitioning && (
-                        <motion.button
-                          type="button"
-                          className="cta-button"
-                          onClick={handleStartEntryTransition}
-                          disabled={isVideoTransitioning}
-                          initial={{ opacity: 0, y: 15 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                          transition={{ duration: 0.35 }}
-                        >
-                          ठेके में प्रवेश करें
-                        </motion.button>
-                      )}
-                    </AnimatePresence>
-
-                    {hasEntered && !currentSong?.youtubeId && !currentPlaylist?.youtubePlaylistId && (
-                      <span className="ambient-status-note">संगीत सूची तैयार की जा रही है...</span>
-                    )}
-                  </div>
-                </div>
-              </section>
-
-              {/* Extended Editorial Content Flow & Playlist Overview */}
-              <motion.div
-                className={`post-entry-editorial-flow ${hasEntered ? 'is-entered-visible' : 'initial-hidden-seo'}`}
-                initial={false}
-                animate={{ opacity: hasEntered ? 1 : 0.85, y: hasEntered ? 0 : 20 }}
-                transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-              >
-                {/* Section 1: About the Site */}
-                <section className="editorial-section story-section" aria-label="काँच के ठेके के बारे में">
-                  <div className="editorial-container">
-                    <div className="editorial-visual-panel">
-                      <img
-                        src="/backgrounds/editorial-story.png"
-                        alt="पुराने विनाइल रिकॉर्ड और क्लासिक हिंदी संगीत का माहौल"
-                        className="editorial-img"
-                        loading="lazy"
-                        width="520"
-                        height="390"
-                      />
-                      <div className="visual-overlay-vignette" />
-                    </div>
-
-                    <div className="editorial-content-panel">
-                      <div className="editorial-badge-row">
-                        <span className="editorial-badge">The Story Behind The Theka</span>
-                        <span className="editorial-meta">A Personal Music Experience</span>
-                      </div>
-                      <h2 className="editorial-title">एक डिजिटल महफ़िल, 90s के सदाबहार नग़मे और रेट्रो हिंदी संगीत</h2>
-                      <p className="editorial-desc">
-                        काँच के ठेके (Kaanch Ke Theke) एक अनोखा ऑनलाइन संगीत अनुभव है—पुराने बॉलीवुड गीतों, 90 के दौर के सदाबहार नग़मों, ग़ज़लों और बीती यादों के नाम। यहाँ हर प्लेलिस्ट एक ख़ास मूड और शाम के सुकून को ध्यान में रखकर तैयार की गई है, ताकि आप बिना किसी झंझट के बेहतरीन हिंदी क्लासिक्स का आनंद ले सकें।
-                      </p>
-                      <button
-                        type="button"
-                        className="editorial-action-link"
-                        onClick={() => setShowAbout(true)}
-                      >
-                        कहानी पढ़ें →
-                      </button>
-                    </div>
-                  </div>
-                </section>
-
-                {/* Section 2: Playlists Overview */}
-                <section className="editorial-section playlists-section" aria-label="चुनिंदा हिंदी म्यूज़िक प्लेलिस्ट्स">
-                  <div className="editorial-container">
-                    <div className="editorial-content-panel full-width-panel">
-                      <div className="editorial-badge-row">
-                        <span className="editorial-badge">Curated Playlists</span>
-                        <span className="editorial-meta">Retro Bollywood &amp; Hindi Classics</span>
-                      </div>
-                      <h2 className="editorial-title">चुनिंदा रेट्रो बॉलीवुड प्लेलिस्ट्स (Curated Hindi Playlists)</h2>
-                      <div className="playlists-editorial-grid">
-                        {PLAYLISTS.map((pl) => {
-                          const isCurrent = currentPlaylist?.id === pl.id
-                          const isUpcoming = Boolean(pl.isUpcoming)
-                          return (
-                            <div
-                              key={pl.id}
-                              className={`playlist-card-item ${isCurrent ? 'active-card' : ''} ${isUpcoming ? 'upcoming-card' : ''}`}
-                            >
-                              <div className="playlist-card-header">
-                                <h3 className="playlist-card-title">
-                                  <Link to={`/playlists/${pl.id}`} className="playlist-title-link">
-                                    {pl.name}
-                                  </Link>
-                                </h3>
-                                {isCurrent && (
-                                  <span className="active-equalizer-badge" title="सक्रिय प्लेलिस्ट">
-                                    <span className="eq-bar bar-1" />
-                                    <span className="eq-bar bar-2" />
-                                    <span className="eq-bar bar-3" />
-                                    <span className="active-badge-text">सक्रिय</span>
-                                  </span>
-                                )}
-                                {isUpcoming && (
-                                  <span className="upcoming-badge" title="शीघ्र उपलब्ध">
-                                    शीघ्र उपलब्ध
-                                  </span>
-                                )}
-                              </div>
-                              <p className="playlist-card-desc">{pl.description}</p>
-                              <div className="playlist-card-footer-row">
-                                <span className="playlist-card-meta">
-                                  {isUpcoming ? 'शीघ्र उपलब्ध • Upcoming' : `${pl.songs?.length || 0} चुनिंदा गीत`}
-                                </span>
-                                <div className="playlist-card-actions">
-                                  <Link to={`/playlists/${pl.id}`} className="card-action-btn view-btn">
-                                    विवरण →
-                                  </Link>
-                                  {!isUpcoming && (
-                                    <button
-                                      type="button"
-                                      className="card-action-btn play-btn"
-                                      onClick={() => handleSelectPlaylist(pl.id)}
-                                    >
-                                      बजाएं ▶
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </section>
-
-                {/* Section 3: Instagram & Community */}
-                <section className="editorial-section instagram-section" aria-label="इन्स्टाग्राम और कम्युनिटी से जुड़ें">
-                  <div className="editorial-container reverse-container">
-                    <div className="editorial-content-panel">
-                      <div className="editorial-badge-row">
-                        <span className="editorial-badge">Beyond The Playlist</span>
-                        <span className="editorial-meta">Find The Creator Elsewhere</span>
-                      </div>
-                      <h2 className="editorial-title">महफ़िल स्क्रीन से बाहर भी जारी है</h2>
-                      <p className="editorial-desc">
-                        अगर इस छोटी-सी महफ़िल ने आपको कुछ देर ठहरने पर मजबूर किया, तो Instagram पर भी मिलिए। वहाँ इस प्रोजेक्ट के पीछे की सोच, छोटे creative experiments, updates और आने वाली नई चीज़ों की झलक मिलेगी।
-                      </p>
-                      <a
-                        href={SITE_CONFIG.INSTAGRAM_URL}
-                        target="_blank"
-                        rel="me noopener noreferrer"
-                        className="editorial-action-link instagram-link"
-                      >
-                        Instagram पर मिलें →
-                      </a>
-                    </div>
-
-                    <div className="editorial-visual-panel">
-                      <img
-                        src="/backgrounds/editorial-instagram.png"
-                        alt="रेट्रो कैसेट प्लेयर, कैमरा और शाम का सुकून"
-                        className="editorial-img"
-                        loading="lazy"
-                        width="520"
-                        height="390"
-                      />
-                      <div className="visual-overlay-vignette" />
-                    </div>
-                  </div>
-                </section>
-              </motion.div>
-            </>
+            <HomePageView
+              hasEntered={hasEntered}
+              isVideoTransitioning={isVideoTransitioning}
+              currentPlaylist={currentPlaylist}
+              playlistSongs={playlistSongs}
+              currentSongIndex={currentSongIndex}
+              currentSong={currentSong}
+              isPlaying={isPlaying}
+              handleStartEntryTransition={handleStartEntryTransition}
+              handleSelectPlaylist={handleSelectPlaylist}
+              handlePlaySong={handlePlaySong}
+              setShowAbout={setShowAbout}
+            />
           }
         />
 
@@ -811,6 +713,7 @@ function App() {
           }
         />
       </Routes>
+      </Suspense>
 
       {/* Custom Floating Music Player */}
       <MusicPlayer
@@ -834,13 +737,17 @@ function App() {
       />
 
       {/* Playlists Dialog Box Modal */}
-      <PlaylistsModal
-        isOpen={showPlaylistsModal}
-        onClose={handleClosePlaylistsModal}
-        currentPlaylist={currentPlaylist}
-        onSelectPlaylist={handleSelectPlaylist}
-        onPlaySong={handlePlaySong}
-      />
+      {hasOpenedModal && (
+        <Suspense fallback={null}>
+          <PlaylistsModal
+            isOpen={showPlaylistsModal}
+            onClose={handleClosePlaylistsModal}
+            currentPlaylist={currentPlaylist}
+            onSelectPlaylist={handleSelectPlaylist}
+            onPlaySong={handlePlaySong}
+          />
+        </Suspense>
+      )}
 
       {/* Accessible Modal */}
       <AnimatePresence>
@@ -891,7 +798,9 @@ function App() {
         <div className="creator-signature">
           Created with 🌿 by Anuj Rai
         </div>
-        <VisitorCounter />
+        <Suspense fallback={null}>
+          <VisitorCounter />
+        </Suspense>
         {hasEntered && (
           <span className="ambient-indicator">
             {`वर्तमान मूड: ${currentPlaylist?.name || '९० का दौर'}`}

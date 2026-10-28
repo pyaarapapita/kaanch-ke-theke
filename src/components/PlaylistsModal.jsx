@@ -159,3 +159,5 @@ export function PlaylistsModal({ isOpen, onClose, currentPlaylist, onSelectPlayl
     </AnimatePresence>
   )
 }
+
+export default PlaylistsModal
