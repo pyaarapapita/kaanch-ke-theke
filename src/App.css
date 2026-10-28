@@ -2374,16 +2374,6 @@
   width: 100%;
 }
 
-.support-action-link {
-  background: linear-gradient(135deg, rgba(184, 137, 74, 0.25) 0%, rgba(124, 45, 36, 0.4) 100%) !important;
-  border-color: var(--accent-gold) !important;
-}
-
-.support-action-link:hover {
-  background: linear-gradient(135deg, var(--accent-gold), var(--accent-red)) !important;
-  color: #FFF5E1 !important;
-}
-
 /* Tablet & Mobile Layout Adjustments for Editorial Magazine Flow */
 @media (max-width: 900px) {
   .post-entry-editorial-flow {
