@@ -34,6 +34,19 @@
   --focus-gold-ring: 2px solid #B8894A;
   --focus-gold-glow: 0 0 12px rgba(184, 137, 74, 0.4);
 
+  /* Cinematic Lighting & Glassmorphism Tokens */
+  --glass-mahogany-base: linear-gradient(145deg, rgba(28, 21, 15, 0.62) 0%, rgba(14, 11, 8, 0.74) 50%, rgba(22, 16, 12, 0.66) 100%);
+  --glass-mahogany-dense: linear-gradient(145deg, rgba(24, 18, 13, 0.82) 0%, rgba(13, 10, 8, 0.92) 100%);
+  --glass-mahogany-card: linear-gradient(145deg, rgba(26, 20, 15, 0.68) 0%, rgba(15, 12, 9, 0.78) 100%);
+  --glass-border-brass: rgba(212, 175, 118, 0.24);
+  --glass-border-brass-hover: rgba(232, 195, 138, 0.52);
+  --glass-specular-bevel: inset 0 1px 1px 0 rgba(255, 238, 204, 0.22);
+  --glass-specular-bevel-subtle: inset 0 1px 0 0 rgba(255, 238, 204, 0.15);
+  --glass-shadow-deep: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 24px rgba(184, 137, 74, 0.12);
+  --glass-shadow-hover: 0 20px 48px rgba(0, 0, 0, 0.88), 0 0 32px rgba(184, 137, 74, 0.24);
+  --lantern-radial-ambient: radial-gradient(ellipse at 50% 0%, rgba(184, 137, 74, 0.15) 0%, transparent 70%);
+  --lantern-gold-glow: 0 0 24px rgba(184, 137, 74, 0.28);
+
   color-scheme: dark;
   background-color: var(--bg-near-black);
   color: var(--text-cream);
