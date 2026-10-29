@@ -2125,6 +2125,1114 @@
 }
 
 /* ==========================================================================
+   THEKA COUNTER EXPERIENCE (Bottle, Glass, Transistor Radio & Keepsakes)
+   ========================================================================== */
+.theka-counter-section {
+  width: 100%;
+  margin-bottom: 3.5rem;
+  transition: filter 0.4s ease;
+}
+
+.theka-counter-section.lantern-ambient-dim {
+  filter: brightness(0.92) contrast(1.02);
+}
+
+.theka-counter-section.lantern-ambient-medium {
+  filter: brightness(1) contrast(1);
+}
+
+.theka-counter-section.lantern-ambient-bright {
+  filter: brightness(1.08) drop-shadow(0 0 45px rgba(232, 175, 74, 0.18));
+}
+
+.theka-counter-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.counter-narrative-header {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(184, 137, 74, 0.18);
+}
+
+.counter-main-title {
+  margin-bottom: 0.5rem;
+}
+
+.counter-main-desc {
+  margin-bottom: 0;
+  max-width: 860px;
+}
+
+/* Counter Objects Quick Navigation Bar */
+.counter-objects-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(22, 16, 12, 0.75);
+  border: 1px solid rgba(184, 137, 74, 0.22);
+  border-radius: 9999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+}
+
+.counter-objects-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.objects-icon {
+  font-size: 1.15rem;
+}
+
+.objects-label {
+  font-family: var(--font-hindi-body);
+  font-size: 0.86rem;
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.counter-quick-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.theka-object-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(36, 26, 18, 0.85);
+  border: 1px solid rgba(212, 175, 118, 0.3);
+  color: var(--text-cream);
+  font-family: var(--font-hindi-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  touch-action: manipulation;
+}
+
+.theka-object-chip:hover {
+  background: rgba(56, 40, 26, 0.95);
+  border-color: var(--accent-gold);
+  color: #FFF5E1;
+  box-shadow: 0 0 12px rgba(184, 137, 74, 0.3);
+  transform: translateY(-1px);
+}
+
+.theka-object-chip .chip-icon {
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Bottle & Glass Scene Styles
+   ========================================================================== */
+.theka-bottle-scene-block {
+  width: 100%;
+  margin-bottom: 2.5rem;
+}
+
+.bottle-glass-scene-wrapper {
+  background: linear-gradient(145deg, rgba(28, 19, 13, 0.9) 0%, rgba(15, 11, 8, 0.96) 100%);
+  border: 1px solid rgba(212, 175, 118, 0.32);
+  border-radius: 14px;
+  padding: 1.75rem 2rem;
+  box-shadow: 
+    0 25px 60px rgba(0, 0, 0, 0.9),
+    0 0 35px rgba(184, 137, 74, 0.12),
+    inset 0 1px 1px 0 rgba(255, 238, 204, 0.22);
+  position: relative;
+  overflow: hidden;
+}
+
+.scene-instruction-header {
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.scene-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(184, 137, 74, 0.16);
+  border: 1px solid rgba(184, 137, 74, 0.35);
+  margin-bottom: 0.65rem;
+}
+
+.pulse-amber-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFAA33;
+  box-shadow: 0 0 8px #FFAA33;
+  animation: pulseAmber 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes pulseAmber {
+  from { opacity: 0.6; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+
+.scene-status-text {
+  font-family: var(--font-english);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.scene-interactive-heading {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  font-weight: 700;
+  color: var(--text-cream);
+  margin: 0 0 0.35rem 0;
+  letter-spacing: 0.2px;
+}
+
+.scene-interactive-sub {
+  font-family: var(--font-hindi-body);
+  font-size: 0.9rem;
+  color: #BBA991;
+  margin: 0;
+}
+
+/* SVG Stage Container */
+.svg-stage-container {
+  position: relative;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, rgba(42, 28, 18, 0.6) 0%, rgba(13, 9, 6, 0.95) 85%);
+  border: 1px solid rgba(184, 137, 74, 0.18);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+}
+
+.theka-counter-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Floating Tap Hint Button */
+.bottle-tap-hint-btn {
+  position: absolute;
+  top: 36%;
+  left: 20%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(184, 137, 74, 0.9) 0%, rgba(124, 45, 36, 0.95) 100%);
+  border: 1px solid #FFE08A;
+  color: #FFF9ED;
+  font-family: var(--font-hindi-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(255, 170, 51, 0.55), 0 4px 12px rgba(0, 0, 0, 0.7);
+  z-index: 5;
+  touch-action: manipulation;
+}
+
+.bottle-tap-hint-btn:hover {
+  filter: brightness(1.1);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.tap-hand-icon {
+  font-size: 0.95rem;
+}
+
+/* Scene Footer Controls */
+.scene-footer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(184, 137, 74, 0.2);
+  flex-wrap: wrap;
+}
+
+.scene-current-vibe {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-hindi-body);
+  font-size: 0.86rem;
+}
+
+.vibe-label {
+  color: var(--text-muted);
+}
+
+.vibe-name {
+  color: var(--accent-gold);
+  font-weight: 700;
+}
+
+.theka-scene-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.2rem;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-hindi-body);
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  touch-action: manipulation;
+}
+
+.theka-scene-btn.pour-action-btn {
+  background: linear-gradient(135deg, rgba(184, 137, 74, 0.35) 0%, rgba(124, 45, 36, 0.5) 100%);
+  border: 1px solid var(--accent-gold);
+  color: #FFF5E1;
+  box-shadow: 0 0 14px rgba(184, 137, 74, 0.28);
+}
+
+.theka-scene-btn.pour-action-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(184, 137, 74, 0.55) 0%, rgba(124, 45, 36, 0.7) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(184, 137, 74, 0.45);
+}
+
+.theka-scene-btn.pour-action-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.theka-scene-btn.replay-btn {
+  background: rgba(36, 26, 18, 0.85);
+  border: 1px solid rgba(212, 175, 118, 0.4);
+  color: #FFF5E1;
+}
+
+.theka-scene-btn.replay-btn:hover {
+  background: rgba(54, 38, 25, 0.95);
+  border-color: var(--accent-gold);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Counter Shelf Dual Grid (Radio + Keepsakes)
+   ========================================================================== */
+.counter-shelf-dual-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.shelf-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.shelf-item-header {
+  margin-bottom: 0.85rem;
+}
+
+.shelf-badge {
+  font-family: var(--font-english);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.shelf-title {
+  font-family: var(--font-hindi-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-cream);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Vintage Transistor Radio Styles
+   ========================================================================== */
+.vintage-radio-cabinet {
+  background: linear-gradient(145deg, #24160E 0%, #150D08 100%);
+  border: 2px solid #5C381E;
+  border-radius: 12px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: 
+    0 20px 45px rgba(0, 0, 0, 0.85),
+    inset 0 1px 2px rgba(255, 230, 190, 0.15),
+    inset 0 0 25px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.radio-top-handle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.handle-bar {
+  flex: 1;
+  height: 6px;
+  background: linear-gradient(90deg, #6B4524 0%, #B8854D 50%, #6B4524 100%);
+  border-radius: 3px;
+  margin-right: 1.5rem;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.radio-antenna {
+  width: 40px;
+  height: 3px;
+  background: #A6A6A6;
+  border-radius: 2px;
+  transform: rotate(-15deg);
+}
+
+.radio-brand-plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.plate-screw {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #B8894A;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+.plate-brand-name {
+  font-family: var(--font-english);
+  font-size: 0.76rem;
+  letter-spacing: 1.2px;
+  color: #D4AF76;
+  text-transform: uppercase;
+}
+
+/* Tuning Dial Panel */
+.radio-tuning-dial-panel {
+  background: #0A0705;
+  border: 1px solid #7D4C25;
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.95);
+}
+
+.frequency-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.band-mark {
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #8C7353;
+  letter-spacing: 1px;
+}
+
+.radio-tuning-needle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2.5px;
+  background: #FF3322;
+  box-shadow: 0 0 8px #FF3322;
+  pointer-events: none;
+}
+
+.dial-glass-glint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Radio Lower Row: Speaker & Controls */
+.radio-lower-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.vintage-speaker-mesh {
+  width: 100px;
+  height: 95px;
+  background: #140C07;
+  border: 1px solid #4D2D16;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.8);
+}
+
+.speaker-cloth-pattern {
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(#6B4524 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.65;
+}
+
+.station-pills-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.radio-station-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+  background: rgba(26, 17, 11, 0.85);
+  border: 1px solid rgba(184, 137, 74, 0.2);
+  color: var(--text-cream);
+  font-family: var(--font-hindi-body);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.radio-station-btn:hover {
+  background: rgba(45, 30, 20, 0.95);
+  border-color: var(--accent-gold);
+}
+
+.radio-station-btn.is-tuned {
+  background: linear-gradient(90deg, rgba(184, 137, 74, 0.25) 0%, rgba(36, 24, 15, 0.95) 100%);
+  border-color: var(--accent-gold);
+  color: #FFF5E1;
+  font-weight: 600;
+}
+
+.stn-freq {
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: var(--accent-gold);
+}
+
+.stn-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stn-glow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF3322;
+  box-shadow: 0 0 6px #FF3322;
+}
+
+/* Tuned Info Display */
+.radio-tuned-display {
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(184, 137, 74, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tuned-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.tuned-badge {
+  font-family: var(--font-english);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  background: rgba(184, 137, 74, 0.18);
+  border: 1px solid rgba(184, 137, 74, 0.35);
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+}
+
+.tuned-channel-title {
+  font-family: var(--font-hindi-display);
+  font-size: 0.95rem;
+  color: #FFF3DD;
+}
+
+.tuned-desc {
+  font-family: var(--font-hindi-body);
+  font-size: 0.82rem;
+  color: #BBA991;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.radio-tune-action-btn {
+  background: rgba(184, 137, 74, 0.22);
+  border: 1px solid rgba(212, 175, 118, 0.38);
+  color: #FFF5E1;
+  align-self: flex-start;
+}
+
+.radio-tune-action-btn:hover {
+  background: linear-gradient(135deg, rgba(184, 137, 74, 0.4) 0%, rgba(124, 45, 36, 0.5) 100%);
+  border-color: var(--accent-gold);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Memorabilia Desk Card (Lantern & Physical Receipt)
+   ========================================================================== */
+.memorabilia-desk-card {
+  background: linear-gradient(145deg, rgba(28, 19, 13, 0.85) 0%, rgba(16, 11, 8, 0.95) 100%);
+  border: 1px solid rgba(212, 175, 118, 0.22);
+  border-radius: 12px;
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+  justify-content: space-between;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+}
+
+/* Desk Lantern */
+.desk-lantern-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed rgba(184, 137, 74, 0.2);
+}
+
+.theka-lantern-interactive {
+  width: 58px;
+  height: 98px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.25s ease;
+  touch-action: manipulation;
+}
+
+.theka-lantern-interactive:hover {
+  transform: scale(1.05);
+}
+
+.lantern-top-ring {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #C4974F;
+  border-radius: 50%;
+  margin-bottom: -2px;
+}
+
+.lantern-brass-hood {
+  width: 36px;
+  height: 14px;
+  background: linear-gradient(180deg, #9C7034 0%, #613F17 100%);
+  border-radius: 6px 6px 0 0;
+  border: 1px solid #D4AF76;
+}
+
+.lantern-glass-chimney {
+  width: 42px;
+  height: 48px;
+  background: rgba(255, 235, 190, 0.08);
+  border-left: 1.5px solid rgba(255, 230, 180, 0.35);
+  border-right: 1.5px solid rgba(255, 230, 180, 0.35);
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lantern-flame {
+  width: 10px;
+  height: 20px;
+  background: radial-gradient(ellipse at 50% 65%, #FFF2CC 0%, #FFAA22 65%, #FF5500 100%);
+  border-radius: 50% 50% 35% 35%;
+  animation: flameFlicker 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes flameFlicker {
+  0% { transform: scale(0.95) skewX(-1deg); }
+  50% { transform: scale(1.05) skewX(1deg); }
+  100% { transform: scale(1) skewX(-0.5deg); }
+}
+
+.chimney-glass-reflection {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+}
+
+.lantern-brass-base {
+  width: 48px;
+  height: 18px;
+  background: linear-gradient(180deg, #8A5E28 0%, #4D3110 100%);
+  border-radius: 0 0 6px 6px;
+  border: 1px solid #D4AF76;
+}
+
+.lantern-hint-tag {
+  font-family: var(--font-hindi-body);
+  font-size: 0.68rem;
+  color: var(--accent-gold);
+  margin-top: 0.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lantern-instruction-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.lantern-instruction-text strong {
+  font-family: var(--font-hindi-display);
+  font-size: 0.95rem;
+  color: var(--text-cream);
+}
+
+.lantern-instruction-text span {
+  font-family: var(--font-hindi-body);
+  font-size: 0.78rem;
+  color: #B5A48B;
+}
+
+/* Desk Physical Receipt Slip */
+.desk-physical-receipt {
+  background: linear-gradient(135deg, #FFF4DE 0%, #EFE1C6 100%);
+  border: 1px solid #B08B57;
+  border-radius: 6px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 2px 2px 0 #3A2312;
+  cursor: pointer;
+  transform: rotate(-1.5deg);
+  transition: all 0.25s ease;
+  touch-action: manipulation;
+}
+
+.desk-physical-receipt:hover {
+  transform: rotate(0deg) translateY(-2px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.7), 2px 2px 0 #5C381E;
+}
+
+.receipt-paper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.receipt-mini-stamp {
+  font-size: 0.65rem;
+  color: #9C2A20;
+  border: 1px solid #9C2A20;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  font-weight: 700;
+  transform: rotate(-4deg);
+}
+
+.receipt-mini-title {
+  font-family: var(--font-hindi-display);
+  font-size: 0.88rem;
+  color: #241408;
+}
+
+.receipt-mini-quote {
+  font-family: var(--font-hindi-body);
+  font-size: 0.82rem;
+  color: #4A2E16;
+  font-style: italic;
+  margin: 0 0 0.45rem 0;
+  line-height: 1.4;
+}
+
+.receipt-tap-cta {
+  font-family: var(--font-hindi-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #8C4B18;
+}
+
+/* Vintage Matchbox */
+.desk-vintage-matchbox {
+  background: linear-gradient(90deg, #A83226 0%, #822218 100%);
+  border: 1px solid #D4AF76;
+  border-radius: 4px;
+  padding: 0.45rem 0.75rem;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.matchbox-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-family: var(--font-hindi-body);
+  font-size: 0.76rem;
+  color: #FFEED2;
+  font-weight: 600;
+}
+
+.matchbox-star {
+  color: #FFE08A;
+  font-size: 0.7rem;
+}
+
+/* ==========================================================================
+   Handwritten Receipt Modal Styles
+   ========================================================================== */
+.receipt-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 7, 5, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.theka-receipt-parchment {
+  background: linear-gradient(135deg, #FFF6E3 0%, #F5E8D0 50%, #E8D7B8 100%);
+  color: #24160A;
+  border: 1px solid #C4A577;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 480px;
+  padding: 2.2rem 2.2rem 1.75rem;
+  position: relative;
+  box-shadow: 
+    0 30px 80px rgba(0, 0, 0, 0.95),
+    0 0 40px rgba(184, 137, 74, 0.25);
+}
+
+.receipt-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(56, 35, 18, 0.15);
+  border: 1px solid rgba(92, 58, 30, 0.35);
+  color: #3D2310;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.receipt-close-btn:hover {
+  background: rgba(56, 35, 18, 0.3);
+  color: #000;
+  transform: rotate(90deg);
+}
+
+.receipt-header {
+  text-align: center;
+  margin-bottom: 1.15rem;
+}
+
+.receipt-serial {
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #7A5734;
+  letter-spacing: 0.5px;
+}
+
+.receipt-theka-name {
+  font-family: var(--font-hindi-display);
+  font-size: 1.85rem;
+  color: #221206;
+  margin: 0.2rem 0;
+  letter-spacing: 0.5px;
+}
+
+.receipt-tagline {
+  font-family: var(--font-hindi-body);
+  font-size: 0.84rem;
+  color: #5C3D22;
+  margin: 0;
+}
+
+.receipt-divider {
+  width: 80%;
+  height: 1px;
+  background: #C4A577;
+  margin: 0.75rem auto 0;
+}
+
+.receipt-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem 1rem;
+  padding: 0.65rem 0;
+  border-top: 1px dashed #B89766;
+  border-bottom: 1px dashed #B89766;
+  margin-bottom: 1rem;
+  font-size: 0.78rem;
+}
+
+.meta-label {
+  color: #7A5734;
+  margin-right: 0.35rem;
+}
+
+.meta-val {
+  color: #261608;
+  font-weight: 600;
+}
+
+/* Items Table */
+.receipt-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-hindi-body);
+  font-size: 0.84rem;
+  margin-bottom: 1rem;
+}
+
+.receipt-items-table th {
+  padding: 0.4rem 0.2rem;
+  border-bottom: 1px solid #9C7749;
+  color: #5E3D1E;
+  font-weight: 700;
+  text-align: left;
+}
+
+.receipt-items-table td {
+  padding: 0.45rem 0.2rem;
+  border-bottom: 1px dashed #D6C29E;
+  color: #2B180B;
+}
+
+.receipt-items-table .text-center {
+  text-align: center;
+}
+
+.receipt-items-table .text-right {
+  text-align: right;
+  font-weight: 600;
+}
+
+.receipt-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0;
+  border-top: 1.5px solid #6E451F;
+  border-bottom: 1.5px solid #6E451F;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+}
+
+.total-label {
+  font-family: var(--font-hindi-display);
+  font-weight: 700;
+  color: #2E1809;
+}
+
+.total-val {
+  font-family: var(--font-hindi-display);
+  font-weight: 800;
+  color: #8C2B20;
+}
+
+.receipt-couplet-box {
+  background: rgba(184, 137, 74, 0.12);
+  border: 1px dashed #B89766;
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.receipt-sher {
+  font-family: var(--font-hindi-display);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #2D1A0C;
+  margin: 0 0 0.35rem 0;
+}
+
+.receipt-poet {
+  font-family: var(--font-hindi-body);
+  font-size: 0.78rem;
+  color: #824E23;
+  font-weight: 600;
+}
+
+/* Red Seal Stamp */
+.receipt-stamp-badge {
+  position: absolute;
+  bottom: 85px;
+  right: 30px;
+  transform: rotate(-14deg);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.stamp-inner-ring {
+  width: 90px;
+  height: 90px;
+  border: 2.5px solid #A82E22;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #A82E22;
+  font-family: var(--font-hindi-display);
+  box-shadow: inset 0 0 4px #A82E22;
+}
+
+.stamp-text-arc {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.stamp-verified {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.stamp-sub {
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.receipt-action-center {
+  display: flex;
+  justify-content: center;
+}
+
+.receipt-fold-btn {
+  background: #2E1B0E;
+  color: #FFF2DB;
+  border: 1px solid #7D4C25;
+}
+
+.receipt-fold-btn:hover {
+  background: #4D2F18;
+  color: #FFF;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints for Theka Counter
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .counter-shelf-dual-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .bottle-glass-scene-wrapper {
+    padding: 1.25rem 1rem;
+  }
+
+  .counter-objects-bar {
+    border-radius: 12px;
+  }
+
+  .radio-lower-row {
+    grid-template-columns: 80px 1fr;
+  }
+
+  .vintage-speaker-mesh {
+    width: 80px;
+    height: 85px;
+  }
+
+  .desk-lantern-wrapper {
+    gap: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bottle-tap-hint-btn {
+    top: 30%;
+    left: 28%;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.76rem;
+  }
+
+  .radio-lower-row {
+    grid-template-columns: 1fr;
+  }
+
+  .vintage-speaker-mesh {
+    display: none;
+  }
+
+  .theka-receipt-parchment {
+    padding: 1.75rem 1.25rem;
+  }
+}
+
+/* ==========================================================================
    Theka Chronicles — Shayari Wall, Mood Spirits & Nostalgia Vignettes
    ========================================================================== */
 .theka-chronicles-section {

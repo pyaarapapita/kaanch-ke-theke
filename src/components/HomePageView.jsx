@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PLAYLISTS } from '../data/playlists'
+import { ThekaCounter } from './ThekaCounter/ThekaCounter'
 
 const SITE_CONFIG = {
   INSTAGRAM_URL: 'https://www.instagram.com/ironically_anujj',
@@ -204,6 +205,12 @@ export const HomePageView = React.memo(function HomePageView({
         animate={{ opacity: hasEntered ? 1 : 0.85, y: hasEntered ? 0 : 20 }}
         transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
       >
+        {/* Interactive Theka Counter Experience (Bottle, Glass, Radio & Keepsakes) */}
+        <ThekaCounter
+          currentPlaylist={currentPlaylist}
+          onSelectPlaylist={handleSelectPlaylist}
+        />
+
         {/* Section 1: Theka Chronicles & Shayari Wall */}
         <section
           id="theka-chronicles-section"
