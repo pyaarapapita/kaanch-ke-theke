@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PLAYLISTS } from '../data/playlists'
@@ -8,18 +8,141 @@ const SITE_CONFIG = {
   BUY_ME_A_COFFEE_URL: 'https://buymeacoffee.com/kaanchketheke'
 }
 
+const THEKA_SHAYARI_COLLECTION = [
+  {
+    id: 'ghalib-1',
+    sher: 'हज़ारों ख़्वाहिशें ऐसी कि हर ख़्वाहिश पे दम निकले,\nबहुत निकले मिरे अरमाँ लेकिन फिर भी कम निकले।',
+    poet: 'मिर्ज़ा ग़ालिब',
+    era: 'क्लासिक ग़ज़ल दौर',
+    context: 'गायन: जगजीत सिंह • अमर नज़्म'
+  },
+  {
+    id: 'sahir-1',
+    sher: 'मैं ज़िंदगी का साथ निभाता चला गया,\nहर फ़िक्र को धुएँ में उड़ाता चला गया।',
+    poet: 'साहिर लुधियानवी',
+    era: 'हम दोनों (१९६१)',
+    context: 'गायन: मुहम्मद रफ़ी • संगीत: जयदेव'
+  },
+  {
+    id: 'gulzar-1',
+    sher: 'आँखों में जल रहा है क्यूँ बुझता नहीं धुआँ,\nउठता है दिल से दर्द कि रुकता नहीं धुआँ।',
+    poet: 'गुलज़ार',
+    era: 'माचिस (१९९६)',
+    context: 'गायन: सुरेश वाडेकर • संगीत: विशाल भारद्वाज'
+  },
+  {
+    id: 'fakir-1',
+    sher: 'ये दौलत भी ले लो, ये शोहरत भी ले लो,\nभले छीन लो मुझसे मेरी जवानी...\nमगर मुझको लौटा दो बचपन का सावन,\nवो काग़ज़ की कश्ती, वो बारिश का पानी।',
+    poet: 'सुदर्शन फ़ाकिर',
+    era: 'आज (१९८२)',
+    context: 'गायन: जगजीत सिंह & चित्रा सिंह'
+  },
+  {
+    id: 'shailendra-1',
+    sher: 'गाता रहे मेरा दिल, तू ही मेरी मंज़िल,\nकहीं बीतें ना ये रातें, कहीं बीतें ना ये दिन।',
+    poet: 'शैलेंद्र',
+    era: 'गाइड (१९६५)',
+    context: 'गायन: किशोर कुमार & लता मंगेशकर • संगीत: एस. डी. बर्मन'
+  },
+  {
+    id: 'sahir-2',
+    sher: 'कभी कभी मेरे दिल में ख़याल आता है,\nकि जैसे तुझको बनाया गया है मेरे लिए।',
+    poet: 'साहिर लुधियानवी',
+    era: 'कभी कभी (१९७६)',
+    context: 'गायन: मुकेश • संगीत: खय्याम'
+  },
+  {
+    id: 'hasrat-1',
+    sher: 'चुपके चुपके रात दिन आँसू बहाना याद है,\nहमको अब तक आशिक़ी का वो ज़माना याद है।',
+    poet: 'हसरत मोहानी',
+    era: 'निकाह (१९८२)',
+    context: 'गायन: ग़ुलाम अली • क्लासिक तराना'
+  },
+  {
+    id: 'bakshi-1',
+    sher: 'ज़िंदगी के सफ़र में गुज़र जाते हैं जो मक़ाम,\nवो फिर नहीं आते, वो फिर नहीं आते।',
+    poet: 'आनंद बक्षी',
+    era: 'आप की कसम (१९७४)',
+    context: 'गायन: किशोर कुमार • संगीत: आर. डी. बर्मन'
+  }
+]
+
+const THEKA_MOOD_VIBES = [
+  {
+    id: '90s',
+    title: '९०s की बोतल 🍾',
+    tagline: 'वॉकमैन व कैसेट का दौर',
+    desc: 'पेंसिल से रील लपेटना, ऑटो-रिवर्स कैसेट और देर रात छत पर बजता ट्रांजिस्टर।',
+    icon: '📼',
+    chip: 'सक्रिय महफ़िल',
+    isUpcoming: false
+  },
+  {
+    id: 'mahfil',
+    title: 'काँच के जाम व ग़ज़ल 🌙',
+    tagline: 'धीमी रात की महफ़िल',
+    desc: 'जगजीत सिंह का सोज़, जलती लालटेन और काँच के गिलासों में उतरता सुकून।',
+    icon: '🍷',
+    chip: 'शीघ्र उपलब्ध',
+    isUpcoming: true
+  },
+  {
+    id: 'barish-aur-yaadein',
+    title: 'रिमझिम बारिश 🌧️',
+    tagline: 'भीगी शाम और पुरानी धुन',
+    desc: 'खिड़की पर गिरती बूँदें, कुल्हड़ वाली चाय और किशोर दा के भीगे नग़मे।',
+    icon: '🌧️',
+    chip: 'शीघ्र उपलब्ध',
+    isUpcoming: true
+  },
+  {
+    id: 'dard-e-dil',
+    title: 'दर्द-ए-दिल 💔',
+    tagline: 'तन्हाई और पुराना अफ़साना',
+    desc: 'टूटे दिलों की दास्तान और मुहम्मद रफ़ी के वो नग़मे जो सीधा रूह में उतर जाएं।',
+    icon: '💔',
+    chip: 'शीघ्र उपलब्ध',
+    isUpcoming: true
+  }
+]
+
+const NOSTALGIA_CHIPS = [
+  {
+    id: 'radio',
+    icon: '📻',
+    title: 'आकाशवाणी व छायागीत',
+    desc: 'रात १० बजे अमीन सयानी की चिर-परिचित आवाज़ और बिनाका गीतमाला का सुरूर'
+  },
+  {
+    id: 'cassette',
+    icon: '📼',
+    title: 'मिक्स-टेप रिकॉर्डिंग दौर',
+    desc: 'नुक्कड़ की कैसेट शॉप पर स्पेशल फ़रमाइश से ए और बी साइड भरवाने का जादू'
+  },
+  {
+    id: 'chai',
+    icon: '☕',
+    title: 'नुक्कड़ की चाय और अड्डा',
+    desc: 'कुल्हड़ वाली कड़क चाय के साथ दूर पान की गुमटी से तैरती रफ़ी साहब की सदा'
+  }
+]
+
 export const HomePageView = React.memo(function HomePageView({
   hasEntered,
   isVideoTransitioning,
   currentPlaylist,
-  playlistSongs = [],
-  currentSongIndex = 0,
   isPlaying = false,
   handleStartEntryTransition,
   handleSelectPlaylist,
-  handlePlaySong,
   setShowAbout
 }) {
+  const [shayariIndex, setShayariIndex] = useState(0)
+  const activeSher = THEKA_SHAYARI_COLLECTION[shayariIndex]
+
+  const handleNextShayari = () => {
+    setShayariIndex((prev) => (prev + 1) % THEKA_SHAYARI_COLLECTION.length)
+  }
+
   return (
     <>
       {/* Hero Section */}
@@ -81,111 +204,155 @@ export const HomePageView = React.memo(function HomePageView({
         animate={{ opacity: hasEntered ? 1 : 0.85, y: hasEntered ? 0 : 20 }}
         transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
       >
-        {/* Section 1: Active Session & Tracklist */}
+        {/* Section 1: Theka Chronicles & Shayari Wall */}
         <section
-          id="active-tracklist-section"
-          className="editorial-section active-session-section"
-          aria-label="सक्रिय महफ़िल और गीत सूची"
+          id="theka-chronicles-section"
+          className="editorial-section theka-chronicles-section"
+          aria-label="ठेके की दास्तान, शायरी और रेट्रो यादें"
         >
-          <div className="editorial-container active-session-container">
+          <div className="editorial-container theka-chronicles-container">
             <div className="editorial-content-panel full-width-panel">
-              <div className="session-header-row">
-                <div className="session-header-info">
+              {/* Header Row */}
+              <div className="theka-chronicles-header-row">
+                <div className="theka-header-titles">
                   <div className="editorial-badge-row">
-                    <span className="editorial-badge">आज की महफ़िल • Current Session</span>
-                    <span className="editorial-meta">
-                      {playlistSongs.length} सदाबहार नग़मे
-                    </span>
+                    <span className="editorial-badge">ठेके की दास्तान • Theka Chronicles</span>
+                    <span className="editorial-meta">साहिर, गुलज़ार, ग़ालिब और रफ़ी का दौर</span>
                   </div>
-                  <h2 className="editorial-title session-title">
-                    {currentPlaylist?.name || '९०s की बोतल 🍾'}
+                  <h2 className="editorial-title theka-chronicles-title">
+                    महफ़िल का शेर और चार पहर के मिज़ाज
                   </h2>
-                  <p className="editorial-desc session-desc">
-                    {currentPlaylist?.description || 'पुराने नग़मे, यादें और महफ़िल का सुरूर।'}
+                  <p className="editorial-desc theka-chronicles-desc">
+                    जब रात गहराती है और काँच के गिलासों में पुरानी यादें उतरती हैं, तब धुन और शायरी मिलकर दिल का हाल बयां करते हैं।
                   </p>
                 </div>
+              </div>
 
-                {/* Inline Mood Switcher Pills */}
-                <div className="session-mood-pills-row" role="group" aria-label="मूड चुनें">
-                  {PLAYLISTS.map((pl) => {
-                    const isPlActive = currentPlaylist?.id === pl.id
-                    const isPlUpcoming = Boolean(pl.isUpcoming)
+              {/* Centerpiece: Interactive Mehfil Shayari Card */}
+              <div className="theka-shayari-card" role="region" aria-label="आज का शेर">
+                <div className="shayari-card-top-bar">
+                  <div className="shayari-badge-group">
+                    <span className="shayari-flame-icon" aria-hidden="true">🕯️</span>
+                    <span className="shayari-card-label">महफ़िल की रुबाई • Sher #{shayariIndex + 1}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="shayari-cycle-btn"
+                    onClick={handleNextShayari}
+                    aria-label="दूसरा शेर पढ़ें"
+                    title="दूसरा शेर देखें"
+                  >
+                    <span className="cycle-btn-text">दूसरा शेर</span>
+                    <span className="cycle-btn-icon" aria-hidden="true">↻</span>
+                  </button>
+                </div>
+
+                <div className="shayari-content-box">
+                  <span className="shayari-quote-mark open" aria-hidden="true">“</span>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeSher.id}
+                      className="shayari-body-motion"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.35, ease: 'easeOut' }}
+                    >
+                      <blockquote className="theka-sher-text">
+                        {activeSher.sher.split('\n').map((line, i) => (
+                          <span key={i} className="sher-line">
+                            {line}
+                          </span>
+                        ))}
+                      </blockquote>
+
+                      <div className="theka-sher-attribution">
+                        <div className="sher-poet-row">
+                          <span className="sher-poet-name">— {activeSher.poet}</span>
+                          <span className="sher-era-tag">{activeSher.era}</span>
+                        </div>
+                        <span className="sher-context-note">{activeSher.context}</span>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                  <span className="shayari-quote-mark close" aria-hidden="true">”</span>
+                </div>
+              </div>
+
+              {/* The 4 Spirits / Mood Vignettes Grid */}
+              <div className="theka-vibes-wrapper">
+                <div className="theka-vibes-header">
+                  <h3 className="theka-sub-heading">चार पहर, चार मिज़ाज (Theka Mood Spirits)</h3>
+                  <span className="theka-sub-meta">अपनी पसंद की महफ़िल का सुरूर चुनें</span>
+                </div>
+
+                <div className="theka-vibes-grid" role="list">
+                  {THEKA_MOOD_VIBES.map((vibe) => {
+                    const isVibeActive = currentPlaylist?.id === vibe.id
+                    const isUpcoming = vibe.isUpcoming
                     return (
-                      <button
-                        key={pl.id}
-                        type="button"
-                        className={`mood-pill-chip ${isPlActive ? 'active' : ''} ${isPlUpcoming ? 'upcoming' : ''}`}
-                        onClick={() => !isPlUpcoming && handleSelectPlaylist(pl.id)}
-                        disabled={isPlUpcoming}
-                        title={isPlUpcoming ? `${pl.name} (शीघ्र उपलब्ध)` : pl.name}
+                      <div
+                        key={vibe.id}
+                        className={`theka-vibe-card ${isVibeActive ? 'is-active-vibe' : ''} ${isUpcoming ? 'is-upcoming-vibe' : ''}`}
+                        role="listitem"
                       >
-                        {pl.name}
-                        {isPlActive && <span className="pill-active-dot" />}
-                      </button>
+                        <div className="vibe-card-header">
+                          <span className="vibe-card-icon" aria-hidden="true">{vibe.icon}</span>
+                          {isVibeActive ? (
+                            <span className="vibe-status-badge active">
+                              {isPlaying && (
+                                <span className="vibe-eq-indicator" aria-hidden="true">
+                                  <span className="vibe-eq-bar bar-1" />
+                                  <span className="vibe-eq-bar bar-2" />
+                                  <span className="vibe-eq-bar bar-3" />
+                                </span>
+                              )}
+                              <span>सक्रिय</span>
+                            </span>
+                          ) : isUpcoming ? (
+                            <span className="vibe-status-badge upcoming">शीघ्र उपलब्ध</span>
+                          ) : null}
+                        </div>
+
+                        <div className="vibe-card-body">
+                          <h4 className="vibe-card-title">{vibe.title}</h4>
+                          <span className="vibe-card-tagline">{vibe.tagline}</span>
+                          <p className="vibe-card-desc">{vibe.desc}</p>
+                        </div>
+
+                        <div className="vibe-card-action">
+                          {isUpcoming ? (
+                            <Link to={`/playlists/${vibe.id}`} className="vibe-card-btn view-link">
+                              विवरण देखें →
+                            </Link>
+                          ) : (
+                            <button
+                              type="button"
+                              className={`vibe-card-btn play-select-btn ${isVibeActive ? 'selected' : ''}`}
+                              onClick={() => handleSelectPlaylist(vibe.id)}
+                            >
+                              {isVibeActive ? 'यह महफ़िल जारी है 🍾' : 'यह महफ़िल चुनें ▶'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     )
                   })}
                 </div>
               </div>
 
-              {/* Tracklist Rows */}
-              <div className="session-tracklist" role="list">
-                {playlistSongs.map((song, idx) => {
-                  const isThisSongActive = currentSongIndex === idx
-                  const isThisSongPlaying = isPlaying && isThisSongActive
-                  return (
-                    <div
-                      key={song.id || idx}
-                      className={`track-item-card ${isThisSongActive ? 'active-track' : ''}`}
-                      onClick={() => handlePlaySong(song.youtubeId || song.id)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault()
-                          handlePlaySong(song.youtubeId || song.id)
-                        }
-                      }}
-                      aria-label={`${song.title} — ${song.artist}`}
-                    >
-                      <div className="track-left-cell">
-                        <span className="track-number">{idx + 1}</span>
-                        {isThisSongPlaying ? (
-                          <span className="track-playing-equalizer" title="बज रहा है">
-                            <span className="eq-bar bar-1" />
-                            <span className="eq-bar bar-2" />
-                            <span className="eq-bar bar-3" />
-                          </span>
-                        ) : (
-                          <button
-                            type="button"
-                            className="track-play-icon-btn"
-                            aria-label={`${song.title} चलाएं`}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              handlePlaySong(song.youtubeId || song.id)
-                            }}
-                          >
-                            ▶
-                          </button>
-                        )}
-                      </div>
-
-                      <div className="track-info-cell">
-                        <div className="track-title-row">
-                          <span className="track-title-text">{song.title}</span>
-                          {isThisSongActive && (
-                            <span className="track-active-tag">अब बज रहा है</span>
-                          )}
-                        </div>
-                        <span className="track-artist-text">{song.artist}</span>
-                      </div>
-
-                      <div className="track-right-cell">
-                        <span className="track-duration-text">{song.duration || 'रेट्रो'}</span>
-                      </div>
+              {/* Retro Nostalgia Cultural Chips */}
+              <div className="theka-nostalgia-chips-row" role="region" aria-label="रेट्रो बॉलीवुड यादें">
+                {NOSTALGIA_CHIPS.map((chip) => (
+                  <div key={chip.id} className="theka-nostalgia-chip">
+                    <span className="nostalgia-chip-icon" aria-hidden="true">{chip.icon}</span>
+                    <div className="nostalgia-chip-content">
+                      <strong className="nostalgia-chip-title">{chip.title}</strong>
+                      <span className="nostalgia-chip-desc">{chip.desc}</span>
                     </div>
-                  )
-                })}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
