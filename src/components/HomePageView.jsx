@@ -20,49 +20,49 @@ const THEKA_SHAYARI_COLLECTION = [
     id: 'sahir-1',
     sher: 'मैं ज़िंदगी का साथ निभाता चला गया,\nहर फ़िक्र को धुएँ में उड़ाता चला गया।',
     poet: 'साहिर लुधियानवी',
-    era: 'हम दोनों (१९६१)',
+    era: 'हम दोनों (1961)',
     context: 'गायन: मुहम्मद रफ़ी • संगीत: जयदेव'
   },
   {
     id: 'gulzar-1',
     sher: 'आँखों में जल रहा है क्यूँ बुझता नहीं धुआँ,\nउठता है दिल से दर्द कि रुकता नहीं धुआँ।',
     poet: 'गुलज़ार',
-    era: 'माचिस (१९९६)',
+    era: 'माचिस (1996)',
     context: 'गायन: सुरेश वाडेकर • संगीत: विशाल भारद्वाज'
   },
   {
     id: 'fakir-1',
     sher: 'ये दौलत भी ले लो, ये शोहरत भी ले लो,\nभले छीन लो मुझसे मेरी जवानी...\nमगर मुझको लौटा दो बचपन का सावन,\nवो काग़ज़ की कश्ती, वो बारिश का पानी।',
     poet: 'सुदर्शन फ़ाकिर',
-    era: 'आज (१९८२)',
+    era: 'आज (1982)',
     context: 'गायन: जगजीत सिंह & चित्रा सिंह'
   },
   {
     id: 'shailendra-1',
     sher: 'गाता रहे मेरा दिल, तू ही मेरी मंज़िल,\nकहीं बीतें ना ये रातें, कहीं बीतें ना ये दिन।',
     poet: 'शैलेंद्र',
-    era: 'गाइड (१९६५)',
+    era: 'गाइड (1965)',
     context: 'गायन: किशोर कुमार & लता मंगेशकर • संगीत: एस. डी. बर्मन'
   },
   {
     id: 'sahir-2',
     sher: 'कभी कभी मेरे दिल में ख़याल आता है,\nकि जैसे तुझको बनाया गया है मेरे लिए।',
     poet: 'साहिर लुधियानवी',
-    era: 'कभी कभी (१९७६)',
+    era: 'कभी कभी (1976)',
     context: 'गायन: मुकेश • संगीत: खय्याम'
   },
   {
     id: 'hasrat-1',
     sher: 'चुपके चुपके रात दिन आँसू बहाना याद है,\nहमको अब तक आशिक़ी का वो ज़माना याद है।',
     poet: 'हसरत मोहानी',
-    era: 'निकाह (१९८२)',
+    era: 'निकाह (1982)',
     context: 'गायन: ग़ुलाम अली • क्लासिक तराना'
   },
   {
     id: 'bakshi-1',
     sher: 'ज़िंदगी के सफ़र में गुज़र जाते हैं जो मक़ाम,\nवो फिर नहीं आते, वो फिर नहीं आते।',
     poet: 'आनंद बक्षी',
-    era: 'आप की कसम (१९७४)',
+    era: 'आप की कसम (1974)',
     context: 'गायन: किशोर कुमार • संगीत: आर. डी. बर्मन'
   }
 ]
@@ -70,7 +70,7 @@ const THEKA_SHAYARI_COLLECTION = [
 const THEKA_MOOD_VIBES = [
   {
     id: '90s',
-    title: '९०s की बोतल 🍾',
+    title: '90s Ki Botal 🍾',
     tagline: 'वॉकमैन व कैसेट का दौर',
     desc: 'पेंसिल से रील लपेटना, ऑटो-रिवर्स कैसेट और देर रात छत पर बजता ट्रांजिस्टर।',
     icon: '📼',
@@ -111,7 +111,7 @@ const NOSTALGIA_CHIPS = [
     id: 'radio',
     icon: '📻',
     title: 'आकाशवाणी व छायागीत',
-    desc: 'रात १० बजे अमीन सयानी की चिर-परिचित आवाज़ और बिनाका गीतमाला का सुरूर'
+    desc: 'रात 10 बजे अमीन सयानी की चिर-परिचित आवाज़ और बिनाका गीतमाला का सुरूर'
   },
   {
     id: 'cassette',
@@ -204,11 +204,8 @@ export const HomePageView = React.memo(function HomePageView({
         animate={{ opacity: hasEntered ? 1 : 0.85, y: hasEntered ? 0 : 20 }}
         transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
       >
-        {/* Interactive Theka Counter Experience (Bottle, Glass, Radio & Keepsakes) */}
-        <ThekaCounter
-          currentPlaylist={currentPlaylist}
-          onSelectPlaylist={handleSelectPlaylist}
-        />
+        {/* Interactive Theka Counter Experience (Lantern & Keepsakes) */}
+        <ThekaCounter />
 
         {/* Section 1: Theka Chronicles & Shayari Wall */}
         <section
@@ -222,11 +219,11 @@ export const HomePageView = React.memo(function HomePageView({
               <div className="theka-chronicles-header-row">
                 <div className="theka-header-titles">
                   <div className="editorial-badge-row">
-                    <span className="editorial-badge">ठेके की दास्तान • Theka Chronicles</span>
-                    <span className="editorial-meta">साहिर, गुलज़ार, ग़ालिब और रफ़ी का दौर</span>
+                    <span className="editorial-badge">ठेके की दास्तान</span>
+                    <span className="editorial-meta">Theka Chronicles</span>
                   </div>
                   <h2 className="editorial-title theka-chronicles-title">
-                    महफ़िल का शेर और चार पहर के मिज़ाज
+                    ठेके की दास्तान
                   </h2>
                   <p className="editorial-desc theka-chronicles-desc">
                     जब रात गहराती है और काँच के गिलासों में पुरानी यादें उतरती हैं, तब धुन और शायरी मिलकर दिल का हाल बयां करते हैं।
@@ -235,22 +232,24 @@ export const HomePageView = React.memo(function HomePageView({
               </div>
 
               {/* Centerpiece: Interactive Mehfil Shayari Card */}
-              <div className="theka-shayari-card" role="region" aria-label="आज का शेर">
+              <div className="theka-shayari-card" role="region" aria-label="आज की शायरी">
                 <div className="shayari-card-top-bar">
                   <div className="shayari-badge-group">
                     <span className="shayari-flame-icon" aria-hidden="true">🕯️</span>
-                    <span className="shayari-card-label">महफ़िल की रुबाई • Sher #{shayariIndex + 1}</span>
+                    <div className="shayari-label-stack">
+                      <span className="shayari-card-label">आज की शायरी</span>
+                      <span className="shayari-card-sub">महफ़िल से एक शेर</span>
+                    </div>
                   </div>
 
                   <button
                     type="button"
                     className="shayari-cycle-btn"
                     onClick={handleNextShayari}
-                    aria-label="दूसरा शेर पढ़ें"
-                    title="दूसरा शेर देखें"
+                    aria-label="अगला शेर पढ़ें"
+                    title="अगला शेर देखें"
                   >
-                    <span className="cycle-btn-text">दूसरा शेर</span>
-                    <span className="cycle-btn-icon" aria-hidden="true">↻</span>
+                    <span className="cycle-btn-text">अगला शेर →</span>
                   </button>
                 </div>
 

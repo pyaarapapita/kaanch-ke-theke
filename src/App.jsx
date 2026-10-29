@@ -87,7 +87,7 @@ function App() {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const scrollTop = window.scrollY || document.documentElement?.scrollTop || 0
-          const scrolled = scrollTop > 20
+          const scrolled = scrollTop > 60
           setIsScrolled((prev) => (prev !== scrolled ? scrolled : prev))
           ticking = false
         })
@@ -478,13 +478,15 @@ function App() {
 
         {/* Desktop Navigation Links */}
         <nav className="nav-links desktop-nav">
-          <Link
-            to="/playlists"
-            className={`nav-link ${location.pathname === '/playlists' ? 'active' : ''}`}
-            aria-label="सभी प्लेलिस्ट्स (All Playlists)"
-          >
-            प्लेलिस्ट्स
-          </Link>
+          {(hasEntered || location.pathname !== '/') && (
+            <Link
+              to="/playlists"
+              className={`nav-link ${location.pathname === '/playlists' ? 'active' : ''}`}
+              aria-label="सभी प्लेलिस्ट्स (All Playlists)"
+            >
+              प्लेलिस्ट्स
+            </Link>
+          )}
 
           {hasEntered && (
             <button
@@ -586,17 +588,19 @@ function App() {
 
               <div className="mobile-drawer-body">
                 <div className="mobile-nav-action-grid">
-                  <Link
-                    to="/playlists"
-                    className="mobile-nav-card-btn"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <span className="mobile-card-icon">📻</span>
-                    <div className="mobile-card-text">
-                      <span className="mobile-card-title">सभी प्लेलिस्ट्स</span>
-                      <span className="mobile-card-sub">५ चुनिंदा महफ़िलें</span>
-                    </div>
-                  </Link>
+                  {(hasEntered || location.pathname !== '/') && (
+                    <Link
+                      to="/playlists"
+                      className="mobile-nav-card-btn"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <span className="mobile-card-icon">📻</span>
+                      <div className="mobile-card-text">
+                        <span className="mobile-card-title">सभी प्लेलिस्ट्स</span>
+                        <span className="mobile-card-sub">5 चुनिंदा महफ़िलें</span>
+                      </div>
+                    </Link>
+                  )}
 
                   {hasEntered && (
                     <button
@@ -860,7 +864,7 @@ function App() {
             </Suspense>
             {hasEntered && (
               <span className="ambient-indicator">
-                {`वर्तमान मूड: ${currentPlaylist?.name || '९० का दौर'}`}
+                {`वर्तमान मूड: ${currentPlaylist?.name || '90s का दौर'}`}
               </span>
             )}
           </div>

@@ -12,7 +12,7 @@ import { playCorkPop, playPourSound, playGlassClink } from '../../utils/thekaAud
  */
 export const BottleAndGlassScene = React.memo(function BottleAndGlassScene({
   onGlassFilled,
-  activePlaylistTitle = '९०s की बोतल 🍾'
+  activePlaylistTitle = '90s की बोतल 🍾'
 }) {
   // Animation states: 'idle' | 'popping' | 'tilting' | 'pouring' | 'returning' | 'filled'
   const [pourState, setPourState] = useState('idle')

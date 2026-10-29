@@ -75,7 +75,7 @@ export const VintageRadio = React.memo(function VintageRadio({
         {/* Brand Plaque */}
         <div className="radio-brand-plate">
           <span className="plate-screw" />
-          <strong className="plate-brand-name">मुसाफ़िर ट्रांजिस्टर • १९९०</strong>
+          <strong className="plate-brand-name">मुसाफ़िर ट्रांजिस्टर • 1990</strong>
           <span className="plate-screw" />
         </div>
 

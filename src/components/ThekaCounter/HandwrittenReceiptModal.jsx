@@ -66,7 +66,7 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
 
             {/* Receipt Header */}
             <div className="receipt-header">
-              <span className="receipt-serial">पर्ची क्र. #१९९०-महफ़िल</span>
+              <span className="receipt-serial">पर्ची क्र. #1990-महफ़िल</span>
               <h3 id="receipt-title" className="receipt-theka-name">
                 काँच के ठेके
               </h3>
@@ -92,7 +92,7 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
               </div>
               <div>
                 <span className="meta-label">काउण्टर:</span>
-                <span className="meta-val">लकड़ी की मेज़ #०१</span>
+                <span className="meta-val">लकड़ी की मेज़ #01</span>
               </div>
             </div>
 
@@ -107,13 +107,13 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
               </thead>
               <tbody>
                 <tr>
-                  <td>९० के दशक के अमर नग़मे</td>
+                  <td>90 के दशक के अमर नग़मे</td>
                   <td className="text-center">असीमित</td>
                   <td className="text-right">अनमोल</td>
                 </tr>
                 <tr>
                   <td>रफ़ी साहब के दर्द भरे तराने</td>
-                  <td className="text-center">२ घूँट</td>
+                  <td className="text-center">2 घूँट</td>
                   <td className="text-right">दिल से</td>
                 </tr>
                 <tr>
@@ -123,12 +123,12 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
                 </tr>
                 <tr>
                   <td>नुक्कड़ वाली कड़क चाय का सुरूर</td>
-                  <td className="text-center">१ कुल्हड़</td>
+                  <td className="text-center">1 कुल्हड़</td>
                   <td className="text-right">मुफ़्त</td>
                 </tr>
                 <tr>
                   <td>बीती यादों की कसक व तन्हाई</td>
-                  <td className="text-center">१००%</td>
+                  <td className="text-center">100%</td>
                   <td className="text-right">शामिल</td>
                 </tr>
               </tbody>
@@ -155,7 +155,7 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
               <div className="stamp-inner-ring">
                 <span className="stamp-text-arc">काँच के ठेके</span>
                 <strong className="stamp-verified">प्रमाणित</strong>
-                <span className="stamp-sub">१९९० • सदाबहार</span>
+                <span className="stamp-sub">1990 • सदाबहार</span>
               </div>
             </div>
 

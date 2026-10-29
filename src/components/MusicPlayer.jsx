@@ -55,7 +55,7 @@ export const MusicPlayer = React.memo(function MusicPlayer({
   const songTitle = currentSong?.title || 'काँच के ठेके';
   const songArtist = currentSong?.artist || 'आज कुछ पुराना सुनते हैं';
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const isVisible = hasEntered;
+  const isVisible = hasEntered && !isScrolled;
 
   const currentMins = Math.floor(currentTime / 60);
   const currentSecs = Math.floor(currentTime % 60);
