@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { PLAYLISTS } from '../data/playlists'
 import { ThekaCounter } from './ThekaCounter/ThekaCounter'
 
 const SITE_CONFIG = {
@@ -365,76 +364,7 @@ export const HomePageView = React.memo(function HomePageView({
           </div>
         </section>
 
-        {/* Section 2: Curated Playlists Showcase */}
-        <section className="editorial-section playlists-section" aria-label="चुनिंदा हिंदी म्यूज़िक प्लेलिस्ट्स">
-          <div className="editorial-container">
-            <div className="editorial-content-panel full-width-panel">
-              <div className="editorial-badge-row">
-                <span className="editorial-badge">संग्रह • Curated Collections</span>
-                <span className="editorial-meta">Retro Bollywood &amp; Hindi Classics</span>
-              </div>
-              <h2 className="editorial-title">चुनिंदा रेट्रो बॉलीवुड प्लेलिस्ट्स (Curated Moods)</h2>
-              <p className="editorial-desc">
-                हर शाम का एक अलग रंग और हर याद का अपना एक नग़मा। अपनी पसंद की महफ़िल चुनें।
-              </p>
-              <div className="playlists-editorial-grid">
-                {PLAYLISTS.map((pl) => {
-                  const isCurrent = currentPlaylist?.id === pl.id
-                  const isUpcoming = Boolean(pl.isUpcoming)
-                  return (
-                    <div
-                      key={pl.id}
-                      className={`playlist-card-item ${isCurrent ? 'active-card' : ''} ${isUpcoming ? 'upcoming-card' : ''}`}
-                    >
-                      <div className="playlist-card-header">
-                        <h3 className="playlist-card-title">
-                          <Link to={`/playlists/${pl.id}`} className="playlist-title-link">
-                            {pl.name}
-                          </Link>
-                        </h3>
-                        {isCurrent && (
-                          <span className="active-equalizer-badge" title="सक्रिय प्लेलिस्ट">
-                            <span className="eq-bar bar-1" />
-                            <span className="eq-bar bar-2" />
-                            <span className="eq-bar bar-3" />
-                            <span className="active-badge-text">सक्रिय</span>
-                          </span>
-                        )}
-                        {isUpcoming && (
-                          <span className="upcoming-badge" title="शीघ्र उपलब्ध">
-                            शीघ्र उपलब्ध
-                          </span>
-                        )}
-                      </div>
-                      <p className="playlist-card-desc">{pl.description}</p>
-                      <div className="playlist-card-footer-row">
-                        <span className="playlist-card-meta">
-                          {isUpcoming ? 'शीघ्र उपलब्ध • Upcoming' : `${pl.songs?.length || 0} चुनिंदा गीत`}
-                        </span>
-                        <div className="playlist-card-actions">
-                          <Link to={`/playlists/${pl.id}`} className="card-action-btn view-btn">
-                            विवरण →
-                          </Link>
-                          {!isUpcoming && (
-                            <button
-                              type="button"
-                              className="card-action-btn play-btn"
-                              onClick={() => handleSelectPlaylist(pl.id)}
-                            >
-                              बजाएं ▶
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 3: About the Theka */}
+        {/* Section 2: About the Theka */}
         <section className="editorial-section story-section" aria-label="काँच के ठेके के बारे में">
           <div className="editorial-container">
             <div className="editorial-visual-panel">
