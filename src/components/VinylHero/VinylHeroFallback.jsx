@@ -10,10 +10,9 @@ export function VinylHeroFallback({
       className={`hero vinyl-hero-container ${hasEntered ? 'is-entered' : ''}`}
       aria-label="काँच के ठेके"
     >
-      {/* Atmospheric High-Resolution Poster Background */}
+      {/* Atmospheric High-Resolution Vinyl Record Poster Background */}
       <div
         className="vinyl-static-fallback"
-        style={{ backgroundImage: "url('/backgrounds/theka-bg.webp')" }}
         role="img"
         aria-label="काँच के ठेके विनाइल रिकॉर्ड"
       />

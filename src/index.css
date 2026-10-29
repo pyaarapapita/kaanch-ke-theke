@@ -67,6 +67,11 @@ button, a, input, select, textarea, [role="button"] {
   -webkit-touch-callout: none;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;

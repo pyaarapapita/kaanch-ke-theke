@@ -110,35 +110,41 @@ export function VinylHeroCanvas({
       onPointerMove={handlePointerMove}
       aria-label="काँच के ठेके 3D विनाइल अनुभव"
     >
-      {/* 3D WebGL Canvas Layer */}
+      {/* 3D WebGL Canvas Layer with seamless instant static poster fallback */}
       {webGLSupported ? (
-        <div className={`vinyl-canvas-wrapper ${isCanvasLoaded ? 'is-loaded' : ''}`}>
-          <Canvas
-            dpr={[1, 1.75]}
-            camera={{ position: [0, 1.8, 4.4], fov: 42 }}
-            gl={{
-              antialias: true,
-              alpha: true,
-              powerPreference: 'high-performance',
-              preserveDrawingBuffer: false
-            }}
-            onCreated={() => setIsCanvasLoaded(true)}
-          >
-            <Suspense fallback={null}>
-              <VinylScene
-                scrollProgressRef={scrollProgressRef}
-                isPlaying={isPlaying}
-                isReducedMotion={isReducedMotion}
-                pointerPosRef={pointerPosRef}
-              />
-            </Suspense>
-          </Canvas>
-        </div>
+        <>
+          <div
+            className={`vinyl-static-fallback ${isCanvasLoaded ? 'is-faded-out' : ''}`}
+            role="img"
+            aria-label="काँच के ठेके विनाइल रिकॉर्ड"
+          />
+          <div className={`vinyl-canvas-wrapper ${isCanvasLoaded ? 'is-loaded' : ''}`}>
+            <Canvas
+              dpr={[1, 1.75]}
+              camera={{ position: [0, 1.8, 4.4], fov: 42 }}
+              gl={{
+                antialias: true,
+                alpha: true,
+                powerPreference: 'high-performance',
+                preserveDrawingBuffer: false
+              }}
+              onCreated={() => setIsCanvasLoaded(true)}
+            >
+              <Suspense fallback={null}>
+                <VinylScene
+                  scrollProgressRef={scrollProgressRef}
+                  isPlaying={isPlaying}
+                  isReducedMotion={isReducedMotion}
+                  pointerPosRef={pointerPosRef}
+                />
+              </Suspense>
+            </Canvas>
+          </div>
+        </>
       ) : (
         /* Static High-Resolution Fallback when WebGL is unavailable */
         <div
           className="vinyl-static-fallback"
-          style={{ backgroundImage: "url('/backgrounds/theka-bg.webp')" }}
           role="img"
           aria-label="काँच के ठेके विनाइल रिकॉर्ड"
         />

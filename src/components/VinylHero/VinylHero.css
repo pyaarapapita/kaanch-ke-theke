@@ -41,18 +41,25 @@
   display: block;
 }
 
-/* Fallback static poster for environments without WebGL or reduced-motion */
+/* Fallback static poster for environments without WebGL or during 3D model initialization */
 .vinyl-static-fallback {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  background-image: url('/backgrounds/vinyl-hero-poster.webp');
   background-size: cover;
   background-position: center right;
   background-repeat: no-repeat;
-  opacity: 0.85;
-  filter: contrast(1.05) brightness(0.9);
+  opacity: 0.95;
+  filter: contrast(1.05) brightness(0.95);
   z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vinyl-static-fallback.is-faded-out {
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -148,7 +155,13 @@
     margin-bottom: 1.5rem;
   }
 
-  .vinyl-canvas-wrapper {
+  .vinyl-canvas-wrapper.is-loaded {
     opacity: 0.95;
+  }
+
+  .vinyl-static-fallback {
+    background-image: url('/backgrounds/vinyl-hero-poster-mobile.webp');
+    background-position: center top;
+    background-size: cover;
   }
 }

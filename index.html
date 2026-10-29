@@ -20,6 +20,11 @@
   <link rel="manifest" href="/manifest.json" />
   <meta name="google-site-verification" content="googled5015db35329c116" />
 
+  <!-- High-priority preloads for instant zero-flash hero paint -->
+  <link rel="preload" as="image" href="/backgrounds/theka-bg.webp" type="image/webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="/backgrounds/vinyl-hero-poster-mobile.webp" media="(max-width: 900px)" type="image/webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="/backgrounds/vinyl-hero-poster.webp" media="(min-width: 901px)" type="image/webp" fetchpriority="high" />
+
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="काँच के ठेके | Kaanch Ke Theke" />
@@ -168,18 +173,30 @@
 
 <body>
   <div id="root">
-    <!-- Accessible Semantic Fallback for Search Engines and AI Crawlers (hydrated on client mount) -->
-    <header style="max-width:960px;margin:2rem auto;padding:0 1rem;font-family:sans-serif;">
+    <div class="landing-container">
+      <!-- Atmospheric Background Layer (Neutral base for all routes) -->
+      <div class="bg-placeholder" aria-hidden="true">
+        <div class="bg-image"></div>
+        <div class="ambient-glow"></div>
+        <div class="overlay-vignette"></div>
+        <div class="film-grain"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accessible Semantic Fallback for Search Engines and AI Crawlers without JavaScript -->
+  <noscript>
+    <header style="max-width:960px;margin:2rem auto;padding:0 1rem;font-family:sans-serif;color:#f3e8d2;">
       <h1>काँच के ठेके | Kaanch Ke Theke</h1>
       <p><strong>Retro Bollywood Music &amp; Nostalgic Hindi Melodies</strong></p>
       <p>पुराने बॉलीवुड गानों, यादों और महफ़िल का एक सिनेमाई संगीत अनुभव। 90s के सदाबहार नग़मे, ग़ज़लें, दर्द-ए-दिल और रेट्रो हिंदी क्लासिक्स।</p>
       <nav aria-label="मुख्य नेविगेशन">
-        <a href="/">मुख्य पृष्ठ (Home)</a> • 
-        <a href="/playlists">सभी प्लेलिस्ट्स (All Playlists)</a>
+        <a href="/" style="color:#d4af37;">मुख्य पृष्ठ (Home)</a> • 
+        <a href="/playlists" style="color:#d4af37;">सभी प्लेलिस्ट्स (All Playlists)</a>
       </nav>
     </header>
 
-    <main style="max-width:960px;margin:2rem auto;padding:0 1rem;font-family:sans-serif;">
+    <main style="max-width:960px;margin:2rem auto;padding:0 1rem;font-family:sans-serif;color:#e8d8c0;">
       <section aria-label="काँच के ठेके का परिचय">
         <h2>काँच के ठेके क्या है? (About Kaanch Ke Theke)</h2>
         <p>
@@ -191,43 +208,27 @@
         <h2>चुनिंदा रेट्रो बॉलीवुड प्लेलिस्ट्स (Curated Hindi Playlists)</h2>
         <ul>
           <li>
-            <h3><a href="/playlists/90s">90s Ki Botal 🍾 (९० के दौर के सदाबहार नग़मे)</a></h3>
-            <p>Purani yaadein, late night mood aur 90s ke iconic bangers. 14 चुनिंदा सदाबहार गीत:</p>
-            <ol>
-              <li>Yeh Jo Mohabbat Hai — किशोर कुमार (Kishore Kumar)</li>
-              <li>Barsaat Ke Mausam Mein — कुमार सानू (Kumar Sanu)</li>
-              <li>Pile Pile O Meri — मोहम्मद अज़ीज़ (Mohammad Aziz)</li>
-              <li>Apni To Jaise Taise — किशोर कुमार (Kishore Kumar)</li>
-              <li>Main Na Bhoolunga (Sad) — लता मंगेशकर &amp; मुकेश (Lata Mangeshkar &amp; Mukesh)</li>
-              <li>Kya Hua Tera Vada — मोहम्मद रफ़ी (Mohammed Rafi)</li>
-              <li>Main Zindagi Ka Saath Nibhata Chala Gaya — मोहम्मद रफ़ी (Mohammed Rafi)</li>
-              <li>Duniya Bananewale — मुकेश (Mukesh)</li>
-              <li>Mujhko Pina Hai Peene Do — मोहम्मद अज़ीज़ (Mohammad Aziz)</li>
-              <li>खामोश लब हैं झुकी निगाहें — कुमार सत्यम (Kumar Satyam)</li>
-              <li>Khamosh Lab Hai Jhuki Hai Palkein — मेहदी हसन स्टाइल (Mehdi Hassan Style)</li>
-              <li>Pehli Pehli Baar Mohabbat Ki Hai — कुमार सानू &amp; अलका याग्निक (Kumar Sanu, Alka Yagnik)</li>
-              <li>Main Na Bhoolunga (Happy) — लता मंगेशकर &amp; मुकेश (Lata Mangeshkar &amp; Mukesh)</li>
-              <li>Chupke Chupke Raat Din Aansoon Bahana — ग़ुलाम अली (Ghulam Ali)</li>
-            </ol>
+            <h3><a href="/playlists/90s" style="color:#d4af37;">90s Ki Botal 🍾 (९० के दौर के सदाबहार नग़मे)</a></h3>
+            <p>Purani yaadein, late night mood aur 90s ke iconic bangers. 14 चुनिंदा सदाबहार गीत।</p>
           </li>
           <li>
-            <h3><a href="/playlists/dard-e-dil">Dard-e-Dil Vibe 💔 (दर्द-ए-दिल)</a></h3>
+            <h3><a href="/playlists/dard-e-dil" style="color:#d4af37;">Dard-e-Dil Vibe 💔 (दर्द-ए-दिल)</a></h3>
             <p>Sip, regret &amp; repeat — toote dil waalon ka dedicated corner.</p>
           </li>
           <li>
-            <h3><a href="/playlists/mahfil">Ghazal &amp; Mahfil 🌙 (ग़ज़ल व महफ़िल)</a></h3>
-            <p>Retro ghazals aur shaam ki peaceful baithak. जगजीत सिंह, ग़ुलाम अली व मेहदी हसन के अमर तराने।</p>
+            <h3><a href="/playlists/mahfil" style="color:#d4af37;">काँच के जाम व ग़ज़ल 🌙 (धीमी रात की महफ़िल)</a></h3>
+            <p>जगजीत सिंह का सोज़, जलती लालटेन और काँच के गिलासों में उतरता सुकून।</p>
           </li>
           <li>
-            <h3><a href="/playlists/barish-aur-yaadein">Monsoon Memories 🌧️ (बारिश और यादें)</a></h3>
-            <p>Baarish ki tip-tip aur iconic retro monsoon tracks.</p>
+            <h3><a href="/playlists/barish-aur-yaadein" style="color:#d4af37;">रिमझिम बारिश 🌧️ (भीगी शाम और पुरानी धुन)</a></h3>
+            <p>खिड़की पर गिरती बूँदें, कुल्हड़ वाली चाय और किशोर दा के भीगे नग़मे।</p>
           </li>
           <li>
-            <h3><a href="/playlists/raat-ka-nasha">Midnight Nasha 🌌 (रात का नशा)</a></h3>
+            <h3><a href="/playlists/raat-ka-nasha" style="color:#d4af37;">Midnight Nasha 🌌 (रात का नशा)</a></h3>
             <p>Aadhi raat ki tanhai aur madhosh vintage hits.</p>
           </li>
         </ul>
-        <p><a href="/playlists"><strong>→ काँच के ठेके की सभी प्लेलिस्ट्स देखें (View All Playlists)</strong></a></p>
+        <p><a href="/playlists" style="color:#d4af37;font-weight:600;">→ काँच के ठेके की सभी प्लेलिस्ट्स देखें (View All Playlists)</a></p>
       </section>
 
       <section aria-label="शायरी और साहित्य">
@@ -240,7 +241,7 @@
         </blockquote>
       </section>
     </main>
-  </div>
+  </noscript>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 
