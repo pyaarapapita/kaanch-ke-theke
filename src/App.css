@@ -2957,6 +2957,9 @@
   border-radius: 8px;
   width: 100%;
   max-width: 480px;
+  max-height: 86vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 2.2rem 2.2rem 1.75rem;
   position: relative;
   box-shadow: 
