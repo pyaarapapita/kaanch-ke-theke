@@ -1,7 +1,29 @@
-# Allow crawling of all content
+# Kaanch Ke Theke (काँच के ठेके) — robots.txt
+# Production Domain: https://kaanch-ke-theke.pages.dev/
+
+# General crawler policy: allow all legitimate public pages and assets
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /private/
 
-# Sitemap location
+# Googlebot (Google Search & Google AI Overviews)
+User-agent: Googlebot
+Allow: /
+
+# Bingbot (Bing Search & Microsoft Copilot)
+User-agent: Bingbot
+Allow: /
+
+# OAI-SearchBot (ChatGPT Search engine citation and retrieval crawler)
+# Allows ChatGPT Search to index and cite public playlists, lyrics, and metadata
+User-agent: OAI-SearchBot
+Allow: /
+
+# GPTBot (OpenAI foundation model training crawler)
+# Governed by model-training policy; real-time search discovery is handled by OAI-SearchBot above.
+User-agent: GPTBot
+Allow: /
+
+# XML Sitemap index
 Sitemap: https://kaanch-ke-theke.pages.dev/sitemap.xml
-

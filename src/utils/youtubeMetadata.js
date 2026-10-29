@@ -3,9 +3,40 @@
  * Supports pagination via nextPageToken and caches metadata in-memory per session.
  */
 
+import { PLAYLISTS } from '../data/playlists';
+
 const metadataCache = new Map();
 
-export async function fetchPlaylistMetadata(playlistId) {
+// Lookup for curated title/artist metadata
+const curatedSongLookup = new Map();
+PLAYLISTS.forEach((pl) => {
+  (pl.songs || []).forEach((s) => {
+    if (s.youtubeId) {
+      curatedSongLookup.set(s.youtubeId, s);
+    }
+  });
+});
+
+function cleanSongTitle(rawTitle) {
+  if (!rawTitle) return 'अज्ञात गीत';
+  let t = rawTitle;
+  // If title has '|', clean up channel promotional suffixes
+  if (t.includes('|')) {
+    const parts = t.split('|').map((s) => s.trim()).filter(Boolean);
+    if (parts.length > 1 && /^(superhit|hit|best|evergreen|classic)\b/i.test(parts[0])) {
+      t = parts[1];
+    } else if (parts.length > 0) {
+      t = parts[0];
+    }
+  }
+  // Remove hashtags
+  t = t.replace(/#[\w\u0900-\u097F_-]+/g, '').trim();
+  // Remove (Official Video), [HD], etc.
+  t = t.replace(/\s*[([](Official Video|Audio|Full Song|HD|4K|Lyrical|Video|Lyrical Video)[)\]]/gi, '').trim();
+  return t || rawTitle;
+}
+
+export async function fetchPlaylistMetadata(playlistId, forceRefresh = false) {
   if (!playlistId) return { items: [], lookupMap: {} };
 
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
@@ -14,7 +45,9 @@ export async function fetchPlaylistMetadata(playlistId) {
     return { items: [], lookupMap: {} };
   }
 
-  if (metadataCache.has(playlistId)) {
+  if (forceRefresh) {
+    metadataCache.delete(playlistId);
+  } else if (metadataCache.has(playlistId)) {
     console.log('[YouTube Data API] Returning cached metadata for playlist:', playlistId);
     return metadataCache.get(playlistId);
   }
@@ -48,12 +81,13 @@ export async function fetchPlaylistMetadata(playlistId) {
         const videoId = snippet.resourceId?.videoId || item.contentDetails?.videoId;
         if (!videoId || snippet.title === 'Private video' || snippet.title === 'Deleted video') return;
 
-        const title = snippet.title || 'अज्ञात गीत';
-        let artist = snippet.videoOwnerChannelTitle || snippet.channelTitle || 'YouTube';
+        const curated = curatedSongLookup.get(videoId);
+        const title = curated?.title || cleanSongTitle(snippet.title);
+        let artist = curated?.artist || snippet.videoOwnerChannelTitle || snippet.channelTitle || 'YouTube';
         artist = artist.replace(/\s*-\s*Topic$/, '').trim();
 
         const songObj = {
-          id: videoId,
+          id: curated?.id || `yt-${videoId}`,
           title: title,
           artist: artist,
           youtubeId: videoId,

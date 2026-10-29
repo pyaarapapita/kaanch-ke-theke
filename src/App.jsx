@@ -14,7 +14,6 @@ import './App.css'
 const PlaylistsPage = lazy(() => import('./pages/PlaylistsPage'))
 const PlaylistDetailPage = lazy(() => import('./pages/PlaylistDetailPage'))
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
-const PlaylistsModal = lazy(() => import('./components/PlaylistsModal'))
 const VisitorCounter = lazy(() => import('./components/VisitorCounter'))
 
 // Configuration for external profile/support links
@@ -27,29 +26,28 @@ function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [hasEntered, setHasEntered] = useState(false)
+  // Standalone public routes (/playlists, /playlists/:id) enter directly without landing modal blocking
+  const [hasEntered, setHasEntered] = useState(() => typeof window !== 'undefined' && window.location.pathname !== '/')
   const [isVideoTransitioning, setIsVideoTransitioning] = useState(false)
   const [isVideoFinished, setIsVideoFinished] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
-  const [showPlaylistsModal, setShowPlaylistsModal] = useState(false)
-  const [hasOpenedModal, setHasOpenedModal] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
-  const [currentPlaylist, setCurrentPlaylist] = useState(() => getPlaylistById(DEFAULT_PLAYLIST_ID) || PLAYLISTS[0])
+  const [dynamicPlaylists, setDynamicPlaylists] = useState(PLAYLISTS)
+  const [currentPlaylistId, setCurrentPlaylistId] = useState(DEFAULT_PLAYLIST_ID)
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false)
   const [autoSkipMessage, setAutoSkipMessage] = useState(null)
+
+  const currentPlaylist = useMemo(() => {
+    return dynamicPlaylists.find((p) => p.id === currentPlaylistId) || dynamicPlaylists[0]
+  }, [dynamicPlaylists, currentPlaylistId])
 
   const aboutBtnRef = useRef(null)
   const closeBtnRef = useRef(null)
   const videoRef = useRef(null)
 
   const playlistSongs = useMemo(() => currentPlaylist?.songs || [], [currentPlaylist])
-
-  const handleOpenPlaylistsModal = useCallback(() => {
-    setHasOpenedModal(true)
-    setShowPlaylistsModal(true)
-  }, [])
 
   // Synchronize route URL parameter with active playlist state and handle smooth scroll to top on navigation
   useEffect(() => {
@@ -62,22 +60,17 @@ function App() {
 
     Promise.resolve().then(() => {
       setIsMobileMenuOpen(false)
-      if (location.pathname === '/playlists') {
+      if (location.pathname !== '/') {
         setHasEntered(true)
-        setShowPlaylistsModal(false)
-      } else if (location.pathname.startsWith('/playlists/')) {
-        setHasEntered(true)
-        setShowPlaylistsModal(false)
-        const targetId = location.pathname.replace('/playlists/', '').trim()
-        if (targetId) {
-          const pl = getPlaylistById(targetId)
-          if (pl && pl.id !== currentPlaylist?.id) {
-            setCurrentPlaylist(pl)
+        if (location.pathname.startsWith('/playlists/')) {
+          const targetId = location.pathname.replace('/playlists/', '').trim()
+          if (targetId && targetId !== currentPlaylistId) {
+            setCurrentPlaylistId(targetId)
           }
         }
       }
     })
-  }, [location.pathname, currentPlaylist?.id])
+  }, [location.pathname, currentPlaylistId])
 
   // Scroll position tracking to control header panel & MusicPlayer visibility
   useEffect(() => {
@@ -115,9 +108,9 @@ function App() {
     }
   }, [location.pathname, navigate])
 
-  // Lock scroll when pre-entry or modal is active
+  // Lock scroll only when pre-entry gate is active on homepage or about modal is open
   useEffect(() => {
-    if (!hasEntered || showAbout) {
+    if ((!hasEntered && location.pathname === '/') || showAbout) {
       const originalOverflow = window.getComputedStyle(document.body).overflow
       document.body.style.overflow = 'hidden'
 
@@ -139,7 +132,7 @@ function App() {
         window.removeEventListener('keydown', handleKeyDown)
       }
     }
-  }, [hasEntered, showAbout, isMobileMenuOpen])
+  }, [hasEntered, showAbout, isMobileMenuOpen, location.pathname])
 
   // Fetch playlist metadata automatically on mount / playlist change
   useEffect(() => {
@@ -149,11 +142,23 @@ function App() {
       Promise.resolve().then(() => {
         if (isMounted) setIsLoadingMetadata(true)
       })
-      fetchPlaylistMetadata(plId).then(() => {
+      fetchPlaylistMetadata(plId).then((result) => {
         if (isMounted) {
           setIsLoadingMetadata(false)
+          if (result?.items && result.items.length > 0) {
+            console.log(`[App] Received ${result.items.length} dynamic songs from YouTube for playlist ${plId}`)
+            setDynamicPlaylists((prevPlaylists) =>
+              prevPlaylists.map((pl) => {
+                if (pl.youtubePlaylistId === plId) {
+                  return { ...pl, songs: result.items }
+                }
+                return pl
+              })
+            )
+          }
         }
-      }).catch(() => {
+      }).catch((err) => {
+        console.warn('[App] fetchPlaylistMetadata error:', err)
         if (isMounted) setIsLoadingMetadata(false)
       })
     }
@@ -259,8 +264,8 @@ function App() {
 
     let targetPlaylist = currentPlaylist
     if (playlistId) {
-      targetPlaylist = getPlaylistById(playlistId)
-      setCurrentPlaylist(targetPlaylist)
+      targetPlaylist = dynamicPlaylists.find((p) => p.id === playlistId) || getPlaylistById(playlistId)
+      setCurrentPlaylistId(playlistId)
     }
 
     const songs = targetPlaylist?.songs || playlistSongs
@@ -274,11 +279,11 @@ function App() {
     } else if (targetPlaylist?.youtubePlaylistId) {
       playPlaylistId(targetPlaylist.youtubePlaylistId)
     }
-  }, [currentPlaylist, playlistSongs, playSongId, playPlaylistId])
+  }, [currentPlaylist, dynamicPlaylists, playlistSongs, playSongId, playPlaylistId])
 
   const handleSelectPlaylist = useCallback((playlistId) => {
-    const selected = getPlaylistById(playlistId)
-    setCurrentPlaylist(selected)
+    setCurrentPlaylistId(playlistId)
+    const selected = dynamicPlaylists.find((p) => p.id === playlistId) || getPlaylistById(playlistId)
     setCurrentSongIndex(0)
     setHasEntered(true)
 
@@ -289,7 +294,7 @@ function App() {
     } else if (selected?.youtubePlaylistId) {
       playPlaylistId(selected.youtubePlaylistId)
     }
-  }, [playPlaylistId, playSongId])
+  }, [dynamicPlaylists, playPlaylistId, playSongId])
 
   const handleEnterTheka = useCallback(() => {
     setHasEntered(true)
@@ -398,10 +403,6 @@ function App() {
     }
   }, [isVideoTransitioning, completeEntryTransition])
 
-  const handleClosePlaylistsModal = useCallback(() => {
-    setShowPlaylistsModal(false)
-  }, [])
-
   return (
     <div className={`landing-container ${hasEntered ? 'is-entered' : ''}`}>
       {/* Hidden YouTube IFrame Player Instance */}
@@ -478,27 +479,6 @@ function App() {
 
         {/* Desktop Navigation Links */}
         <nav className="nav-links desktop-nav">
-          {(hasEntered || location.pathname !== '/') && (
-            <Link
-              to="/playlists"
-              className={`nav-link ${location.pathname === '/playlists' ? 'active' : ''}`}
-              aria-label="सभी प्लेलिस्ट्स (All Playlists)"
-            >
-              प्लेलिस्ट्स
-            </Link>
-          )}
-
-          {hasEntered && (
-            <button
-              type="button"
-              className="nav-link nav-link-btn"
-              onClick={handleOpenPlaylistsModal}
-              aria-label="प्लेलिस्ट डायलॉग (Quick Switch Modal)"
-            >
-              मूड स्विच 📻
-            </button>
-          )}
-
           <div className="support-nav-item">
             <a
               href={SITE_CONFIG.BUY_ME_A_COFFEE_URL}
@@ -511,13 +491,25 @@ function App() {
             </a>
           </div>
 
-          {hasEntered && (
-            <MoodSelector
-              playlists={PLAYLISTS}
-              activePlaylistId={currentPlaylist?.id}
-              onSelectPlaylist={handleSelectPlaylist}
-            />
-          )}
+          <AnimatePresence>
+            {hasEntered && !isScrolled && (
+              <motion.div
+                key="header-mood-selector"
+                initial={{ opacity: 0, scale: 0.9, width: 0 }}
+                animate={{ opacity: 1, scale: 1, width: 'auto' }}
+                exit={{ opacity: 0, scale: 0.9, width: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                style={{ overflow: 'visible', display: 'inline-flex', alignItems: 'center' }}
+              >
+                <MoodSelector
+                  playlists={dynamicPlaylists}
+                  activePlaylistId={currentPlaylist?.id}
+                  onSelectPlaylist={handleSelectPlaylist}
+                  isScrolled={isScrolled}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <button
             ref={aboutBtnRef}
@@ -588,37 +580,6 @@ function App() {
 
               <div className="mobile-drawer-body">
                 <div className="mobile-nav-action-grid">
-                  {(hasEntered || location.pathname !== '/') && (
-                    <Link
-                      to="/playlists"
-                      className="mobile-nav-card-btn"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <span className="mobile-card-icon">📻</span>
-                      <div className="mobile-card-text">
-                        <span className="mobile-card-title">सभी प्लेलिस्ट्स</span>
-                        <span className="mobile-card-sub">5 चुनिंदा महफ़िलें</span>
-                      </div>
-                    </Link>
-                  )}
-
-                  {hasEntered && (
-                    <button
-                      type="button"
-                      className="mobile-nav-card-btn"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false)
-                        handleOpenPlaylistsModal()
-                      }}
-                    >
-                      <span className="mobile-card-icon">🎛️</span>
-                      <div className="mobile-card-text">
-                        <span className="mobile-card-title">मूड बदलें</span>
-                        <span className="mobile-card-sub">क्विक प्लेलिस्ट डायलॉग</span>
-                      </div>
-                    </button>
-                  )}
-
                   <button
                     type="button"
                     className="mobile-nav-card-btn"
@@ -653,7 +614,7 @@ function App() {
                       <span className="mobile-mood-title">मूड चुनिए (Mood Selector)</span>
                     </div>
                     <div className="mobile-mood-list">
-                      {PLAYLISTS.map((pl) => {
+                      {dynamicPlaylists.map((pl) => {
                         const isSelected = pl.id === currentPlaylist?.id
                         const isUpcoming = Boolean(pl.isUpcoming)
                         return (
@@ -714,6 +675,7 @@ function App() {
           element={
             <PlaylistsPage
               currentPlaylist={currentPlaylist}
+              playlists={dynamicPlaylists}
               onSelectPlaylist={handleSelectPlaylist}
             />
           }
@@ -724,6 +686,7 @@ function App() {
           element={
             <PlaylistDetailPage
               currentPlaylist={currentPlaylist}
+              playlists={dynamicPlaylists}
               onSelectPlaylist={handleSelectPlaylist}
               onPlaySong={playSongId}
             />
@@ -757,19 +720,6 @@ function App() {
         autoSkipMessage={autoSkipMessage}
         onRetry={retryCurrent}
       />
-
-      {/* Playlists Dialog Box Modal */}
-      {hasOpenedModal && (
-        <Suspense fallback={null}>
-          <PlaylistsModal
-            isOpen={showPlaylistsModal}
-            onClose={handleClosePlaylistsModal}
-            currentPlaylist={currentPlaylist}
-            onSelectPlaylist={handleSelectPlaylist}
-            onPlaySong={handlePlaySong}
-          />
-        </Suspense>
-      )}
 
       {/* Accessible Modal */}
       <AnimatePresence>
@@ -828,7 +778,7 @@ function App() {
               मुख्य पृष्ठ (Home)
             </Link>
             <Link to="/playlists" className="footer-nav-link">
-              प्लेलिस्ट्स (Playlists)
+              सभी प्लेलिस्ट्स (Playlists)
             </Link>
             <button
               type="button"

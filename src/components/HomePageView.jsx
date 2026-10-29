@@ -1,7 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ThekaCounter } from './ThekaCounter/ThekaCounter'
+import { VinylHeroFallback } from './VinylHero/VinylHeroFallback'
+import { VinylHeroErrorBoundary } from './VinylHero/VinylHeroErrorBoundary'
+import './VinylHero/VinylHero.css'
+
+const VinylHeroCanvas = lazy(() =>
+  import('./VinylHero/VinylHeroCanvas').then((m) => ({ default: m.VinylHeroCanvas }))
+)
 
 const SITE_CONFIG = {
   INSTAGRAM_URL: 'https://www.instagram.com/ironically_anujj',
@@ -145,57 +152,29 @@ export const HomePageView = React.memo(function HomePageView({
 
   return (
     <>
-      {/* Hero Section */}
-      <section className={`hero ${hasEntered ? 'is-entered' : ''}`}>
-        <div className={`hero-content ${hasEntered ? 'receded' : ''}`}>
-          <div className="title-wrapper">
-            <motion.h1
-              className="main-title"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 0.4 }}
-            >
-              काँच के ठेके
-            </motion.h1>
-            <motion.p
-              className="subtitle-english"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.95 }}
-              transition={{ duration: 1.2, delay: 0.6 }}
-            >
-              KAANCH KE THEKE — Retro Bollywood Music &amp; Nostalgic Melodies
-            </motion.p>
-          </div>
-
-          <motion.p
-            className="tagline"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, delay: 0.8 }}
-          >
-            अपने किरदार से महकता है इंसान, चरित्र पवित्र करने का इत्र नहीं आता
-          </motion.p>
-
-          <div className="cta-wrapper">
-            <AnimatePresence mode="wait">
-              {!hasEntered && !isVideoTransitioning && (
-                <motion.button
-                  type="button"
-                  className="cta-button"
-                  onClick={handleStartEntryTransition}
-                  disabled={isVideoTransitioning}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                  transition={{ duration: 0.35 }}
-                >
-                  ठेके में प्रवेश करें
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </section>
+      {/* 3D Cinematic Scroll-Driven Vinyl Hero Section (Lazy loaded with instant zero-CLS fallback) */}
+      <VinylHeroErrorBoundary
+        hasEntered={hasEntered}
+        isVideoTransitioning={isVideoTransitioning}
+        handleStartEntryTransition={handleStartEntryTransition}
+      >
+        <Suspense
+          fallback={
+            <VinylHeroFallback
+              hasEntered={hasEntered}
+              isVideoTransitioning={isVideoTransitioning}
+              handleStartEntryTransition={handleStartEntryTransition}
+            />
+          }
+        >
+          <VinylHeroCanvas
+            hasEntered={hasEntered}
+            isVideoTransitioning={isVideoTransitioning}
+            isPlaying={isPlaying}
+            handleStartEntryTransition={handleStartEntryTransition}
+          />
+        </Suspense>
+      </VinylHeroErrorBoundary>
 
       {/* Extended Editorial Content Flow & Playlist Overview */}
       <motion.div
@@ -327,23 +306,46 @@ export const HomePageView = React.memo(function HomePageView({
                         </div>
 
                         <div className="vibe-card-action">
-                          {isUpcoming ? (
-                            <Link to={`/playlists/${vibe.id}`} className="vibe-card-btn view-link">
-                              विवरण देखें →
-                            </Link>
-                          ) : (
+                          <Link
+                            to={`/playlists/${vibe.id}`}
+                            className="vibe-card-btn view-link"
+                            aria-label={`${vibe.title} का पूरा विवरण व ट्रैकलिस्ट देखें`}
+                          >
+                            विवरण देखें →
+                          </Link>
+                          {!isUpcoming && (
                             <button
                               type="button"
                               className={`vibe-card-btn play-select-btn ${isVibeActive ? 'selected' : ''}`}
                               onClick={() => handleSelectPlaylist(vibe.id)}
+                              aria-label={`${vibe.title} बजाएं`}
                             >
-                              {isVibeActive ? 'यह महफ़िल जारी है 🍾' : 'यह महफ़िल चुनें ▶'}
+                              {isVibeActive ? 'सक्रिय 🍾' : 'बजाएं ▶'}
                             </button>
                           )}
                         </div>
                       </div>
                     )
                   })}
+                </div>
+
+                <div className="theka-all-playlists-cta-row" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                  <Link
+                    to="/playlists"
+                    className="vibe-card-btn view-link"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0.75rem 1.6rem',
+                      fontSize: '0.92rem',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    सभी चुनिंदा प्लेलिस्ट्स देखें (Explore All Curated Playlists) →
+                  </Link>
                 </div>
               </div>
 

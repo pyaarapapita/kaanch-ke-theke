@@ -1794,6 +1794,20 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.header.is-scrolled .mood-selector-container,
+.mood-selector-container.is-scrolled {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateY(-6px) scale(0.95);
 }
 
 .mood-dropdown-menu {

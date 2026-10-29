@@ -98,15 +98,20 @@
                 "description": "आज कुछ पुराना सुनते हैं — ९० के दौर के सदाबहार नग़मे।",
                 "numTracks": 9,
                 "track": [
-                  { "@type": "MusicRecording", "name": "Kya Hua Tera Wada", "byArtist": { "@type": "MusicGroup", "name": "Mohammed Rafi" } },
-                  { "@type": "MusicRecording", "name": "Main Zindagi Ka Saath Nibhata Chala Gaya", "byArtist": { "@type": "MusicGroup", "name": "Mohammed Rafi" } },
-                  { "@type": "MusicRecording", "name": "Mujhko Peena Hai Peene Do", "byArtist": { "@type": "MusicGroup", "name": "Mohd Aziz" } },
                   { "@type": "MusicRecording", "name": "Yeh Jo Mohabbat Hai", "byArtist": { "@type": "MusicGroup", "name": "Kishore Kumar" } },
-                  { "@type": "MusicRecording", "name": "Barsaat Ke Mausam Mein", "byArtist": { "@type": "MusicGroup", "name": "Kumar Sanu, Roop Kumar Rathod" } },
-                  { "@type": "MusicRecording", "name": "Mujhe Peene Ka Shauk Nahi", "byArtist": { "@type": "MusicGroup", "name": "Alka Yagnik" } },
-                  { "@type": "MusicRecording", "name": "Peele Peele O Morey Raja", "byArtist": { "@type": "MusicGroup", "name": "Tirangaa" } },
-                  { "@type": "MusicRecording", "name": "Aapka Kya Hoga (Dhanno)", "byArtist": { "@type": "MusicGroup", "name": "Mika Singh, Sunidhi Chauhan" } },
-                  { "@type": "MusicRecording", "name": "Do Ghut Mujhe Bhi Pila De", "byArtist": { "@type": "MusicGroup", "name": "RD Burman" } }
+                  { "@type": "MusicRecording", "name": "Barsaat Ke Mausam Mein", "byArtist": { "@type": "MusicGroup", "name": "Kumar Sanu" } },
+                  { "@type": "MusicRecording", "name": "Pile Pile O Meri", "byArtist": { "@type": "MusicGroup", "name": "Mohammad Aziz" } },
+                  { "@type": "MusicRecording", "name": "Apni To Jaise Taise", "byArtist": { "@type": "MusicGroup", "name": "Kishore Kumar" } },
+                  { "@type": "MusicRecording", "name": "Main Na Bhoolunga (Sad)", "byArtist": { "@type": "MusicGroup", "name": "Lata Mangeshkar, Mukesh" } },
+                  { "@type": "MusicRecording", "name": "Kya Hua Tera Vada", "byArtist": { "@type": "MusicGroup", "name": "Mohammed Rafi" } },
+                  { "@type": "MusicRecording", "name": "Main Zindagi Ka Saath Nibhata Chala Gaya", "byArtist": { "@type": "MusicGroup", "name": "Mohammed Rafi" } },
+                  { "@type": "MusicRecording", "name": "Duniya Bananewale", "byArtist": { "@type": "MusicGroup", "name": "Mukesh" } },
+                  { "@type": "MusicRecording", "name": "Mujhko Pina Hai Peene Do", "byArtist": { "@type": "MusicGroup", "name": "Mohammad Aziz" } },
+                  { "@type": "MusicRecording", "name": "खामोश लब हैं झुकी निगाहें", "byArtist": { "@type": "MusicGroup", "name": "कुमार सत्यम" } },
+                  { "@type": "MusicRecording", "name": "Khamosh Lab Hai Jhuki Hai Palkein", "byArtist": { "@type": "MusicGroup", "name": "Mehdi Hassan Style" } },
+                  { "@type": "MusicRecording", "name": "Pehli Pehli Baar Mohabbat Ki Hai", "byArtist": { "@type": "MusicGroup", "name": "Kumar Sanu, Alka Yagnik" } },
+                  { "@type": "MusicRecording", "name": "Main Na Bhoolunga (Happy)", "byArtist": { "@type": "MusicGroup", "name": "Lata Mangeshkar, Mukesh" } },
+                  { "@type": "MusicRecording", "name": "Chupke Chupke Raat Din Aansoon Bahana", "byArtist": { "@type": "MusicGroup", "name": "Ghulam Ali" } }
                 ]
               }
             },
@@ -162,7 +167,80 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <!-- Accessible Semantic Fallback for Search Engines and AI Crawlers (hydrated on client mount) -->
+    <header style="max-width:960px;margin:2rem auto;padding:0 1rem;font-family:sans-serif;">
+      <h1>काँच के ठेके | Kaanch Ke Theke</h1>
+      <p><strong>Retro Bollywood Music &amp; Nostalgic Hindi Melodies</strong></p>
+      <p>पुराने बॉलीवुड गानों, यादों और महफ़िल का एक सिनेमाई संगीत अनुभव। 90s के सदाबहार नग़मे, ग़ज़लें, दर्द-ए-दिल और रेट्रो हिंदी क्लासिक्स।</p>
+      <nav aria-label="मुख्य नेविगेशन">
+        <a href="/">मुख्य पृष्ठ (Home)</a> • 
+        <a href="/playlists">सभी प्लेलिस्ट्स (All Playlists)</a>
+      </nav>
+    </header>
+
+    <main style="max-width:960px;margin:2rem auto;padding:0 1rem;font-family:sans-serif;">
+      <section aria-label="काँच के ठेके का परिचय">
+        <h2>काँच के ठेके क्या है? (About Kaanch Ke Theke)</h2>
+        <p>
+          काँच के ठेके दोस्तों की महफ़िल, तन्हा शामों और पुरानी यादों को ताज़ा करने के लिए तैयार किया गया एक ख़ास हिंदी रेट्रो म्यूज़िक अनुभव है। यहाँ आपको 90s के सदाबहार नग़मे, अमर ग़ज़लें, क्लासिक कव्वालियाँ और पुराने ज़माने के अनमोल तराने मिलते हैं।
+        </p>
+      </section>
+
+      <section aria-label="चुनिंदा प्लेलिस्ट्स">
+        <h2>चुनिंदा रेट्रो बॉलीवुड प्लेलिस्ट्स (Curated Hindi Playlists)</h2>
+        <ul>
+          <li>
+            <h3><a href="/playlists/90s">90s Ki Botal 🍾 (९० के दौर के सदाबहार नग़मे)</a></h3>
+            <p>Purani yaadein, late night mood aur 90s ke iconic bangers. 14 चुनिंदा सदाबहार गीत:</p>
+            <ol>
+              <li>Yeh Jo Mohabbat Hai — किशोर कुमार (Kishore Kumar)</li>
+              <li>Barsaat Ke Mausam Mein — कुमार सानू (Kumar Sanu)</li>
+              <li>Pile Pile O Meri — मोहम्मद अज़ीज़ (Mohammad Aziz)</li>
+              <li>Apni To Jaise Taise — किशोर कुमार (Kishore Kumar)</li>
+              <li>Main Na Bhoolunga (Sad) — लता मंगेशकर &amp; मुकेश (Lata Mangeshkar &amp; Mukesh)</li>
+              <li>Kya Hua Tera Vada — मोहम्मद रफ़ी (Mohammed Rafi)</li>
+              <li>Main Zindagi Ka Saath Nibhata Chala Gaya — मोहम्मद रफ़ी (Mohammed Rafi)</li>
+              <li>Duniya Bananewale — मुकेश (Mukesh)</li>
+              <li>Mujhko Pina Hai Peene Do — मोहम्मद अज़ीज़ (Mohammad Aziz)</li>
+              <li>खामोश लब हैं झुकी निगाहें — कुमार सत्यम (Kumar Satyam)</li>
+              <li>Khamosh Lab Hai Jhuki Hai Palkein — मेहदी हसन स्टाइल (Mehdi Hassan Style)</li>
+              <li>Pehli Pehli Baar Mohabbat Ki Hai — कुमार सानू &amp; अलका याग्निक (Kumar Sanu, Alka Yagnik)</li>
+              <li>Main Na Bhoolunga (Happy) — लता मंगेशकर &amp; मुकेश (Lata Mangeshkar &amp; Mukesh)</li>
+              <li>Chupke Chupke Raat Din Aansoon Bahana — ग़ुलाम अली (Ghulam Ali)</li>
+            </ol>
+          </li>
+          <li>
+            <h3><a href="/playlists/dard-e-dil">Dard-e-Dil Vibe 💔 (दर्द-ए-दिल)</a></h3>
+            <p>Sip, regret &amp; repeat — toote dil waalon ka dedicated corner.</p>
+          </li>
+          <li>
+            <h3><a href="/playlists/mahfil">Ghazal &amp; Mahfil 🌙 (ग़ज़ल व महफ़िल)</a></h3>
+            <p>Retro ghazals aur shaam ki peaceful baithak. जगजीत सिंह, ग़ुलाम अली व मेहदी हसन के अमर तराने।</p>
+          </li>
+          <li>
+            <h3><a href="/playlists/barish-aur-yaadein">Monsoon Memories 🌧️ (बारिश और यादें)</a></h3>
+            <p>Baarish ki tip-tip aur iconic retro monsoon tracks.</p>
+          </li>
+          <li>
+            <h3><a href="/playlists/raat-ka-nasha">Midnight Nasha 🌌 (रात का नशा)</a></h3>
+            <p>Aadhi raat ki tanhai aur madhosh vintage hits.</p>
+          </li>
+        </ul>
+        <p><a href="/playlists"><strong>→ काँच के ठेके की सभी प्लेलिस्ट्स देखें (View All Playlists)</strong></a></p>
+      </section>
+
+      <section aria-label="शायरी और साहित्य">
+        <h2>महफ़िल की शायरी (Poetry &amp; Nostalgia)</h2>
+        <blockquote>
+          <p>"हज़ारों ख़्वाहिशें ऐसी कि हर ख़्वाहिश पे दम निकले, बहुत निकले मिरे अरमाँ लेकिन फिर भी कम निकले।" — मिर्ज़ा ग़ालिब</p>
+        </blockquote>
+        <blockquote>
+          <p>"मैं ज़िंदगी का साथ निभाता चला गया, हर फ़िक्र को धुएँ में उड़ाता चला गया।" — साहिर लुधियानवी (गायन: मुहम्मद रफ़ी)</p>
+        </blockquote>
+      </section>
+    </main>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

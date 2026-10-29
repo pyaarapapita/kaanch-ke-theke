@@ -1,19 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const MoodSelector = React.memo(function MoodSelector({ playlists = [], activePlaylistId, onSelectPlaylist }) {
+export const MoodSelector = React.memo(function MoodSelector({
+  playlists = [],
+  activePlaylistId,
+  onSelectPlaylist,
+  isScrolled = false
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen((prev) => !prev);
   const closeMenu = () => setIsOpen(false);
 
   useEffect(() => {
+    if (isScrolled && isOpen) {
+      setIsOpen(false);
+    }
+  }, [isScrolled, isOpen]);
+
+  useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') closeMenu();
     };
+    const handleScroll = () => {
+      closeMenu();
+    };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, [isOpen]);
 
   const handleSelect = (id) => {
@@ -22,7 +40,7 @@ export const MoodSelector = React.memo(function MoodSelector({ playlists = [], a
   };
 
   return (
-    <div className="mood-selector-container">
+    <div className={`mood-selector-container ${isScrolled ? 'is-scrolled' : ''}`}>
       <button
         type="button"
         className={`nav-link nav-link-btn mood-toggle-btn ${isOpen ? 'active' : ''}`}

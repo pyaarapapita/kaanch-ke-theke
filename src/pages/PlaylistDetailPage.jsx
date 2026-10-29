@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getPlaylistById } from '../data/playlists'
 
-export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySong }) {
+export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySong, playlists }) {
   const { id } = useParams()
   const navigate = useNavigate()
-  const playlist = getPlaylistById(id)
+  const playlist = getPlaylistById(id, playlists)
   const [copyFeedback, setCopyFeedback] = useState(null)
 
   const handleShare = async () => {
@@ -32,6 +32,8 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
     let twDesc = document.querySelector('meta[name="twitter:description"]')
     let twUrl = document.querySelector('meta[name="twitter:url"]')
 
+    let jsonLdScript = document.getElementById('playlist-detail-jsonld')
+
     if (playlist) {
       const pageTitle = `${playlist.name} | Kaanch Ke Theke — Playlist`
       const pageDesc = `${playlist.name} — ${playlist.description} काँच के ठेके पर पुराने हिंदी गानों का आनंद लें।`
@@ -46,6 +48,62 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
       if (twTitle) twTitle.setAttribute('content', pageTitle)
       if (twDesc) twDesc.setAttribute('content', pageDesc)
       if (twUrl) twUrl.setAttribute('content', pageUrl)
+
+      // Inject structured data for BreadcrumbList and MusicPlaylist
+      if (!jsonLdScript) {
+        jsonLdScript = document.createElement('script')
+        jsonLdScript.id = 'playlist-detail-jsonld'
+        jsonLdScript.type = 'application/ld+json'
+        document.head.appendChild(jsonLdScript)
+      }
+
+      const structuredData = {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'BreadcrumbList',
+            'itemListElement': [
+              {
+                '@type': 'ListItem',
+                'position': 1,
+                'name': 'मुख्य पृष्ठ (Home)',
+                'item': 'https://kaanch-ke-theke.pages.dev/'
+              },
+              {
+                '@type': 'ListItem',
+                'position': 2,
+                'name': 'प्लेलिस्ट्स (Playlists)',
+                'item': 'https://kaanch-ke-theke.pages.dev/playlists'
+              },
+              {
+                '@type': 'ListItem',
+                'position': 3,
+                'name': playlist.name,
+                'item': pageUrl
+              }
+            ]
+          },
+          {
+            '@type': 'MusicPlaylist',
+            '@id': `${pageUrl}#playlist`,
+            'url': pageUrl,
+            'name': playlist.name,
+            'description': `${playlist.name} — ${playlist.description}`,
+            'inLanguage': ['hi', 'en'],
+            'numTracks': playlist.songs?.length || 0,
+            'track': (playlist.songs || []).map((song, i) => ({
+              '@type': 'MusicRecording',
+              'position': i + 1,
+              'name': song.title,
+              'byArtist': {
+                '@type': 'MusicGroup',
+                'name': song.artist
+              }
+            }))
+          }
+        ]
+      }
+      jsonLdScript.textContent = JSON.stringify(structuredData)
     } else {
       document.title = 'प्लेलिस्ट नहीं मिली | Kaanch Ke Theke'
     }
@@ -64,6 +122,10 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
       if (twTitle) twTitle.setAttribute('content', 'काँच के ठेके | Kaanch Ke Theke — Retro Bollywood Music')
       if (twDesc) twDesc.setAttribute('content', defaultDesc)
       if (twUrl) twUrl.setAttribute('content', defaultUrl)
+
+      if (jsonLdScript) {
+        jsonLdScript.remove()
+      }
     }
   }, [playlist])
 
@@ -94,9 +156,6 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
                 <button type="button" className="not-found-primary-btn" onClick={() => navigate('/playlists')}>
                   सभी प्लेलिस्ट्स देखें →
                 </button>
-                <Link to="/" className="not-found-secondary-btn">
-                  मुख्य पृष्ठ पर जाएं
-                </Link>
               </div>
             </div>
           </div>
@@ -217,6 +276,14 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
                     </tbody>
                   </table>
                 </div>
+                <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  <Link to="/playlists" className="editorial-action-link">
+                    ← सभी प्लेलिस्ट्स देखें (All Playlists)
+                  </Link>
+                  <Link to="/" className="editorial-action-link">
+                    मुख्य पृष्ठ (Home)
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="upcoming-playlist-notice">
@@ -224,7 +291,7 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
                   यह प्लेलिस्ट जल्द ही नई धुनों और गीतों के साथ सजाई जाएगी।
                 </p>
                 <Link to="/playlists" className="editorial-action-link">
-                  ← दूसरी प्लेलिस्ट्स देखें
+                  ← सभी प्लेलिस्ट्स देखें
                 </Link>
               </div>
             )}

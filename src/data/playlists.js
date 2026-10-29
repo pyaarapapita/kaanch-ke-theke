@@ -10,57 +10,87 @@ export const PLAYLISTS = [
     songs: [
       {
         id: 'song-90s-001',
-        title: 'Kya Hua Tera Wada',
-        artist: 'Mohammed Rafi',
-        youtubeId: 'cIVkYSm7Orw'
+        title: 'Yeh Jo Mohabbat Hai',
+        artist: 'Kishore Kumar',
+        youtubeId: '16pz4wFVc_w'
       },
       {
         id: 'song-90s-002',
-        title: 'Main Zindagi Ka Saath Nibhata Chala Gaya',
-        artist: 'Mohammed Rafi',
-        youtubeId: '8xLGdI9_jak'
+        title: 'Barsaat Ke Mausam Mein',
+        artist: 'Kumar Sanu',
+        youtubeId: 'ER7RoDTT2_4'
       },
       {
         id: 'song-90s-003',
-        title: 'Mujhko Peena Hai Peene Do',
-        artist: 'Mohd Aziz',
-        youtubeId: 'ZDsneGdOdaQ'
+        title: 'Pile Pile O Meri',
+        artist: 'Mohammad Aziz',
+        youtubeId: '9xap3GD7Vvw'
       },
       {
         id: 'song-90s-004',
-        title: 'Yeh Jo Mohabbat Hai',
+        title: 'Apni To Jaise Taise',
         artist: 'Kishore Kumar',
-        youtubeId: '5-lRnMrz6Ok'
+        youtubeId: 'vVXM_8kptDg'
       },
       {
         id: 'song-90s-005',
-        title: 'Barsaat Ke Mausam Mein',
-        artist: 'Kumar Sanu, Roop Kumar Rathod',
-        youtubeId: 'Q_cq8__k--M'
+        title: 'Main Na Bhoolunga (Sad)',
+        artist: 'Lata Mangeshkar, Mukesh',
+        youtubeId: '1N0ZFQOHr-4'
       },
       {
         id: 'song-90s-006',
-        title: 'Mujhe Peene Ka Shauk Nahi',
-        artist: 'Alka Yagnik',
-        youtubeId: '7DgiWQSN-jQ'
+        title: 'Kya Hua Tera Vada',
+        artist: 'Mohammed Rafi',
+        youtubeId: 'OnomKR46aP4'
       },
       {
         id: 'song-90s-007',
-        title: 'Peele Peele O Morey Raja',
-        artist: 'Tirangaa',
-        youtubeId: 'ZAK8L8jQSeQ'
+        title: 'Main Zindagi Ka Saath Nibhata Chala Gaya',
+        artist: 'Mohammed Rafi',
+        youtubeId: 'xnaqXjeYYE8'
       },
       {
         id: 'song-90s-008',
-        title: 'Aapka Kya Hoga (Dhanno)',
-        artist: 'Mika Singh, Sunidhi Chauhan',
-        youtubeId: 'gcVbtUGLDNk'
+        title: 'Duniya Bananewale',
+        artist: 'Mukesh',
+        youtubeId: 'b4nDex-MQNc'
       },
       {
         id: 'song-90s-009',
-        title: 'Do Ghut Mujhe Bhi Pila De',
-        artist: 'RD Burman',
-        youtubeId: 'UANG8_P224w'
+        title: 'Mujhko Pina Hai Peene Do',
+        artist: 'Mohammad Aziz',
+        youtubeId: 'yPTP8P-y_Oo'
+      },
+      {
+        id: 'song-90s-010',
+        title: 'खामोश लब हैं झुकी निगाहें',
+        artist: 'कुमार सत्यम',
+        youtubeId: 'vY7vYX0ITOQ'
+      },
+      {
+        id: 'song-90s-011',
+        title: 'Khamosh Lab Hai Jhuki Hai Palkein',
+        artist: 'Mehdi Hassan Style',
+        youtubeId: 'z3uynSFb1VM'
+      },
+      {
+        id: 'song-90s-012',
+        title: 'Pehli Pehli Baar Mohabbat Ki Hai',
+        artist: 'Kumar Sanu, Alka Yagnik',
+        youtubeId: 'LMrgv7bRLQM'
+      },
+      {
+        id: 'song-90s-013',
+        title: 'Main Na Bhoolunga (Happy)',
+        artist: 'Lata Mangeshkar, Mukesh',
+        youtubeId: 'Xqtr77stwKo'
+      },
+      {
+        id: 'song-90s-014',
+        title: 'Chupke Chupke Raat Din Aansoon Bahana',
+        artist: 'Ghulam Ali',
+        youtubeId: 'ipLEPP34-w4'
       }
     ]
   },

@@ -68,9 +68,6 @@ export function NotFoundPage() {
               <Link to="/" className="not-found-primary-btn" aria-label="ठेके के मुख्य पृष्ठ पर जाएं">
                 ← मुख्य पृष्ठ पर वापस जाएं (Home)
               </Link>
-              <Link to="/playlists" className="not-found-secondary-btn" aria-label="सभी प्लेलिस्ट्स देखें">
-                सभी प्लेलिस्ट्स देखें (Playlists) →
-              </Link>
             </div>
           </div>
         </div>

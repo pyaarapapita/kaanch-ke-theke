@@ -34,6 +34,57 @@ export function PlaylistsPage({ currentPlaylist, onSelectPlaylist, playlists = P
     let twUrl = document.querySelector('meta[name="twitter:url"]')
     if (twUrl) twUrl.setAttribute('content', pageUrl)
 
+    let jsonLdScript = document.getElementById('playlists-overview-jsonld')
+    if (!jsonLdScript) {
+      jsonLdScript = document.createElement('script')
+      jsonLdScript.id = 'playlists-overview-jsonld'
+      jsonLdScript.type = 'application/ld+json'
+      document.head.appendChild(jsonLdScript)
+    }
+
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'BreadcrumbList',
+          'itemListElement': [
+            {
+              '@type': 'ListItem',
+              'position': 1,
+              'name': 'मुख्य पृष्ठ (Home)',
+              'item': 'https://kaanch-ke-theke.pages.dev/'
+            },
+            {
+              '@type': 'ListItem',
+              'position': 2,
+              'name': 'प्लेलिस्ट्स (Playlists)',
+              'item': pageUrl
+            }
+          ]
+        },
+        {
+          '@type': 'CollectionPage',
+          '@id': `${pageUrl}#collection`,
+          'url': pageUrl,
+          'name': pageTitle,
+          'description': pageDesc,
+          'inLanguage': ['hi', 'en'],
+          'mainEntity': {
+            '@type': 'ItemList',
+            'name': 'काँच के ठेके की सभी प्लेलिस्ट्स (All Playlists)',
+            'itemListElement': playlists.map((pl, idx) => ({
+              '@type': 'ListItem',
+              'position': idx + 1,
+              'url': `https://kaanch-ke-theke.pages.dev/playlists/${pl.id}`,
+              'name': pl.name,
+              'description': pl.description
+            }))
+          }
+        }
+      ]
+    }
+    jsonLdScript.textContent = JSON.stringify(structuredData)
+
     return () => {
       const defaultTitle = 'काँच के ठेके | Kaanch Ke Theke — Retro Bollywood Music & Nostalgic Hindi Melodies'
       const defaultDesc = 'काँच के ठेके (Kaanch Ke Theke) — पुराने बॉलीवुड गानों, यादों और महफ़िल का एक सिनेमाई संगीत अनुभव। 90s के सदाबहार नग़मे, ग़ज़लें और रेट्रो हिंदी क्लासिक्स।'
@@ -47,13 +98,17 @@ export function PlaylistsPage({ currentPlaylist, onSelectPlaylist, playlists = P
         canonical.setAttribute('href', defaultUrl)
       }
       if (ogTitle) ogTitle.setAttribute('content', 'काँच के ठेके | Kaanch Ke Theke — Retro Bollywood Music')
-      if (ogDesc) ogDesc.setAttribute('content', 'काँच के ठेके — पुराने बॉलीवुड गानों, यादों और महफ़िल का एक सिनेमाई संगीत अनुभव। 90s के सदाबहार नग़मे और रेट्रो क्लासिक्स।')
+      if (ogDesc) ogDesc.setAttribute('content', defaultDesc)
       if (ogUrl) ogUrl.setAttribute('content', defaultUrl)
       if (twTitle) twTitle.setAttribute('content', 'काँच के ठेके | Kaanch Ke Theke — Retro Bollywood Music')
-      if (twDesc) twDesc.setAttribute('content', 'काँच के ठेके — पुराने बॉलीवुड गानों, यादों और महफ़िल का एक सिनेमाई संगीत अनुभव। 90s के सदाबहार नग़मे और रेट्रो क्लासिक्स।')
+      if (twDesc) twDesc.setAttribute('content', defaultDesc)
       if (twUrl) twUrl.setAttribute('content', defaultUrl)
+
+      if (jsonLdScript) {
+        jsonLdScript.remove()
+      }
     }
-  }, [])
+  }, [playlists])
 
   return (
     <div className="page-content-wrapper">
