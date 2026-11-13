@@ -10,6 +10,9 @@
  * room baked back room visibility              tapes cassette visibility
  * stack 0 = tapes loose, 1 = gathered in a stack beside the playlists
  *
+ * Stage names are historical: "chronicles" lands on the shayari chapter and "shayari" on
+ * the Time Machine. scrollTimeline.js holds the mapping from stage to page anchor.
+ *
  * The hero stages must match the captured posters. Recapture them if a hero value changes.
  */
 const TURN = Math.PI * 2
@@ -46,6 +49,12 @@ const DESKTOP = {
     cx: 0.55, cy: 1.35, cz: 4.5, tx: -0.45, ty: -0.1, tz: -0.2,
     dx: 2.45, dy: -0.25, dz: -0.85, rx: 0.56, rz: -0.1,
     spin: TURN * 1.75, opacity: 0.34, halo: 0.45, dust: 0.75, parallax: 0.2, float: 0, key: 0.8
+  },
+  // Cassette game: the tapes are the subject, so the record waits low in the gutter.
+  rewind: {
+    cx: 0.1, cy: 1.42, cz: 4.65, tx: -0.48, ty: -0.12, tz: -0.2,
+    dx: 2.48, dy: -0.5, dz: -0.82, rx: 0.59, rz: -0.08,
+    spin: TURN * 1.9, opacity: 0.28, halo: 0.38, dust: 0.9, parallax: 0.18, float: 0, key: 0.78
   },
   // Playlists: settled and dim, so the cards carry the screen.
   playlist: {
@@ -92,6 +101,11 @@ function portrait(dy) {
       dx: 0, dy: dy - 0.55, dz: -0.35, rx: 0.54, rz: -0.04,
       spin: TURN * 1.75, opacity: 0.18, halo: 0.35, dust: 0.65, parallax: 0, float: 0, key: 0.8
     },
+    rewind: {
+      cx: -0.15, cy: 1.65, cz: 4.7, tx: 0, ty: 0, tz: 0,
+      dx: 0, dy: dy - 0.62, dz: -0.35, rx: 0.56, rz: -0.03,
+      spin: TURN * 1.9, opacity: 0.16, halo: 0.3, dust: 0.75, parallax: 0, float: 0, key: 0.78
+    },
     playlist: {
       cx: 0, cy: 1.7, cz: 4.8, tx: 0, ty: 0, tz: 0,
       dx: 0, dy: dy - 0.7, dz: -0.35, rx: 0.58, rz: -0.02,
@@ -112,7 +126,7 @@ function portrait(dy) {
 
 // The cool rim light separates the disc's edge at the hero angle. At the low angles later in
 // the story it would tint the whole record blue, away from the amber palette.
-const RIM_BY_STAGE = { approach: 0.7, counter: 0.15, chronicles: 0.25, shayari: 0.25, playlist: 0.25, story: 0.4, final: 0.5 }
+const RIM_BY_STAGE = { approach: 0.7, counter: 0.15, chronicles: 0.25, shayari: 0.25, rewind: 0.25, playlist: 0.25, story: 0.4, final: 0.5 }
 
 // P2: the back room fades in behind the record as the camera moves in, and the tapes come
 // out in the chronicles, then gather into a stack for the playlists.
@@ -121,7 +135,8 @@ const ROOM_AND_TAPES = {
     approach: { room: 0.45, tapes: 0, stack: 0 },
     counter: { room: 0.85, tapes: 0.35, stack: 0 },
     chronicles: { room: 0.75, tapes: 1, stack: 0 },
-    shayari: { room: 0.7, tapes: 1, stack: 0.15 },
+    shayari: { room: 0.7, tapes: 1, stack: 0 },
+    rewind: { room: 0.72, tapes: 1, stack: 0.12 },
     playlist: { room: 0.8, tapes: 1, stack: 1 },
     story: { room: 0.7, tapes: 0.85, stack: 1 },
     final: { room: 0.85, tapes: 0.7, stack: 1 }
@@ -130,7 +145,8 @@ const ROOM_AND_TAPES = {
     approach: { room: 0.4, tapes: 0, stack: 0 },
     counter: { room: 0.7, tapes: 0.3, stack: 0 },
     chronicles: { room: 0.6, tapes: 0.9, stack: 0 },
-    shayari: { room: 0.55, tapes: 0.9, stack: 0.15 },
+    shayari: { room: 0.55, tapes: 0.9, stack: 0 },
+    rewind: { room: 0.58, tapes: 1, stack: 0.12 },
     playlist: { room: 0.6, tapes: 1, stack: 1 },
     story: { room: 0.55, tapes: 0.8, stack: 1 },
     final: { room: 0.7, tapes: 0.6, stack: 1 }

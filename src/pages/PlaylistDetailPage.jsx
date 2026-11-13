@@ -206,7 +206,8 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
                   onClick={handleShare}
                   aria-label="प्लेलिस्ट लिंक कॉपी करें"
                 >
-                  🔗 लिंक साझा करें
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5" /><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" /></svg>
+                  लिंक साझा करें
                 </button>
 
                 {!isUpcoming && (
@@ -215,7 +216,7 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
                     className="editorial-action-link play-playlist-hero-btn"
                     onClick={() => onSelectPlaylist(playlist.id)}
                   >
-                    {isCurrentPlaylist ? 'सक्रिय प्लेलिस्ट (Playing)' : 'यह प्लेलिस्ट बजाएं ▶'}
+                    {isCurrentPlaylist ? 'सक्रिय प्लेलिस्ट (Playing)' : 'यह प्लेलिस्ट बजाएं'}
                   </button>
                 )}
               </div>
@@ -268,7 +269,7 @@ export function PlaylistDetailPage({ currentPlaylist, onSelectPlaylist, onPlaySo
                               }}
                               aria-label={`${song.title} बजाएं`}
                             >
-                              ▶
+                              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
                             </button>
                           </td>
                         </tr>

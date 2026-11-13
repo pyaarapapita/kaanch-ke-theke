@@ -48,7 +48,6 @@ export async function fetchPlaylistMetadata(playlistId, forceRefresh = false) {
   if (forceRefresh) {
     metadataCache.delete(playlistId);
   } else if (metadataCache.has(playlistId)) {
-    console.log('[YouTube Data API] Returning cached metadata for playlist:', playlistId);
     return metadataCache.get(playlistId);
   }
 
@@ -101,7 +100,6 @@ export async function fetchPlaylistMetadata(playlistId, forceRefresh = false) {
       pageToken = data.nextPageToken || '';
     } while (pageToken);
 
-    console.log(`[YouTube Data API] Successfully fetched ${itemsList.length} playlist items for ${playlistId}`);
     const result = { items: itemsList, lookupMap };
     metadataCache.set(playlistId, result);
     return result;

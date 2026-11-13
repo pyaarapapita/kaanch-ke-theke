@@ -5,46 +5,11 @@
 .musical-time-machine-section {
   position: relative;
   width: 100%;
-  max-width: 100%;
-  padding: 4.5rem 1.5rem;
-  background: radial-gradient(
-    circle at 50% 0%,
-    rgba(38, 25, 16, 0.65) 0%,
-    rgba(14, 11, 8, 0.92) 60%,
-    var(--bg-near-black, #0a0806) 100%
-  );
-  border-top: 1px solid rgba(184, 137, 74, 0.15);
-  border-bottom: 1px solid rgba(184, 137, 74, 0.15);
-  overflow: hidden;
-  z-index: 10;
 }
 
 .time-machine-container {
   max-width: 1200px;
   margin: 0 auto;
-}
-
-/* Header */
-.time-machine-header {
-  text-align: center;
-  max-width: 780px;
-  margin: 0 auto 3rem;
-}
-
-.time-machine-main-title {
-  font-family: var(--font-hindi-display, 'Rozha One', serif);
-  color: var(--text-cream, #fdf8ed);
-  font-size: clamp(1.8rem, 4vw, 2.75rem);
-  letter-spacing: -0.01em;
-  margin-bottom: 0.85rem;
-  line-height: 1.25;
-}
-
-.time-machine-main-desc {
-  font-family: var(--font-hindi-body, 'Noto Serif Devanagari', serif);
-  color: var(--text-muted, #b3a492);
-  font-size: clamp(0.92rem, 2vw, 1.05rem);
-  line-height: 1.7;
 }
 
 /* Deck Layout: Turntable + Console */
@@ -99,7 +64,7 @@
   border-radius: 50%;
   pointer-events: none;
   opacity: 0.35;
-  transition: all 0.6s ease-out;
+  transition: color 0.3s var(--ease-out), background-color 0.3s var(--ease-out), border-color 0.3s var(--ease-out), opacity 0.3s var(--ease-out), transform 0.3s var(--ease-out);
 }
 
 .turntable-platter-glow.has-glow {
@@ -114,7 +79,7 @@
   height: 290px;
   border-radius: 50%;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.9);
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.6s var(--ease-out);
 }
 
 .time-machine-disc-img {
@@ -140,10 +105,6 @@
   animation: turntableSpin 0.65s linear infinite;
 }
 
-.time-machine-vinyl-disc.is-settled {
-  animation: turntableSpin 6s linear infinite;
-}
-
 /* Tonearm */
 .turntable-tonearm {
   position: absolute;
@@ -152,7 +113,7 @@
   width: 90px;
   height: 160px;
   pointer-events: none;
-  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform 0.6s var(--ease-out);
   transform-origin: top right;
   z-index: 5;
 }
@@ -210,15 +171,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.35rem 0.85rem;
-  background: rgba(18, 13, 9, 0.75);
+  padding: 0.375rem 0.75rem;
+  background: var(--glass-mahogany-dense);
   border: 1px solid rgba(184, 137, 74, 0.25);
   border-radius: 6px;
   font-family: var(--font-english, 'Cinzel', serif);
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   color: var(--accent-gold, #d4af37);
-  backdrop-filter: blur(4px);
 }
 
 .plate-status {
@@ -261,8 +221,8 @@
 .time-machine-mood-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.85rem;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
   background: rgba(36, 26, 18, 0.7);
   border: 1px solid rgba(184, 137, 74, 0.25);
   border-radius: 20px;
@@ -271,7 +231,7 @@
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: color 0.2s var(--ease-out), background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), opacity 0.2s var(--ease-out), transform 0.2s var(--ease-out);
   white-space: nowrap;
 }
 
@@ -284,7 +244,7 @@
 .time-machine-mood-pill.active-pill {
   background: linear-gradient(135deg, rgba(212, 175, 55, 0.3) 0%, rgba(184, 137, 74, 0.2) 100%);
   border-color: var(--accent-gold, #d4af37);
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.35);
+  box-shadow: none;
   color: #fff8e8;
   font-weight: 600;
 }
@@ -311,7 +271,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1.15rem 1.5rem;
+  padding: 1.25rem 1.5rem;
   background: linear-gradient(
     135deg,
     #d4a35f 0%,
@@ -325,7 +285,7 @@
   box-shadow:
     0 8px 24px rgba(184, 137, 74, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: color 0.25s var(--ease-out), background-color 0.25s var(--ease-out), border-color 0.25s var(--ease-out), opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
   text-align: center;
 }
 
@@ -349,16 +309,10 @@
   box-shadow: none;
 }
 
-.surprise-btn-dice {
-  font-size: 1.5rem;
-  margin-bottom: 0.2rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
 .surprise-btn-text {
   font-family: var(--font-hindi-display, 'Rozha One', serif);
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.02em;
   line-height: 1.3;
 }
@@ -367,7 +321,7 @@
   font-family: var(--font-hindi-body, 'Noto Serif Devanagari', serif);
   font-size: 0.8rem;
   opacity: 0.85;
-  margin-top: 0.15rem;
+  margin-top: 0.125rem;
 }
 
 /* Result Area */
@@ -381,12 +335,6 @@
   background: rgba(22, 17, 12, 0.6);
   border: 1px dashed rgba(184, 137, 74, 0.3);
   border-radius: 14px;
-}
-
-.invitation-icon {
-  font-size: 2.25rem;
-  margin-bottom: 0.75rem;
-  opacity: 0.85;
 }
 
 .invitation-title {
@@ -416,8 +364,7 @@
   border-radius: 16px;
   padding: 1.75rem;
   box-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.6),
-    0 0 20px rgba(184, 137, 74, 0.12);
+    0 12px 32px rgba(0, 0, 0, 0.6);
   position: relative;
   overflow: hidden;
 }
@@ -448,18 +395,13 @@
 .discovered-badge-group {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-}
-
-.discovered-icon {
-  font-size: 2rem;
-  line-height: 1;
+  gap: 0.75rem;
 }
 
 .discovered-meta-stack {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.125rem;
 }
 
 .discovered-era-badge {
@@ -467,7 +409,6 @@
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   color: var(--accent-gold, #d4af37);
-  text-transform: uppercase;
   font-weight: 600;
 }
 
@@ -487,14 +428,14 @@
 .pill-active-dot {
   font-size: 0.65rem;
   color: #70d69b;
-  margin-left: 0.2rem;
+  margin-left: 0.25rem;
 }
 
 .discovered-status-badge {
   background: rgba(184, 137, 74, 0.15);
   border: 1px solid rgba(184, 137, 74, 0.35);
   border-radius: 20px;
-  padding: 0.25rem 0.65rem;
+  padding: 0.25rem 0.75rem;
   font-family: var(--font-hindi-body, 'Noto Serif Devanagari', serif);
   font-size: 0.72rem;
   color: var(--accent-gold, #d4af37);
@@ -509,8 +450,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.4rem;
-  margin-bottom: 0.65rem;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
 }
 
 .discovered-title .title-hindi {
@@ -532,9 +473,8 @@
   font-family: var(--font-hindi-body, 'Noto Serif Devanagari', serif);
   color: #e2d3be;
   font-size: 0.95rem;
-  font-style: italic;
   line-height: 1.6;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.75rem;
 }
 
 .discovered-desc {
@@ -550,18 +490,14 @@
   border: 1px solid rgba(184, 137, 74, 0.2);
   border-radius: 10px;
   padding: 0.75rem 1rem;
-  margin-bottom: 1.35rem;
+  margin-bottom: 1.25rem;
 }
 
 .highlight-track-header {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.375rem;
   margin-bottom: 0.25rem;
-}
-
-.highlight-track-icon {
-  font-size: 0.85rem;
 }
 
 .highlight-track-label {
@@ -580,7 +516,7 @@
 .highlight-track-info .track-name {
   color: #fff4e0;
   font-weight: 600;
-  margin-right: 0.4rem;
+  margin-right: 0.375rem;
 }
 
 .highlight-track-info .track-artist {
@@ -593,14 +529,14 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
 .enter-discovered-mood-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.4rem;
+  padding: 0.75rem 1.5rem;
   background: linear-gradient(
     135deg,
     #c29353 0%,
@@ -613,7 +549,7 @@
   font-size: 0.92rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: color 0.25s var(--ease-out), background-color 0.25s var(--ease-out), border-color 0.25s var(--ease-out), opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
   box-shadow: 0 4px 14px rgba(184, 137, 74, 0.35);
 }
 
@@ -636,7 +572,7 @@
   font-size: 0.88rem;
   font-weight: 500;
   text-decoration: none;
-  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: color 0.25s var(--ease-out), background-color 0.25s var(--ease-out), border-color 0.25s var(--ease-out), opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
 }
 
 .view-discovered-playlist-link:hover {
@@ -725,4 +661,20 @@
   .turntable-tonearm {
     transition: none !important;
   }
+}
+
+/* Each mood is marked by a small dot in its own colour instead of an emoji. */
+.pill-dot,
+.discovered-dot {
+  flex: none;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.discovered-dot {
+  width: 12px;
+  height: 12px;
+  margin-top: 0.375rem;
 }

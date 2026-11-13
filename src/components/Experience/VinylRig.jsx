@@ -12,6 +12,11 @@ const IDLE_SPIN_RAD_PER_SECOND = 0.05
 const FRAMES_BEFORE_READY = 2
 // Parallax and float wait until the poster, which has neither, has finished fading out.
 const INTRO_DELAY_SECONDS = 0.9
+// A page pulse: extra spin at full strength, and how quickly it dies away.
+const PULSE_SPIN_RAD_PER_SECOND = 7
+const PULSE_DECAY = 1.9
+// How far a pulse lifts the dimmed record back towards full brightness.
+const PULSE_BRIGHTEN = 0.4
 
 export function VinylRig({ rigRef, signalRef, pointerRef, scale, isPlaying, onFirstFrame }) {
   const { nodes, materials } = useGLTF(MODEL_PATH)
@@ -19,7 +24,7 @@ export function VinylRig({ rigRef, signalRef, pointerRef, scale, isPlaying, onFi
   const spinRef = useRef(null)
   const bodyRef = useRef(null)
   const labelRef = useRef(null)
-  const motion = useRef({ frames: -1, sinceReady: 0, intro: 0, time: 0, playback: 0, idle: 0 })
+  const motion = useRef({ frames: -1, sinceReady: 0, intro: 0, time: 0, playback: 0, idle: 0, burst: 0 })
 
   // The scene dim is applied to the record itself, not the whole canvas, so the tapes in the
   // gutters can stay fully visible while the record recedes behind reading sections.
@@ -57,6 +62,12 @@ export function VinylRig({ rigRef, signalRef, pointerRef, scale, isPlaying, onFi
     }
     if (isPlaying) state.playback += delta * PLAYBACK_RAD_PER_SECOND
 
+    // The pulse decays here, once per frame. StudioEnvironment reads the same value.
+    if (signal.pulse > 0) {
+      state.burst += delta * PULSE_SPIN_RAD_PER_SECOND * signal.pulse
+      signal.pulse = signal.pulse < 0.01 ? 0 : THREE.MathUtils.damp(signal.pulse, 0, PULSE_DECAY, delta)
+    }
+
     const pointer = pointerRef.current
     const parallax = 0.08 * state.intro * rig.parallax
     const offsetX = pointer.x * parallax
@@ -67,11 +78,12 @@ export function VinylRig({ rigRef, signalRef, pointerRef, scale, isPlaying, onFi
     root.position.set(rig.dx + offsetX, rig.dy - offsetY + driftY, rig.dz)
     root.rotation.x = rig.rx - offsetY * 0.18 + driftTilt
     root.rotation.z = rig.rz + offsetX * 0.18
-    spin.rotation.y = rig.spin + state.playback + state.idle
+    spin.rotation.y = rig.spin + state.playback + state.idle + state.burst
     // Recede by darkening while the record is solid, and only fade out at the low end. A
     // half-transparent record over the lit shelves reads as glass, not vinyl.
-    const darken = Math.min(1, rig.opacity / 0.55)
-    const alpha = Math.min(1, rig.opacity / 0.3)
+    const lit = rig.opacity + signal.pulse * PULSE_BRIGHTEN
+    const darken = Math.min(1, lit / 0.55)
+    const alpha = Math.min(1, lit / 0.3)
     for (const mesh of [bodyRef.current, labelRef.current]) {
       if (!mesh) continue
       mesh.material.color.setScalar(darken)

@@ -1,0 +1,290 @@
+/* ==========================================================================
+   RewindGame.css - the pencil-and-cassette game
+   The cassette is one SVG. The drag target is a circle laid over its right reel, placed
+   with the same proportions as the drawing (reel centre 242,118 in a 360x232 view).
+   ========================================================================== */
+
+.rewind {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  width: 100%;
+  max-width: 520px;
+  margin-inline: auto;
+}
+
+.rewind-deck {
+  position: relative;
+  width: 100%;
+  filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.7));
+}
+
+.rewind-cassette {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.rewind-shell {
+  stroke: rgba(212, 175, 118, 0.45);
+  stroke-width: 1.2;
+}
+
+.rewind-label-band {
+  fill: #7C2D24;
+}
+
+.rewind-label-small {
+  font-family: var(--font-english);
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  fill: #F1E2C3;
+}
+
+.rewind-label-title {
+  font-family: var(--font-hindi-display);
+  font-size: 15px;
+  fill: #2A1A0E;
+}
+
+.rewind-label-rule {
+  stroke: rgba(42, 26, 14, 0.35);
+  stroke-width: 0.8;
+  stroke-dasharray: 3 3;
+}
+
+.rewind-window {
+  fill: #0B0A08;
+  stroke: rgba(42, 26, 14, 0.6);
+  stroke-width: 1.5;
+}
+
+.rewind-window-glass {
+  fill: rgba(255, 238, 204, 0.05);
+  stroke: rgba(255, 238, 204, 0.12);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.rewind-tape {
+  fill: #2B1B10;
+  stroke: #46301C;
+  stroke-width: 1;
+}
+
+.rewind-tape-bridge {
+  fill: none;
+  stroke: #46301C;
+  stroke-width: 1.6;
+}
+
+.rewind-hub {
+  fill: #E8D7B5;
+  stroke: #8A6230;
+  stroke-width: 1;
+}
+
+.rewind-hub-tooth {
+  fill: #6B4A22;
+}
+
+.rewind-hub-hole {
+  fill: #0B0A08;
+}
+
+.rewind-foot {
+  fill: #0E0A07;
+  stroke: rgba(212, 175, 118, 0.3);
+  stroke-width: 1;
+}
+
+.rewind-foot-hole {
+  fill: #050403;
+  stroke: rgba(212, 175, 118, 0.25);
+  stroke-width: 0.8;
+}
+
+.rewind-screw {
+  fill: #8A6230;
+  stroke: #3A2814;
+  stroke-width: 0.8;
+}
+
+.rewind-pencil {
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.6));
+}
+
+.rewind-pencil-ferrule {
+  fill: #C9C2B4;
+}
+
+.rewind-pencil-eraser {
+  fill: #A6483C;
+}
+
+.rewind-pencil-tip {
+  fill: #2A1A0E;
+  stroke: #D4A35F;
+  stroke-width: 1.2;
+}
+
+/* Drag target */
+.rewind-zone {
+  position: absolute;
+  left: 67.2%;
+  top: 50.9%;
+  width: 54%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+}
+
+.rewind.is-dragging .rewind-zone {
+  cursor: grabbing;
+}
+
+.rewind.is-done .rewind-zone,
+.rewind-zone[aria-disabled='true'] {
+  cursor: default;
+  touch-action: auto;
+}
+
+.rewind-zone:focus-visible {
+  box-shadow: 0 0 0 2px var(--accent-gold), var(--focus-gold-glow);
+}
+
+/* A dashed ring around the reel, to show where to drag. */
+.rewind-zone-hint {
+  position: absolute;
+  inset: 6%;
+  border: 1.5px dashed rgba(212, 163, 95, 0.55);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Counter and result */
+.rewind-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.rewind-counter {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rewind-counter-label {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.rewind-counter-digits {
+  display: inline-flex;
+  gap: 3px;
+  padding: 4px;
+  background: #050403;
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: var(--radius-xs);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+
+.rewind-counter-digit {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 2rem;
+  font-family: var(--font-english);
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-cream);
+  background: linear-gradient(180deg, #2A1E14 0%, #17120D 48%, #0E0A07 52%, #1E160F 100%);
+  border-radius: 2px;
+}
+
+.rewind-counter-bar {
+  height: 3px;
+  background: rgba(232, 215, 181, 0.14);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rewind-counter-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-hover));
+  transform-origin: left center;
+}
+
+/* Tall enough for either state, so finishing the game never moves the page below it. */
+.rewind-result {
+  min-height: 9.5rem;
+}
+
+.rewind-prompt {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+}
+
+.rewind-prompt-text {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-base);
+  line-height: 1.8;
+  color: #D6C5A9;
+}
+
+.rewind-song {
+  display: grid;
+  justify-items: start;
+  gap: 0.25rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--accent-gold);
+}
+
+.rewind-song-label {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent-gold);
+}
+
+.rewind-song-title {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--text-cream);
+}
+
+.rewind-song-artist {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.rewind-song-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.rewind-song-actions .editorial-action-link {
+  gap: 0.5rem;
+}
+

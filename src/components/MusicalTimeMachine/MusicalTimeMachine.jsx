@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TIME_MACHINE_MOODS } from './timeMachineMoods'
+import { pulseScene } from '../../utils/scenePulse'
 import './MusicalTimeMachine.css'
 
 export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
@@ -54,6 +55,7 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
     }
 
     setIsSpinning(true)
+    pulseScene(0.8)
 
     // Rapid mood cycling effect
     let currentStep = 0
@@ -94,26 +96,8 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
   const activeMood = selectedMood || (isSpinning ? TIME_MACHINE_MOODS[activeCycleIndex] : null)
 
   return (
-    <section
-      id="musical-time-machine"
-      className="musical-time-machine-section"
-      aria-label="संगीत का टाइम मशीन — आज की महफ़िल चुनें"
-    >
+    <div className="musical-time-machine-section">
       <div className="time-machine-container">
-        {/* Section Header */}
-        <div className="time-machine-header">
-          <div className="editorial-badge-row">
-            <span className="editorial-badge">टाइम मशीन • Nostalgic Time Machine</span>
-            <span className="editorial-meta">ग्रामोफ़ोन, पुरानी डायरी और महफ़िल की तलाश</span>
-          </div>
-          <h2 className="editorial-title time-machine-main-title">
-            संगीत का टाइम मशीन — आज का मिज़ाज चुनें
-          </h2>
-          <p className="editorial-desc time-machine-main-desc">
-            पुराने दौर की संगीत की दुकान में जैसे किसी धूल जमी रिकॉर्ड रैक से अचानक कोई अनमोल विनाइल हाथ लग जाता था... पहिया घुमाइए और देखिए आज की रात आपकी रूह के लिए कौन सा नग़मा इंतज़ार कर रहा है।
-          </p>
-        </div>
-
         {/* Console Deck: Vinyl Gramophone + Interactive Mood Station */}
         <div className="time-machine-deck">
           {/* Left Column: Vintage Vinyl Platter */}
@@ -178,7 +162,7 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
                       disabled={isSpinning}
                       aria-label={`${mood.titleHindi} (${mood.titleEnglish})${isPlaylistActive ? ' - सक्रिय' : ''}`}
                     >
-                      <span className="pill-icon" aria-hidden="true">{mood.icon}</span>
+                      <span className="pill-dot" aria-hidden="true" style={{ background: mood.accentColor }} />
                       <span className="pill-title">{mood.titleHindi}</span>
                       {isPlaylistActive && <span className="pill-active-dot" aria-hidden="true">●</span>}
                     </button>
@@ -196,14 +180,11 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
                 disabled={isSpinning}
                 aria-label="आज की महफ़िल चुनें (Surprise Me with a Random Mood)"
               >
-                <span className="surprise-btn-dice" aria-hidden="true">
-                  {isSpinning ? '📻' : '🎲'}
-                </span>
                 <span className="surprise-btn-text">
-                  {isSpinning ? 'महफ़िल खोजी जा रही है...' : selectedMood ? 'दूसरा मिज़ाज चुनें (Spin Again)' : 'आज की महफ़िल चुनें (Surprise Me)'}
+                  {isSpinning ? 'महफ़िल खोजी जा रही है...' : selectedMood ? 'दूसरा मिज़ाज चुनें' : 'आज की महफ़िल चुनें'}
                 </span>
                 <span className="surprise-btn-sub">
-                  {isSpinning ? 'विनाइल घूम रहा है • Please wait' : 'किस्मत को एक नया नग़मा चुनने दें'}
+                  {isSpinning ? 'विनाइल घूम रहा है…' : 'किस्मत को एक नया नग़मा चुनने दें'}
                 </span>
               </button>
             </div>
@@ -223,12 +204,12 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
                   >
                     <div className="discovered-card-header">
                       <div className="discovered-badge-group">
-                        <span className="discovered-icon" aria-hidden="true">{activeMood.icon}</span>
+                        <span className="discovered-dot" aria-hidden="true" style={{ background: activeMood.accentColor }} />
                         <div className="discovered-meta-stack">
                           <span className="discovered-era-badge">{activeMood.eraBadge}</span>
                           <span className="discovered-playlist-tag">प्लेलिस्ट: {activeMood.playlistName}</span>
                           {currentPlaylist?.id === activeMood.playlistId && (
-                            <span className="discovered-active-pill-tag">● वर्तमान में सक्रिय (Now Active)</span>
+                            <span className="discovered-active-pill-tag">● अभी बज रही है</span>
                           )}
                         </div>
                       </div>
@@ -249,8 +230,7 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
                     {/* Highlight Track Preview */}
                     <div className="discovered-highlight-track">
                       <div className="highlight-track-header">
-                        <span className="highlight-track-icon" aria-hidden="true">🎵</span>
-                        <span className="highlight-track-label">सुझाया गया पहला नग़मा (Recommended Track):</span>
+                        <span className="highlight-track-label">सुझाया गया पहला नग़मा</span>
                       </div>
                       <div className="highlight-track-info">
                         <strong className="track-name">{activeMood.highlightSong}</strong>
@@ -266,7 +246,7 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
                         onClick={() => handleEnterMood(activeMood)}
                         aria-label={`${activeMood.titleHindi} महफ़िल में उतरें`}
                       >
-                        <span>इस महफ़िल में उतरें (Enter Playlist) →</span>
+                        <span>इस महफ़िल में उतरें →</span>
                       </button>
 
                       <Link
@@ -287,10 +267,9 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="invitation-icon" aria-hidden="true">📻</div>
                     <h3 className="invitation-title">आज का सुरूर आपकी पसंद पर छोड़ दिया गया है</h3>
                     <p className="invitation-desc">
-                      ऊपर दिए गए बटन <strong>"आज की महफ़िल चुनें"</strong> पर क्लिक करें, या किसी भी मिज़ाज पर टैप करके उसकी दास्तान और धुनें खोजें।
+                      <strong>“आज की महफ़िल चुनें”</strong> दबाइए, या किसी भी मिज़ाज को छूकर उसकी दास्तान और धुनें खोजिए।
                     </p>
                   </motion.div>
                 )}
@@ -299,6 +278,6 @@ export const MusicalTimeMachine = React.memo(function MusicalTimeMachine({
           </div>
         </div>
       </div>
-    </section>
+    </div>
   )
 })

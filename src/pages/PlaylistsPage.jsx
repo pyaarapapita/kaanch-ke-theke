@@ -181,7 +181,7 @@ export function PlaylistsPage({ currentPlaylist, onSelectPlaylist, playlists = P
                             className="card-action-btn play-btn"
                             onClick={() => onSelectPlaylist(pl.id)}
                           >
-                            बजाएं ▶
+                            बजाएं
                           </button>
                         )}
                       </div>

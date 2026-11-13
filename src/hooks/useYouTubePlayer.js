@@ -16,7 +16,6 @@ function loadYouTubeIframeApi() {
   apiLoadingPromise = new Promise((resolve) => {
     const existingScript = document.getElementById('youtube-iframe-api');
     if (!existingScript) {
-      console.log('[YouTube API] Injecting script tag for iframe_api');
       const script = document.createElement('script');
       script.id = 'youtube-iframe-api';
       script.src = 'https://www.youtube.com/iframe_api';
@@ -26,7 +25,6 @@ function loadYouTubeIframeApi() {
 
     const previousCallback = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
-      console.log('[YouTube API] onYouTubeIframeAPIReady callback fired');
       if (typeof previousCallback === 'function') {
         previousCallback();
       }
@@ -123,7 +121,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
       playerDiv.id = elementId;
       containerRef.current.appendChild(playerDiv);
 
-      console.log('[YouTube Player] Creating YT.Player instance on elementId:', elementId, 'initial youtubeId:', youtubeId, 'playlistId:', playlistId);
 
       playerRef.current = new YT.Player(elementId, {
         height: '100%',
@@ -143,7 +140,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
         events: {
           onReady: (event) => {
             if (!isMounted) return;
-            console.log('[YouTube Player] onReady event fired. Duration:', event.target.getDuration());
             setIsReady(true);
             try {
               setDuration(event.target.getDuration() || 0);
@@ -159,7 +155,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
               const { playlistId: targetPlId, index: targetIdx } = pendingPlaylistRef.current;
               pendingPlaylistRef.current = null;
               lastPlayedIdRef.current = targetPlId;
-              console.log('[YouTube Player] Executing pending playlist playback onReady for:', targetPlId);
               try {
                 event.target.loadPlaylist({ listType: 'playlist', list: targetPlId, index: targetIdx });
               } catch (err) {
@@ -167,7 +162,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
               }
             } else if (pendingSongIdRef.current) {
               const pendingId = pendingSongIdRef.current;
-              console.log('[YouTube Player] Executing pending song playback onReady for:', pendingId);
               pendingSongIdRef.current = null;
               lastPlayedIdRef.current = pendingId;
               try {
@@ -180,7 +174,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
           onStateChange: (event) => {
             if (!isMounted) return;
             const state = event.data;
-            console.log(`[YouTube Player] onStateChange: ${state}`);
 
             try {
               const vId = event.target.getVideoData()?.video_id || '';
@@ -228,7 +221,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
     return () => {
       isMounted = false;
       if (playerRef.current && typeof playerRef.current.destroy === 'function') {
-        console.log('[YouTube Player] Destroying player instance');
         try {
           playerRef.current.destroy();
         } catch {
@@ -243,7 +235,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   // Update video when youtubeId prop changes
   useEffect(() => {
     if (!isReady || !playerRef.current) return;
-    console.log('[YouTube Player] youtubeId prop updated to:', youtubeId, 'lastPlayedId:', lastPlayedIdRef.current);
 
     if (youtubeId && lastPlayedIdRef.current === youtubeId) {
       return;
@@ -266,14 +257,12 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   // Playback Control API
   const playSongId = useCallback((idToPlay) => {
     const targetId = idToPlay || youtubeId;
-    console.log('[YouTube Player] playSongId requested for ID:', targetId);
     if (!targetId) return;
 
     lastPlayedIdRef.current = targetId;
 
     if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
       try {
-        console.log('[YouTube Player] Executing playerRef.current.loadVideoById for targetId:', targetId);
         playerRef.current.loadVideoById(targetId);
         if (typeof playerRef.current.playVideo === 'function') {
           playerRef.current.playVideo();
@@ -285,21 +274,18 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
         console.error('[YouTube Player] Exception during loadVideoById:', err);
       }
     } else {
-      console.log('[YouTube Player] Player not fully ready yet, queueing pending targetId:', targetId);
       pendingSongIdRef.current = targetId;
     }
   }, [youtubeId]);
 
   const playPlaylistId = useCallback((playlistIdToPlay, index = 0) => {
     const targetPlaylistId = playlistIdToPlay || playlistId;
-    console.log('[YouTube Player] playPlaylistId requested for ID:', targetPlaylistId);
     if (!targetPlaylistId) return;
 
     lastPlayedIdRef.current = targetPlaylistId;
 
     if (playerRef.current && typeof playerRef.current.loadPlaylist === 'function') {
       try {
-        console.log('[YouTube Player] Executing playerRef.current.loadPlaylist for targetPlaylistId:', targetPlaylistId);
         playerRef.current.loadPlaylist({
           listType: 'playlist',
           list: targetPlaylistId,
@@ -314,7 +300,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
         console.error('[YouTube Player] Exception during loadPlaylist:', err);
       }
     } else {
-      console.log('[YouTube Player] Player not fully ready yet, queueing pending playlist targetId:', targetPlaylistId);
       pendingPlaylistRef.current = { playlistId: targetPlaylistId, index };
     }
   }, [playlistId]);
@@ -322,7 +307,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   const nextVideo = useCallback(() => {
     if (!playerRef.current || typeof playerRef.current.nextVideo !== 'function') return;
     try {
-      console.log('[YouTube Player] Calling playerRef.current.nextVideo()');
       playerRef.current.nextVideo();
     } catch (err) {
       console.error('[YouTube Player] Exception during nextVideo():', err);
@@ -332,7 +316,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   const previousVideo = useCallback(() => {
     if (!playerRef.current || typeof playerRef.current.previousVideo !== 'function') return;
     try {
-      console.log('[YouTube Player] Calling playerRef.current.previousVideo()');
       playerRef.current.previousVideo();
     } catch (err) {
       console.error('[YouTube Player] Exception during previousVideo():', err);
@@ -342,7 +325,6 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   const pause = useCallback(() => {
     if (!playerRef.current || typeof playerRef.current.pauseVideo !== 'function') return;
     try {
-      console.log('[YouTube Player] Invoking pauseVideo');
       playerRef.current.pauseVideo();
     } catch (err) {
       console.error('[YouTube Player] Exception during pauseVideo:', err);
@@ -352,13 +334,11 @@ export function useYouTubePlayer({ youtubeId = '', playlistId = '', onSongEnd, o
   const resume = useCallback(() => {
     if (playerRef.current && typeof playerRef.current.playVideo === 'function' && lastPlayedIdRef.current) {
       try {
-        console.log('[YouTube Player] Invoking playVideo to resume playback');
         playerRef.current.playVideo();
       } catch (err) {
         console.error('[YouTube Player] Exception during playVideo:', err);
       }
     } else {
-      console.log('[YouTube Player] No active track playing/loaded yet, loading initial track');
       if (playlistId) {
         playPlaylistId(playlistId);
       } else if (youtubeId) {

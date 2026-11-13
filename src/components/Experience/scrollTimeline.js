@@ -32,11 +32,13 @@ function measureStages() {
     ['hero', 0],
     ['approach', heroHeight * 0.34],
     // Dimmed by the time the counter's heading rises into the frame.
-    ['counter', at('#theka-counter-experience', 0.5)],
-    ['chronicles', at('#theka-chronicles-section', 0.35)],
-    ['shayari', at('.theka-shayari-card', 0.25)],
-    ['playlist', at('.theka-vibes-wrapper', 0.4)],
-    ['story', at('.story-section', 0.5)],
+    ['counter', at('#chapter-counter', 0.5)],
+    ['chronicles', at('#chapter-shayari', 0.45)],
+    ['shayari', at('#chapter-machine', 0.4)],
+    // The tapes come loose around the cassette game, then stack up for the mixtapes.
+    ['rewind', at('#chapter-rewind', 0.45)],
+    ['playlist', at('#chapter-moods', 0.4)],
+    ['story', at('#chapter-story', 0.5)],
     ['final', maxScroll]
   ]
 
@@ -115,7 +117,7 @@ export function createScrollTimeline({ rig, poses, textFadeShare, onUpdate, onRe
     onRebuild?.(built)
   }
 
-  // Sections change height (the shayari card, the Time Machine, fonts), which moves every
+  // Sections change height (the Time Machine result, fonts), which moves every
   // anchor below them. Rebuilding keeps the story pinned to where the sections really are.
   const scheduleRebuild = () => {
     clearTimeout(timer)

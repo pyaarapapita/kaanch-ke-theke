@@ -55,6 +55,7 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
               type="button"
               className="receipt-close-btn"
               onClick={onClose}
+              autoFocus
               aria-label="पर्ची बंद करें"
               title="पर्ची बंद करें (Esc)"
             >
@@ -137,7 +138,7 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
             {/* Total Section */}
             <div className="receipt-total-row">
               <span className="total-label">कुल योग (Grand Total):</span>
-              <span className="total-val">दिल का सुकून 🍷</span>
+              <span className="total-val">दिल का सुकून</span>
             </div>
 
             {/* Poetic Couplet at bottom */}

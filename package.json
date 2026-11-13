@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender.js",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "21st": "21st"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
@@ -22,7 +21,6 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
-    "@21st-dev/cli": "^1.18.0",
     "@eslint/js": "^10.0.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",

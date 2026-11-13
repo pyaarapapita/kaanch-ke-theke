@@ -42,7 +42,7 @@ const SHARED_HEADER = `      <header class="header">
         </a>
         <nav class="nav-links desktop-nav">
           <div class="support-nav-item">
-            <a href="https://buymeacoffee.com/kaanchketheke" target="_blank" rel="noopener noreferrer" class="nav-support-btn">मेरी अगली बोतल के लिए 🍾</a>
+            <a href="https://buymeacoffee.com/kaanchketheke" target="_blank" rel="noopener noreferrer" class="nav-support-btn">मेरी अगली बोतल के लिए</a>
           </div>
           <div style="overflow:visible;display:inline-flex;align-items:center;">
             <div class="mood-selector-container">
@@ -52,7 +52,7 @@ const SHARED_HEADER = `      <header class="header">
           <button type="button" class="nav-link nav-link-btn">बारे में</button>
         </nav>
         <button type="button" class="mobile-menu-toggle" aria-label="मेनू खोलें">
-          <span class="mobile-toggle-icon">☰</span>
+          <span class="mobile-toggle-icon"></span>
           <span class="mobile-toggle-label">मेनू</span>
         </button>
       </header>`;
@@ -206,7 +206,7 @@ ${SHARED_HEADER}
                         <a href="/playlists/${pl.id}" class="card-action-btn view-btn">
                           विवरण देखें →
                         </a>
-                        ${pl.isUpcoming ? '' : '<button type="button" class="card-action-btn play-btn">बजाएं ▶</button>'}
+                        ${pl.isUpcoming ? '' : '<button type="button" class="card-action-btn play-btn">बजाएं</button>'}
                       </div>
                     </div>
                   </div>
@@ -298,7 +298,7 @@ function prerenderPlaylistDetailPages() {
         <td class="col-num">${idx + 1}</td>
         <td class="col-title"><span class="song-title-text">${escapeHtml(s.title)}</span><span class="mobile-only-artist">${escapeHtml(s.artist)}</span></td>
         <td class="col-artist"><span class="song-artist-text">${escapeHtml(s.artist)}</span></td>
-        <td class="col-action"><button type="button" class="song-play-row-btn" aria-label="${escapeHtml(s.title)} बजाएं">▶</button></td>
+        <td class="col-action"><button type="button" class="song-play-row-btn" aria-label="${escapeHtml(s.title)} बजाएं"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></td>
       </tr>
     `).join('');
 
@@ -331,8 +331,8 @@ ${SHARED_HEADER}
                   <p class="editorial-desc">${escapeHtml(pl.description)}</p>
                 </div>
                 <div class="playlist-header-actions-group">
-                  <button type="button" class="editorial-action-link share-playlist-btn" aria-label="प्लेलिस्ट लिंक कॉपी करें">🔗 लिंक साझा करें</button>
-                  ${pl.isUpcoming ? '' : `<button type="button" class="editorial-action-link play-playlist-hero-btn">${pl.id === DEFAULT_PLAYLIST_ID ? 'सक्रिय प्लेलिस्ट (Playing)' : 'यह प्लेलिस्ट बजाएं ▶'}</button>`}
+                  <button type="button" class="editorial-action-link share-playlist-btn" aria-label="प्लेलिस्ट लिंक कॉपी करें">लिंक साझा करें</button>
+                  ${pl.isUpcoming ? '' : `<button type="button" class="editorial-action-link play-playlist-hero-btn">${pl.id === DEFAULT_PLAYLIST_ID ? 'सक्रिय प्लेलिस्ट (Playing)' : 'यह प्लेलिस्ट बजाएं'}</button>`}
                 </div>
               </div>
 

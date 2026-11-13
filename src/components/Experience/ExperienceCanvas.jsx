@@ -10,9 +10,12 @@ import { Cassettes, CASSETTES_PATH } from './Cassettes'
 import { createScrollTimeline, countScrollTriggers } from './scrollTimeline'
 import { getLayoutName, INITIAL_CAMERA, LAYOUTS } from './sceneConfig'
 import { TIER_CONFIG } from './deviceTier'
+import { SCENE_PULSE_EVENT } from '../../utils/scenePulse'
 
 // Keep drawing this long after the last change, so damped values can settle.
 const SETTLE_MS = 400
+// A pulse from the page fades over about two seconds.
+const PULSE_SETTLE_MS = 2400
 // Frame budget: under about 22 FPS lower the resolution. If it is still under about 12 FPS
 // at the lowest resolution, this device gets the poster instead. The slow limit must stay
 // clear of the idle frame caps in deviceTier.js, or a capped loop would read as a slow one.
@@ -38,7 +41,7 @@ function FrameDriver({ signalRef, isActiveRef, isPlaying, config }) {
       if (document.hidden || !isActiveRef.current) return
       const signal = signalRef.current
       const isChanging = now < signal.dirtyUntil
-      const wantsFrames = isChanging || isPlaying || signal.floatActive || signal.introPending || signal.lanternSettling
+      const wantsFrames = isChanging || isPlaying || signal.floatActive || signal.introPending || signal.lanternSettling || signal.pulse > 0.01
       if (!wantsFrames) return
       const fps = isChanging || isPlaying ? config.activeFps : config.idleFps
       if (now - last < 1000 / fps - 2) return
@@ -150,6 +153,8 @@ export default function ExperienceCanvas({ tier, isHome, isCovered, isPlaying, h
     floatActive: false,
     introPending: true,
     lanternSettling: false,
+    // 0 to 1. Set by the page through scenePulse.js, then decays in VinylRig.
+    pulse: 0,
     freezeIntro: debug === 'freeze'
   })
   const [isReady, setIsReady] = useState(false)
@@ -184,6 +189,17 @@ export default function ExperienceCanvas({ tier, isHome, isCovered, isPlaying, h
     }
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
     return () => window.removeEventListener('pointermove', handlePointerMove)
+  }, [])
+
+  // The page can ask the record to react: a rewound tape, a chosen mood.
+  useEffect(() => {
+    const handlePulse = (event) => {
+      const strength = Number(event.detail)
+      signalRef.current.pulse = Math.min(1, Math.max(signalRef.current.pulse, Number.isFinite(strength) ? strength : 1))
+      signalRef.current.dirtyUntil = performance.now() + PULSE_SETTLE_MS
+    }
+    window.addEventListener(SCENE_PULSE_EVENT, handlePulse)
+    return () => window.removeEventListener(SCENE_PULSE_EVENT, handlePulse)
   }, [])
 
   // Follow the lantern control through the attribute ThekaCounter already sets.

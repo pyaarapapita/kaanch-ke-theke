@@ -184,7 +184,6 @@ function App() {
         if (isMounted) {
           setIsLoadingMetadata(false)
           if (result?.items && result.items.length > 0) {
-            console.log(`[App] Received ${result.items.length} dynamic songs from YouTube for playlist ${plId}`)
             setDynamicPlaylists((prevPlaylists) =>
               prevPlaylists.map((pl) => {
                 if (pl.youtubePlaylistId === plId) {
@@ -575,7 +574,7 @@ function App() {
               className="nav-support-btn"
               aria-label="मेरी अगली बोतल के लिए (Support Creator)"
             >
-              मेरी अगली बोतल के लिए 🍾
+              मेरी अगली बोतल के लिए
             </a>
           </div>
 
@@ -676,7 +675,6 @@ function App() {
                       setShowAbout(true)
                     }}
                   >
-                    <span className="mobile-card-icon">📜</span>
                     <div className="mobile-card-text">
                       <span className="mobile-card-title">बारे में</span>
                       <span className="mobile-card-sub">ठेके की कहानी</span>
@@ -691,7 +689,7 @@ function App() {
                   className="mobile-support-banner-btn"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <span>मेरी अगली बोतल के लिए 🍾</span>
+                  <span>मेरी अगली बोतल के लिए</span>
                   <span className="mobile-support-sub">Support Creator</span>
                 </a>
 
@@ -751,10 +749,8 @@ function App() {
             <HomePageView
               hasEntered={hasEntered}
               isVideoTransitioning={isVideoTransitioning}
+              playlists={dynamicPlaylists}
               currentPlaylist={currentPlaylist}
-              playlistSongs={playlistSongs}
-              currentSongIndex={currentSongIndex}
-              currentSong={currentSong}
               isPlaying={isPlaying}
               handleStartEntryTransition={handleStartEntryTransition}
               onEntryIntent={handleEntryIntent}
@@ -889,7 +885,7 @@ function App() {
               rel="noopener noreferrer"
               className="footer-nav-link footer-support-link"
             >
-              सहयोग करें 🍾
+              सहयोग करें
             </a>
             <a
               href={SITE_CONFIG.INSTAGRAM_URL}
@@ -903,7 +899,7 @@ function App() {
 
           <div className="footer-meta-row">
             <div className="creator-signature">
-              Designed &amp; Developed with 🌿 by Anuj Rai
+              Designed &amp; developed by Anuj Rai
             </div>
             <Suspense fallback={null}>
               <VisitorCounter />

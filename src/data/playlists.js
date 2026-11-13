@@ -3,7 +3,7 @@ export const DEFAULT_PLAYLIST_ID = '90s';
 export const PLAYLISTS = [
   {
     id: '90s',
-    name: '90s Ki Botal 🍾',
+    name: '90s Ki Botal',
     description: 'Purani yaadein, late night mood aur 90s ke iconic bangers.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: 'PLDol6WidI4Uo',
@@ -96,7 +96,7 @@ export const PLAYLISTS = [
   },
   {
     id: 'dard-e-dil',
-    name: 'Dard-e-Dil Vibe 💔',
+    name: 'Dard-e-Dil Vibe',
     description: 'Sip, regret & repeat — toote dil waalon ka dedicated corner.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
@@ -105,7 +105,7 @@ export const PLAYLISTS = [
   },
   {
     id: 'mahfil',
-    name: 'Ghazal & Mahfil 🌙',
+    name: 'Ghazal & Mahfil',
     description: 'Retro ghazals aur shaam ki peaceful baithak.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
@@ -114,7 +114,7 @@ export const PLAYLISTS = [
   },
   {
     id: 'barish-aur-yaadein',
-    name: 'Monsoon Memories 🌧️',
+    name: 'Monsoon Memories',
     description: 'Baarish ki tip-tip aur iconic retro monsoon tracks.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',
@@ -123,7 +123,7 @@ export const PLAYLISTS = [
   },
   {
     id: 'raat-ka-nasha',
-    name: 'Midnight Nasha 🌌',
+    name: 'Midnight Nasha',
     description: 'Aadhi raat ki tanhai aur madhosh vintage hits.',
     background: '/backgrounds/theka-bg.png',
     youtubePlaylistId: '',

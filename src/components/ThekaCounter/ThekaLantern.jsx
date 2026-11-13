@@ -65,7 +65,7 @@ export const ThekaLantern = React.memo(function ThekaLantern({
       </div>
 
       {/* Interactive Micro-Hint */}
-      <span className="lantern-hint-tag">{currentLevel.label} 🕯️</span>
+      <span className="lantern-hint-tag">{currentLevel.label}</span>
     </div>
   )
 })

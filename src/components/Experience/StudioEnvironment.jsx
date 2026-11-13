@@ -7,6 +7,8 @@ const LANTERN_BASE_INTENSITY = 2.6
 const KEY_BASE_INTENSITY = 3.6
 const RIM_BASE_INTENSITY = 1.2
 const HALO_MAX_OPACITY = 0.2
+// Extra lamp glow at the peak of a page pulse.
+const PULSE_HALO_OPACITY = 0.22
 
 /**
  * A tiny procedural reflection probe: a dark room with one warm lamp. It gives the vinyl a
@@ -95,8 +97,9 @@ export function StudioEnvironment({ rigRef, lanternRef, signalRef }) {
     const halo = haloRef.current
     if (halo) {
       halo.position.set(rig.dx - 0.15, rig.dy + 0.1, rig.dz - 1.6)
-      halo.material.opacity = rig.halo * HALO_MAX_OPACITY * rig.opacity
-      halo.visible = rig.halo > 0.01
+      const pulse = signalRef.current.pulse
+      halo.material.opacity = rig.halo * HALO_MAX_OPACITY * rig.opacity + pulse * PULSE_HALO_OPACITY
+      halo.visible = rig.halo > 0.01 || pulse > 0.01
     }
   })
 

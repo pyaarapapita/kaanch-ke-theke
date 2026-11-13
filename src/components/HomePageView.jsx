@@ -1,139 +1,26 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import React, { useMemo } from 'react'
 import { ThekaCounter } from './ThekaCounter/ThekaCounter'
 import { MusicalTimeMachine } from './MusicalTimeMachine/MusicalTimeMachine'
+import { RewindGame } from './RewindGame/RewindGame'
 import { VinylHero } from './VinylHero/VinylHero'
 import { VinylHeroErrorBoundary } from './VinylHero/VinylHeroErrorBoundary'
+import { Chapter } from './Home/Chapter'
+import { ChapterRail } from './Home/ChapterRail'
+import { ShayariWall } from './Home/ShayariWall'
+import { MoodShelf } from './Home/MoodShelf'
+import { pulseScene } from '../utils/scenePulse'
 import './VinylHero/VinylHero.css'
+import './Home/Home.css'
 
 const SITE_CONFIG = {
   INSTAGRAM_URL: 'https://www.instagram.com/ironically_anujj',
   BUY_ME_A_COFFEE_URL: 'https://buymeacoffee.com/kaanchketheke'
 }
 
-const THEKA_SHAYARI_COLLECTION = [
-  {
-    id: 'ghalib-1',
-    sher: 'हज़ारों ख़्वाहिशें ऐसी कि हर ख़्वाहिश पे दम निकले,\nबहुत निकले मिरे अरमाँ लेकिन फिर भी कम निकले।',
-    poet: 'मिर्ज़ा ग़ालिब',
-    era: 'क्लासिक ग़ज़ल दौर',
-    context: 'गायन: जगजीत सिंह • अमर नज़्म'
-  },
-  {
-    id: 'sahir-1',
-    sher: 'मैं ज़िंदगी का साथ निभाता चला गया,\nहर फ़िक्र को धुएँ में उड़ाता चला गया।',
-    poet: 'साहिर लुधियानवी',
-    era: 'हम दोनों (1961)',
-    context: 'गायन: मुहम्मद रफ़ी • संगीत: जयदेव'
-  },
-  {
-    id: 'gulzar-1',
-    sher: 'आँखों में जल रहा है क्यूँ बुझता नहीं धुआँ,\nउठता है दिल से दर्द कि रुकता नहीं धुआँ।',
-    poet: 'गुलज़ार',
-    era: 'माचिस (1996)',
-    context: 'गायन: सुरेश वाडेकर • संगीत: विशाल भारद्वाज'
-  },
-  {
-    id: 'fakir-1',
-    sher: 'ये दौलत भी ले लो, ये शोहरत भी ले लो,\nभले छीन लो मुझसे मेरी जवानी...\nमगर मुझको लौटा दो बचपन का सावन,\nवो काग़ज़ की कश्ती, वो बारिश का पानी।',
-    poet: 'सुदर्शन फ़ाकिर',
-    era: 'आज (1982)',
-    context: 'गायन: जगजीत सिंह & चित्रा सिंह'
-  },
-  {
-    id: 'shailendra-1',
-    sher: 'गाता रहे मेरा दिल, तू ही मेरी मंज़िल,\nकहीं बीतें ना ये रातें, कहीं बीतें ना ये दिन।',
-    poet: 'शैलेंद्र',
-    era: 'गाइड (1965)',
-    context: 'गायन: किशोर कुमार & लता मंगेशकर • संगीत: एस. डी. बर्मन'
-  },
-  {
-    id: 'sahir-2',
-    sher: 'कभी कभी मेरे दिल में ख़याल आता है,\nकि जैसे तुझको बनाया गया है मेरे लिए।',
-    poet: 'साहिर लुधियानवी',
-    era: 'कभी कभी (1976)',
-    context: 'गायन: मुकेश • संगीत: खय्याम'
-  },
-  {
-    id: 'hasrat-1',
-    sher: 'चुपके चुपके रात दिन आँसू बहाना याद है,\nहमको अब तक आशिक़ी का वो ज़माना याद है।',
-    poet: 'हसरत मोहानी',
-    era: 'निकाह (1982)',
-    context: 'गायन: ग़ुलाम अली • क्लासिक तराना'
-  },
-  {
-    id: 'bakshi-1',
-    sher: 'ज़िंदगी के सफ़र में गुज़र जाते हैं जो मक़ाम,\nवो फिर नहीं आते, वो फिर नहीं आते।',
-    poet: 'आनंद बक्षी',
-    era: 'आप की कसम (1974)',
-    context: 'गायन: किशोर कुमार • संगीत: आर. डी. बर्मन'
-  }
-]
-
-const THEKA_MOOD_VIBES = [
-  {
-    id: '90s',
-    title: '90s Ki Botal 🍾',
-    tagline: 'वॉकमैन व कैसेट का दौर',
-    desc: 'पेंसिल से रील लपेटना, ऑटो-रिवर्स कैसेट और देर रात छत पर बजता ट्रांजिस्टर।',
-    icon: '📼',
-    chip: 'सक्रिय महफ़िल',
-    isUpcoming: false
-  },
-  {
-    id: 'mahfil',
-    title: 'काँच के जाम व ग़ज़ल 🌙',
-    tagline: 'धीमी रात की महफ़िल',
-    desc: 'जगजीत सिंह का सोज़, जलती लालटेन और काँच के गिलासों में उतरता सुकून।',
-    icon: '🍷',
-    chip: 'शीघ्र उपलब्ध',
-    isUpcoming: true
-  },
-  {
-    id: 'barish-aur-yaadein',
-    title: 'रिमझिम बारिश 🌧️',
-    tagline: 'भीगी शाम और पुरानी धुन',
-    desc: 'खिड़की पर गिरती बूँदें, कुल्हड़ वाली चाय और किशोर दा के भीगे नग़मे।',
-    icon: '🌧️',
-    chip: 'शीघ्र उपलब्ध',
-    isUpcoming: true
-  },
-  {
-    id: 'dard-e-dil',
-    title: 'दर्द-ए-दिल 💔',
-    tagline: 'तन्हाई और पुराना अफ़साना',
-    desc: 'टूटे दिलों की दास्तान और मुहम्मद रफ़ी के वो नग़मे जो सीधा रूह में उतर जाएं।',
-    icon: '💔',
-    chip: 'शीघ्र उपलब्ध',
-    isUpcoming: true
-  }
-]
-
-const NOSTALGIA_CHIPS = [
-  {
-    id: 'radio',
-    icon: '📻',
-    title: 'आकाशवाणी व छायागीत',
-    desc: 'रात 10 बजे अमीन सयानी की चिर-परिचित आवाज़ और बिनाका गीतमाला का सुरूर'
-  },
-  {
-    id: 'cassette',
-    icon: '📼',
-    title: 'मिक्स-टेप रिकॉर्डिंग दौर',
-    desc: 'नुक्कड़ की कैसेट शॉप पर स्पेशल फ़रमाइश से ए और बी साइड भरवाने का जादू'
-  },
-  {
-    id: 'chai',
-    icon: '☕',
-    title: 'नुक्कड़ की चाय और अड्डा',
-    desc: 'कुल्हड़ वाली कड़क चाय के साथ दूर पान की गुमटी से तैरती रफ़ी साहब की सदा'
-  }
-]
-
 export const HomePageView = React.memo(function HomePageView({
   hasEntered,
   isVideoTransitioning,
+  playlists,
   currentPlaylist,
   isPlaying = false,
   handleStartEntryTransition,
@@ -143,11 +30,15 @@ export const HomePageView = React.memo(function HomePageView({
   handlePlaySong,
   setShowAbout
 }) {
-  const [shayariIndex, setShayariIndex] = useState(0)
-  const activeSher = THEKA_SHAYARI_COLLECTION[shayariIndex]
+  // The rewind game deals from the first playlist that has songs in it.
+  const rewindPlaylist = useMemo(
+    () => playlists.find((playlist) => !playlist.isUpcoming && playlist.songs?.length > 0) || null,
+    [playlists]
+  )
 
-  const handleNextShayari = () => {
-    setShayariIndex((prev) => (prev + 1) % THEKA_SHAYARI_COLLECTION.length)
+  const handleMoodSelect = (playlistId) => {
+    handleSelectPlaylist(playlistId)
+    pulseScene(0.7)
   }
 
   return (
@@ -167,314 +58,154 @@ export const HomePageView = React.memo(function HomePageView({
         />
       </VinylHeroErrorBoundary>
 
-      {/* Extended Editorial Content Flow & Playlist Overview */}
-      <motion.div
-        className={`post-entry-editorial-flow ${hasEntered ? 'is-entered-visible' : 'initial-hidden-seo'}`}
-        initial={false}
-        animate={{ opacity: hasEntered ? 1 : 0.85, y: hasEntered ? 0 : 20 }}
-        transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-      >
-        {/* Interactive Theka Counter Experience (Lantern & Keepsakes) */}
-        <ThekaCounter />
+      {hasEntered && <ChapterRail />}
 
-        {/* Section 1: Theka Chronicles & Shayari Wall */}
-        <section
-          id="theka-chronicles-section"
-          className="editorial-section theka-chronicles-section"
-          aria-label="ठेके की दास्तान, शायरी और रेट्रो यादें"
+      <div className={`home-flow ${hasEntered ? 'is-entered' : ''}`}>
+        <Chapter
+          id="chapter-counter"
+          number="०१"
+          kicker="The Counter"
+          title="काउण्टर की अमानत"
+          lede="यह केवल एक वेबसाइट नहीं, रात के पहर का वही चिर-परिचित ठेका है। काउण्टर पर रखी हर चीज़ से एक याद जुड़ी है — पीतल की लालटेन, पुराने हिसाब की पर्ची और 1990 की एक माचिस।"
+          layout="split"
         >
-          <div className="editorial-container theka-chronicles-container">
-            <div className="editorial-content-panel full-width-panel">
-              {/* Header Row */}
-              <div className="theka-chronicles-header-row">
-                <div className="theka-header-titles">
-                  <div className="editorial-badge-row">
-                    <span className="editorial-badge">ठेके की दास्तान</span>
-                    <span className="editorial-meta">Theka Chronicles</span>
-                  </div>
-                  <h2 className="editorial-title theka-chronicles-title">
-                    ठेके की दास्तान
-                  </h2>
-                  <p className="editorial-desc theka-chronicles-desc">
-                    जब रात गहराती है और काँच के गिलासों में पुरानी यादें उतरती हैं, तब धुन और शायरी मिलकर दिल का हाल बयां करते हैं।
-                  </p>
-                </div>
-              </div>
+          <ThekaCounter />
+        </Chapter>
 
-              {/* Centerpiece: Interactive Mehfil Shayari Card */}
-              <div className="theka-shayari-card" role="region" aria-label="आज की शायरी">
-                <div className="shayari-card-top-bar">
-                  <div className="shayari-badge-group">
-                    <span className="shayari-flame-icon" aria-hidden="true">🕯️</span>
-                    <div className="shayari-label-stack">
-                      <span className="shayari-card-label">आज की शायरी</span>
-                      <span className="shayari-card-sub">महफ़िल से एक शेर</span>
-                    </div>
-                  </div>
+        <Chapter
+          id="chapter-shayari"
+          number="०२"
+          kicker="Mehfil Shayari"
+          title="महफ़िल से एक शेर"
+          lede="जब रात गहराती है और काँच के गिलासों में पुरानी यादें उतरती हैं, तब धुन और शायरी मिलकर दिल का हाल बयां करते हैं।"
+          layout="center"
+        >
+          <ShayariWall />
+        </Chapter>
 
-                  <button
-                    type="button"
-                    className="shayari-cycle-btn"
-                    onClick={handleNextShayari}
-                    aria-label="अगला शेर पढ़ें"
-                    title="अगला शेर देखें"
-                  >
-                    <span className="cycle-btn-text">अगला शेर →</span>
-                  </button>
-                </div>
+        <Chapter
+          id="chapter-machine"
+          number="०३"
+          kicker="Time Machine"
+          title="संगीत का टाइम मशीन"
+          lede="पुरानी दुकान की धूल जमी रिकॉर्ड रैक से जैसे अचानक कोई अनमोल विनाइल हाथ लग जाए। पहिया घुमाइए और देखिए आज की रात कौन-सा मिज़ाज आपका इंतज़ार कर रहा है।"
+          layout="center"
+        >
+          <MusicalTimeMachine
+            onSelectPlaylist={handleSelectPlaylist}
+            handlePlaySong={handlePlaySong}
+            currentPlaylist={currentPlaylist}
+          />
+        </Chapter>
 
-                <div className="shayari-content-box">
-                  <span className="shayari-quote-mark open" aria-hidden="true">“</span>
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={activeSher.id}
-                      className="shayari-body-motion"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.35, ease: 'easeOut' }}
-                    >
-                      <blockquote className="theka-sher-text">
-                        {activeSher.sher.split('\n').map((line, i) => (
-                          <span key={i} className="sher-line">
-                            {line}
-                          </span>
-                        ))}
-                      </blockquote>
+        <Chapter
+          id="chapter-rewind"
+          number="०४"
+          kicker="Pencil Rewind"
+          title="पेंसिल से रील लपेटो"
+          lede="याद है? वॉकमैन की बैटरी बचाने के लिए कैसेट में पेंसिल फँसाकर रील घुमाना। वही खेल फिर खेलिए — रील लपेटिए, साल 1990 तक लौटिए और टेप को आपके लिए एक नग़मा चुनने दीजिए।"
+          layout="split"
+          className="chapter--flip"
+        >
+          <RewindGame
+            songs={rewindPlaylist?.songs || []}
+            playlistId={rewindPlaylist?.id || null}
+            onPlaySong={handlePlaySong}
+          />
+        </Chapter>
 
-                      <div className="theka-sher-attribution">
-                        <div className="sher-poet-row">
-                          <span className="sher-poet-name">— {activeSher.poet}</span>
-                          <span className="sher-era-tag">{activeSher.era}</span>
-                        </div>
-                        <span className="sher-context-note">{activeSher.context}</span>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                  <span className="shayari-quote-mark close" aria-hidden="true">”</span>
-                </div>
-              </div>
+        <Chapter
+          id="chapter-moods"
+          number="०५"
+          kicker="The Mixtapes"
+          title="हर मिज़ाज की एक टेप"
+          lede="अपनी शाम के हिसाब से टेप उठाइए। जो तैयार हैं वो अभी बजेंगी, बाक़ी रिकॉर्डिंग में हैं।"
+        >
+          <MoodShelf
+            playlists={playlists}
+            activePlaylistId={currentPlaylist?.id}
+            isPlaying={isPlaying}
+            onSelectPlaylist={handleMoodSelect}
+          />
+        </Chapter>
 
-              {/* The Musical Time Machine — Interactive Nostalgic Mood Discovery */}
-              <MusicalTimeMachine
-                onSelectPlaylist={handleSelectPlaylist}
-                handlePlaySong={handlePlaySong}
-                currentPlaylist={currentPlaylist}
-              />
-
-              {/* The 4 Spirits / Mood Vignettes Grid */}
-              <div className="theka-vibes-wrapper">
-                <div className="theka-vibes-header">
-                  <h3 className="theka-sub-heading">चार पहर, चार मिज़ाज (Theka Mood Spirits)</h3>
-                  <span className="theka-sub-meta">अपनी पसंद की महफ़िल का सुरूर चुनें</span>
-                </div>
-
-                <div className="theka-vibes-grid" role="list">
-                  {THEKA_MOOD_VIBES.map((vibe) => {
-                    const isVibeActive = currentPlaylist?.id === vibe.id
-                    const isUpcoming = vibe.isUpcoming
-                    return (
-                      <div
-                        key={vibe.id}
-                        className={`theka-vibe-card ${isVibeActive ? 'is-active-vibe' : ''} ${isUpcoming ? 'is-upcoming-vibe' : ''}`}
-                        role="listitem"
-                      >
-                        <div className="vibe-card-header">
-                          <span className="vibe-card-icon" aria-hidden="true">{vibe.icon}</span>
-                          {isVibeActive ? (
-                            <span className="vibe-status-badge active">
-                              {isPlaying && (
-                                <span className="vibe-eq-indicator" aria-hidden="true">
-                                  <span className="vibe-eq-bar bar-1" />
-                                  <span className="vibe-eq-bar bar-2" />
-                                  <span className="vibe-eq-bar bar-3" />
-                                </span>
-                              )}
-                              <span>सक्रिय</span>
-                            </span>
-                          ) : isUpcoming ? (
-                            <span className="vibe-status-badge upcoming">शीघ्र उपलब्ध</span>
-                          ) : null}
-                        </div>
-
-                        <div className="vibe-card-body">
-                          <h4 className="vibe-card-title">{vibe.title}</h4>
-                          <span className="vibe-card-tagline">{vibe.tagline}</span>
-                          <p className="vibe-card-desc">{vibe.desc}</p>
-                        </div>
-
-                        <div className="vibe-card-action">
-                          <Link
-                            to={`/playlists/${vibe.id}`}
-                            className="vibe-card-btn view-link"
-                            aria-label={`${vibe.title} का पूरा विवरण व ट्रैकलिस्ट देखें`}
-                          >
-                            विवरण देखें →
-                          </Link>
-                          {!isUpcoming && (
-                            <button
-                              type="button"
-                              className={`vibe-card-btn play-select-btn ${isVibeActive ? 'selected' : ''}`}
-                              onClick={() => handleSelectPlaylist(vibe.id)}
-                              aria-label={`${vibe.title} बजाएं`}
-                            >
-                              {isVibeActive ? 'सक्रिय 🍾' : 'बजाएं ▶'}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-
-                <div className="theka-all-playlists-cta-row" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-                  <Link
-                    to="/playlists"
-                    className="vibe-card-btn view-link"
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '0.75rem 1.6rem',
-                      fontSize: '0.92rem',
-                      fontWeight: 600,
-                      textDecoration: 'none',
-                      borderRadius: '8px'
-                    }}
-                  >
-                    सभी चुनिंदा प्लेलिस्ट्स देखें (Explore All Curated Playlists) →
-                  </Link>
-                </div>
-              </div>
-
-              {/* Retro Nostalgia Cultural Chips */}
-              <div className="theka-nostalgia-chips-row" role="region" aria-label="रेट्रो बॉलीवुड यादें">
-                {NOSTALGIA_CHIPS.map((chip) => (
-                  <div key={chip.id} className="theka-nostalgia-chip">
-                    <span className="nostalgia-chip-icon" aria-hidden="true">{chip.icon}</span>
-                    <div className="nostalgia-chip-content">
-                      <strong className="nostalgia-chip-title">{chip.title}</strong>
-                      <span className="nostalgia-chip-desc">{chip.desc}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 2: About the Theka */}
-        <section className="editorial-section story-section" aria-label="काँच के ठेके के बारे में">
-          <div className="editorial-container">
-            <div className="editorial-visual-panel">
-              <picture>
-                <source srcSet="/backgrounds/editorial-story.webp" type="image/webp" />
-                <img
-                  src="/backgrounds/editorial-story.png"
-                  alt="पुराने विनाइल रिकॉर्ड और क्लासिक हिंदी संगीत का माहौल"
-                  className="editorial-img"
-                  loading="lazy"
-                  decoding="async"
-                  width="520"
-                  height="390"
-                />
-              </picture>
-              <div className="visual-overlay-vignette" />
-            </div>
-
-            <div className="editorial-content-panel">
-              <div className="editorial-badge-row">
-                <span className="editorial-badge">The Story Behind The Theka</span>
-                <span className="editorial-meta">A Personal Music Experience</span>
-              </div>
-              <h2 className="editorial-title">एक डिजिटल महफ़िल, 90s के सदाबहार नग़मे और रेट्रो हिंदी संगीत</h2>
-              <p className="editorial-desc">
-                काँच के ठेके (Kaanch Ke Theke) एक अनोखा ऑनलाइन संगीत अनुभव है—पुराने बॉलीवुड गीतों, 90 के दौर के सदाबहार नग़मों, ग़ज़लों और बीती यादों के नाम। यहाँ हर प्लेलिस्ट एक ख़ास मूड और शाम के सुकून को ध्यान में रखकर तैयार की गई है, ताकि आप बिना किसी झंझट के बेहतरीन हिंदी क्लासिक्स का आनंद ले सकें।
+        <Chapter
+          id="chapter-story"
+          number="०६"
+          kicker="The Story"
+          title="ठेके के पीछे की कहानी"
+        >
+          <div className="story-grid">
+            <div className="story-text">
+              <p className="story-tagline">एक डिजिटल महफ़िल, 90s के सदाबहार नग़मे और रेट्रो हिंदी संगीत</p>
+              <p className="chapter-lede">
+                काँच के ठेके (Kaanch Ke Theke) एक अनोखा ऑनलाइन संगीत अनुभव है — पुराने बॉलीवुड गीतों, 90 के दौर के सदाबहार नग़मों, ग़ज़लों और बीती यादों के नाम। यहाँ हर प्लेलिस्ट एक ख़ास मूड और शाम के सुकून को ध्यान में रखकर तैयार की गई है, ताकि आप बिना किसी झंझट के बेहतरीन हिंदी क्लासिक्स का आनंद ले सकें।
               </p>
-              <button
-                type="button"
-                className="editorial-action-link"
-                onClick={() => setShowAbout(true)}
-              >
+              <button type="button" className="editorial-action-link" onClick={() => setShowAbout(true)}>
                 पूरी कहानी पढ़ें →
               </button>
             </div>
+            <figure className="story-figure">
+              <img
+                src="/backgrounds/editorial-story.webp"
+                alt="पुराने विनाइल रिकॉर्ड और क्लासिक हिंदी संगीत का माहौल"
+                loading="lazy"
+                decoding="async"
+                width="520"
+                height="390"
+              />
+            </figure>
           </div>
-        </section>
+        </Chapter>
 
-        {/* Section 4: Community & Support */}
-        <section className="editorial-section community-section" aria-label="कम्युनिटी और सहयोग">
-          <div className="community-cards-grid">
-            {/* Instagram Card */}
-            <div className="community-card instagram-community-card">
-              <div className="community-card-visual">
-                <picture>
-                  <source srcSet="/backgrounds/editorial-instagram.webp" type="image/webp" />
-                  <img
-                    src="/backgrounds/editorial-instagram.png"
-                    alt="रेट्रो कैसेट प्लेयर, कैमरा और शाम का सुकून"
-                    className="community-card-img"
-                    loading="lazy"
-                    decoding="async"
-                    width="520"
-                    height="260"
-                  />
-                </picture>
-                <div className="visual-overlay-vignette" />
-              </div>
+        <section className="chapter community" aria-label="कम्युनिटी और सहयोग">
+          <div className="chapter-inner community-grid">
+            <article className="community-card">
+              <img
+                className="community-card-img"
+                src="/backgrounds/editorial-instagram.webp"
+                alt="रेट्रो कैसेट प्लेयर, कैमरा और शाम का सुकून"
+                loading="lazy"
+                decoding="async"
+                width="520"
+                height="260"
+              />
               <div className="community-card-body">
-                <span className="editorial-badge">Instagram Community</span>
+                <span className="chapter-kicker">Instagram</span>
                 <h3 className="community-card-title">महफ़िल स्क्रीन से बाहर भी जारी है</h3>
                 <p className="community-card-desc">
                   अगर इस छोटी-सी महफ़िल ने आपको कुछ देर ठहरने पर मजबूर किया, तो Instagram पर मिलिए। वहाँ इस प्रोजेक्ट के पीछे की सोच और नए अपडेट्स मिलेंगे।
                 </p>
-                <a
-                  href={SITE_CONFIG.INSTAGRAM_URL}
-                  target="_blank"
-                  rel="me noopener noreferrer"
-                  className="editorial-action-link instagram-link"
-                >
+                <a href={SITE_CONFIG.INSTAGRAM_URL} target="_blank" rel="me noopener noreferrer" className="text-link">
                   Instagram पर जुड़ें →
                 </a>
               </div>
-            </div>
+            </article>
 
-            {/* Support Creator Card */}
-            <div className="community-card support-community-card">
-              <div className="community-card-visual">
-                <picture>
-                  <source srcSet="/backgrounds/theka-bg.webp" type="image/webp" />
-                  <img
-                    src="/backgrounds/theka-bg.png"
-                    alt="काँच के ठेके की अगली बोतल — सहयोग"
-                    className="community-card-img"
-                    loading="lazy"
-                    decoding="async"
-                    width="520"
-                    height="260"
-                  />
-                </picture>
-                <div className="visual-overlay-vignette" />
-              </div>
+            <article className="community-card">
+              <img
+                className="community-card-img"
+                src="/backgrounds/theka-bg.webp"
+                alt="काँच के ठेके की अगली बोतल — सहयोग"
+                loading="lazy"
+                decoding="async"
+                width="520"
+                height="260"
+              />
               <div className="community-card-body">
-                <span className="editorial-badge">Support The Theka</span>
+                <span className="chapter-kicker">Support</span>
                 <h3 className="community-card-title">मेरी अगली बोतल के लिए</h3>
                 <p className="community-card-desc">
                   काँच के ठेके एक स्वतंत्र, विज्ञापन-मुक्त संगीत प्रयास है। अगर आपको यहाँ सुकून मिला, तो अपनी पसंद से अगली बोतल या चाय स्पॉन्सर कर सकते हैं।
                 </p>
-                <a
-                  href={SITE_CONFIG.BUY_ME_A_COFFEE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="editorial-action-link support-action-link"
-                >
-                  सहयोग करें 🍾
+                <a href={SITE_CONFIG.BUY_ME_A_COFFEE_URL} target="_blank" rel="noopener noreferrer" className="text-link">
+                  सहयोग करें →
                 </a>
               </div>
-            </div>
+            </article>
           </div>
         </section>
-      </motion.div>
+      </div>
     </>
   )
 })

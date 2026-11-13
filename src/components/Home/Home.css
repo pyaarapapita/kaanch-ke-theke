@@ -1,0 +1,1038 @@
+/* ==========================================================================
+   Home.css - the homepage story below the hero
+
+   The page is a run of numbered chapters laid straight over the 3D room. Chapters are
+   not boxed: each one sits on a soft dark scrim so the text stays readable while the
+   record, shelves and tapes remain visible in the gutters and between chapters.
+
+   Breakpoints used here: 900px (two columns become one) and 1360px (chapter rail).
+   ========================================================================== */
+
+.home-flow {
+  --page-gutter: clamp(1.25rem, 5vw, 3.5rem);
+  --chapter-gap: clamp(4rem, 10vh, 7.5rem);
+  --content-max: 1080px;
+
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Room for the floating player on phones and the footer's own top edge. */
+  padding-bottom: clamp(4rem, 10vh, 7rem);
+}
+
+/* --------------------------------------------------------------------------
+   Chapter frame
+   -------------------------------------------------------------------------- */
+.chapter {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  padding: var(--chapter-gap) var(--page-gutter);
+  /* Clears the fixed header when the rail jumps here. */
+  scroll-margin-top: 3.5rem;
+}
+
+/* Reading scrim: dense behind the text column, gone before the gutters. */
+.chapter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 64% 62% at 50% 50%,
+    rgba(9, 8, 6, 0.9) 0%,
+    rgba(9, 8, 6, 0.74) 52%,
+    rgba(9, 8, 6, 0) 100%
+  );
+}
+
+.chapter-inner {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.chapter-head {
+  max-width: 44rem;
+  margin-bottom: clamp(2rem, 5vh, 3.25rem);
+}
+
+.chapter-mark {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.chapter-no {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(2.75rem, 6vw, 4.25rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(212, 163, 95, 0.7);
+  /* Devanagari numerals carry a tall ascent box; this trims the empty space above. */
+  margin-top: -0.12em;
+}
+
+.chapter-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: var(--font-english);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--accent-gold);
+}
+
+.chapter-mark .chapter-kicker::before {
+  content: '';
+  width: clamp(1.75rem, 4vw, 3rem);
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent-gold), rgba(184, 137, 74, 0.2));
+}
+
+.chapter-title {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.85rem, 4.6vw, 3.3rem);
+  font-weight: 400;
+  line-height: 1.28;
+  letter-spacing: 0.01em;
+  color: var(--text-cream);
+  text-wrap: balance;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.9);
+}
+
+.chapter-lede {
+  margin-top: 1rem;
+  max-width: 38rem;
+  font-family: var(--font-hindi-body);
+  font-size: clamp(1rem, 1.35vw, 1.12rem);
+  line-height: 1.9;
+  color: #D6C5A9;
+  text-wrap: pretty;
+}
+
+/* Centred chapters */
+.chapter--center .chapter-head {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.chapter--center .chapter-mark {
+  justify-content: center;
+}
+
+.chapter--center .chapter-mark .chapter-kicker::after {
+  content: '';
+  width: clamp(1.75rem, 4vw, 3rem);
+  height: 1px;
+  background: linear-gradient(270deg, var(--accent-gold), rgba(184, 137, 74, 0.2));
+}
+
+.chapter--center .chapter-lede {
+  margin-inline: auto;
+}
+
+/* Two-column chapters: words on one side, the object on the other. */
+@media (min-width: 900px) {
+  .chapter--split .chapter-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 5.5rem);
+  }
+
+  .chapter--split .chapter-head {
+    margin-bottom: 0;
+  }
+
+  .chapter--flip .chapter-head {
+    order: 2;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Shared controls
+   -------------------------------------------------------------------------- */
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--accent-gold-hover);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(212, 163, 95, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.4em;
+  transition: color 0.25s var(--ease-out), text-decoration-color 0.25s var(--ease-out);
+  touch-action: manipulation;
+}
+
+.text-link:hover {
+  color: #F2D9AC;
+  text-decoration-color: currentColor;
+}
+
+.round-btn {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  color: var(--text-cream);
+  background: rgba(17, 13, 9, 0.7);
+  border: 1px solid var(--glass-border-brass);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease-out), background-color 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+  touch-action: manipulation;
+}
+
+.round-btn:hover {
+  border-color: var(--glass-border-brass-hover);
+  background: rgba(124, 45, 36, 0.4);
+}
+
+.round-btn:active {
+  transform: scale(0.94);
+}
+
+.text-link:focus-visible,
+.round-btn:focus-visible,
+.shayari:focus-visible,
+.chapter-rail-item:focus-visible,
+.desk-physical-receipt:focus-visible,
+.mood-spine-link:focus-visible {
+  outline: var(--focus-gold-ring);
+  outline-offset: 3px;
+  box-shadow: var(--focus-gold-glow);
+}
+
+.editorial-action-link svg {
+  margin-left: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Story progress line and chapter rail
+   -------------------------------------------------------------------------- */
+.story-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 155;
+  pointer-events: none;
+}
+
+.story-progress-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-red), var(--accent-gold) 45%, var(--accent-gold-hover));
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.chapter-rail {
+  display: none;
+}
+
+@media (min-width: 1360px) and (min-height: 620px) {
+  .chapter-rail {
+    display: block;
+    position: fixed;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 110;
+  }
+
+  .chapter-rail-list {
+    display: grid;
+    gap: 0.125rem;
+    list-style: none;
+  }
+
+  .chapter-rail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 36px;
+    padding: 0.25rem 0.375rem;
+    font-family: var(--font-hindi-body);
+    color: var(--text-muted);
+    background: none;
+    border: 0;
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    transition: color 0.3s var(--ease-out);
+  }
+
+  .chapter-rail-no {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+  }
+
+  .chapter-rail-tick {
+    width: 14px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+    transition: width 0.35s var(--ease-out), opacity 0.3s var(--ease-out);
+  }
+
+  .chapter-rail-label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+  }
+
+  .chapter-rail-item:hover,
+  .chapter-rail-item:focus-visible,
+  .chapter-rail-item.is-active {
+    color: var(--accent-gold-hover);
+  }
+
+  .chapter-rail-item.is-active .chapter-rail-tick {
+    width: 30px;
+    opacity: 1;
+  }
+
+  .chapter-rail-item.is-active .chapter-rail-no {
+    opacity: 1;
+  }
+
+  .chapter-rail-item:hover .chapter-rail-label,
+  .chapter-rail-item:focus-visible .chapter-rail-label {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   01 Counter: lantern, receipt, matchbox
+   -------------------------------------------------------------------------- */
+.counter-desk {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  max-width: 460px;
+  margin-inline: auto;
+}
+
+.counter-desk-glow {
+  position: absolute;
+  left: 22%;
+  top: 38%;
+  width: 115%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 170, 60, 0.26) 0%, rgba(184, 137, 74, 0.08) 38%, transparent 62%);
+  pointer-events: none;
+  transition: opacity 0.8s var(--ease-out);
+}
+
+.counter-desk.lantern-ambient-dim .counter-desk-glow { opacity: 0.3; }
+.counter-desk.lantern-ambient-medium .counter-desk-glow { opacity: 0.7; }
+.counter-desk.lantern-ambient-bright .counter-desk-glow { opacity: 1; }
+
+.counter-desk-items {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(1.25rem, 4vw, 2.5rem);
+  width: 100%;
+}
+
+/* The lantern markup is drawn at 58x98. It is scaled up here and its box reserved. */
+.counter-lantern {
+  flex: none;
+  display: grid;
+  place-items: end center;
+  width: 110px;
+  height: 196px;
+}
+
+.counter-lantern .theka-lantern-interactive {
+  transform: scale(1.65);
+  transform-origin: bottom center;
+  margin-bottom: 1.5rem;
+}
+
+.counter-lantern .theka-lantern-interactive:hover {
+  transform: scale(1.72);
+}
+
+.counter-lantern .theka-lantern-interactive:focus-visible {
+  outline: var(--focus-gold-ring);
+  outline-offset: 6px;
+}
+
+.counter-papers {
+  display: grid;
+  gap: 1rem;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 270px;
+  padding-bottom: 0.75rem;
+}
+
+.desk-physical-receipt {
+  display: grid;
+  gap: 0.375rem;
+  width: 100%;
+  padding: 1rem 1rem;
+  font: inherit;
+  text-align: left;
+  background: linear-gradient(135deg, #FFF4DE 0%, #EFE1C6 100%);
+  border: 1px solid #B08B57;
+  border-radius: 6px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55), 2px 2px 0 #3A2312;
+  cursor: pointer;
+  transform: rotate(-2deg);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  touch-action: manipulation;
+}
+
+.desk-physical-receipt:hover {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.7), 2px 2px 0 #5C381E;
+}
+
+.receipt-paper-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.receipt-mini-stamp {
+  font-family: var(--font-hindi-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #9C2A20;
+  border: 1px solid #9C2A20;
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  transform: rotate(-4deg);
+}
+
+.receipt-mini-title {
+  font-family: var(--font-hindi-display);
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #241408;
+}
+
+.receipt-mini-quote {
+  font-family: var(--font-hindi-body);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  color: #4A2E16;
+}
+
+.receipt-tap-cta {
+  font-family: var(--font-hindi-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #8C4B18;
+}
+
+.desk-vintage-matchbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-hindi-body);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #FFEED2;
+  background: linear-gradient(90deg, #A83226 0%, #822218 100%);
+  border: 1px solid #D4AF76;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  transform: rotate(1.5deg);
+}
+
+.matchbox-star {
+  color: #FFE08A;
+  font-size: 0.7rem;
+}
+
+/* The edge of the wooden counter the objects stand on. */
+.counter-desk-ledge {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: linear-gradient(180deg, #5A3D22 0%, #2E1E11 55%, #130D08 100%);
+  border-top: 1px solid rgba(232, 195, 138, 0.5);
+  border-radius: 2px;
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.8);
+}
+
+.counter-desk-hint {
+  margin-top: 1.25rem;
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   02 Shayari
+   -------------------------------------------------------------------------- */
+.shayari {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  max-width: 50rem;
+  margin-inline: auto;
+  text-align: center;
+  border-radius: var(--radius-lg);
+}
+
+.shayari-mark {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(4rem, 10vw, 6.5rem);
+  line-height: 0.6;
+  color: rgba(184, 137, 74, 0.4);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Sized for the longest sher (four lines), so turning the page never moves what follows. */
+.shayari-stage {
+  display: grid;
+  align-items: center;
+  width: 100%;
+  min-height: clamp(17rem, 46vw, 19.5rem);
+  overflow: hidden;
+}
+
+.shayari-figure {
+  display: grid;
+  gap: 1.5rem;
+  cursor: grab;
+}
+
+.shayari-figure:active {
+  cursor: grabbing;
+}
+
+.shayari-text {
+  display: grid;
+  gap: 0.35em;
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.25rem, 3.1vw, 2.05rem);
+  line-height: 1.6;
+  color: var(--text-cream);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9);
+}
+
+.shayari-line {
+  display: block;
+  text-wrap: balance;
+}
+
+.shayari-credit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem 1rem;
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.shayari-poet {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--accent-gold-hover);
+}
+
+.shayari-era {
+  padding: 0.125rem 0.75rem;
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: var(--radius-pill);
+}
+
+.shayari-context {
+  flex-basis: 100%;
+}
+
+.shayari-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 1.75rem;
+}
+
+.shayari-count {
+  display: inline-flex;
+  gap: 0.375rem;
+  min-width: 3.5rem;
+  justify-content: center;
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-cream);
+}
+
+.shayari-count-sep {
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   05 Mixtapes
+   -------------------------------------------------------------------------- */
+.mood-shelf {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+
+.mood-upcoming {
+  min-width: 0;
+}
+
+.mood-ready-list,
+.mood-upcoming-list {
+  list-style: none;
+}
+
+.mood-ready-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.mood-tape {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  height: 100%;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  background: var(--glass-mahogany-dense);
+  border: 1px solid var(--glass-border-brass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow-deep), var(--glass-specular-bevel-subtle);
+  overflow: hidden;
+  transition: border-color 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+}
+
+/* The red band across the top of a cassette label. */
+.mood-tape::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-red), var(--accent-gold));
+}
+
+.mood-tape.is-active {
+  border-color: var(--border-gold-glow);
+  box-shadow: var(--glass-shadow-hover), var(--glass-specular-bevel);
+}
+
+.mood-tape-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mood-code {
+  font-family: var(--font-english);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.mood-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-gold-hover);
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: var(--radius-pill);
+}
+
+.mood-eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 11px;
+}
+
+.mood-eq-bar {
+  width: 2px;
+  height: 100%;
+  background: currentColor;
+  transform-origin: bottom;
+  animation: moodEq 0.9s ease-in-out infinite alternate;
+}
+
+.mood-eq-bar:nth-child(2) { animation-delay: -0.3s; }
+.mood-eq-bar:nth-child(3) { animation-delay: -0.6s; }
+
+@keyframes moodEq {
+  from { transform: scaleY(0.25); }
+  to { transform: scaleY(1); }
+}
+
+.mood-title {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--text-cream);
+}
+
+.mood-tagline {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--accent-gold);
+}
+
+.mood-desc {
+  max-width: 34rem;
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-base);
+  line-height: 1.8;
+  color: #D6C5A9;
+}
+
+.mood-meta {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.mood-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.mood-upcoming-label {
+  margin-bottom: 0.75rem;
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.mood-upcoming-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.mood-spine {
+  min-width: 0;
+}
+
+.mood-spine-link {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  height: 100%;
+  min-height: 7.25rem;
+  padding: 1rem 1rem 1rem 1.25rem;
+  background: var(--glass-mahogany-card);
+  border: 1px solid rgba(212, 175, 118, 0.16);
+  border-radius: var(--radius-md);
+  transition: border-color 0.3s var(--ease-out), transform 0.3s var(--ease-out), background-color 0.3s var(--ease-out);
+}
+
+.mood-spine-link::before {
+  content: '';
+  position: absolute;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 0;
+  width: 3px;
+  background: var(--accent-red);
+  border-radius: 0 2px 2px 0;
+}
+
+.mood-spine-link:hover {
+  border-color: var(--glass-border-brass-hover);
+  transform: translateY(-3px);
+}
+
+.mood-spine-title {
+  font-family: var(--font-hindi-display);
+  font-size: var(--fs-md);
+  line-height: 1.35;
+  color: var(--text-cream);
+}
+
+.mood-spine-tagline {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.mood-spine-chip {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  padding: 0.125rem 0.5rem;
+  font-family: var(--font-hindi-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border: 1px dashed rgba(163, 147, 124, 0.5);
+  border-radius: var(--radius-pill);
+}
+
+.mood-all-link {
+  justify-self: start;
+}
+
+@media (min-width: 900px) {
+  .mood-shelf {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .mood-all-link {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Phones: the upcoming tapes become one swipeable row that bleeds to the screen edges. */
+@media (max-width: 599px) {
+  .mood-upcoming-list {
+    display: flex;
+    gap: 0.75rem;
+    margin-inline: calc(var(--page-gutter) * -1);
+    padding: 0.25rem var(--page-gutter) 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--page-gutter);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mood-upcoming-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mood-spine {
+    flex: 0 0 72%;
+    scroll-snap-align: start;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   06 Story and community
+   -------------------------------------------------------------------------- */
+.story-grid {
+  display: grid;
+  gap: clamp(1.75rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.story-figure {
+  position: relative;
+  border-radius: var(--radius-md);
+}
+
+/* A brass frame set slightly off the photograph. */
+.story-figure::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translate(12px, 12px);
+  border: 1px solid var(--border-gold-subtle);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.story-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: inherit;
+  filter: brightness(0.9) contrast(1.05);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
+}
+
+.story-text {
+  display: grid;
+  justify-items: start;
+  gap: 1.5rem;
+}
+
+.story-tagline {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  line-height: 1.5;
+  color: var(--accent-gold-hover);
+  text-wrap: balance;
+}
+
+.story-text .chapter-lede {
+  margin-top: 0;
+}
+
+@media (min-width: 900px) {
+  .story-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  }
+}
+
+.community {
+  padding-top: 0;
+}
+
+.community::before {
+  display: none;
+}
+
+.community-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.community-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--glass-mahogany-dense);
+  border: 1px solid rgba(212, 175, 118, 0.18);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow-deep);
+  overflow: hidden;
+  transition: border-color 0.4s var(--ease-out);
+}
+
+.community-card:hover {
+  border-color: var(--glass-border-brass-hover);
+}
+
+.community-card-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 7;
+  object-fit: cover;
+  filter: brightness(0.82) contrast(1.05);
+  transition: transform 0.8s var(--ease-out), filter 0.6s var(--ease-out);
+}
+
+.community-card:hover .community-card-img {
+  filter: brightness(0.95) contrast(1.05);
+}
+
+.community-card-body {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 0.5rem;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.community-card-title {
+  font-family: var(--font-hindi-display);
+  font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--text-cream);
+}
+
+.community-card-desc {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-base);
+  line-height: 1.8;
+  color: #D6C5A9;
+}
+
+@media (min-width: 760px) {
+  .community-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Small screens
+   -------------------------------------------------------------------------- */
+@media (max-width: 899px) {
+  /* One column covers the full width, so the scrim does too, feathered top and bottom. */
+  .chapter::before {
+    background: linear-gradient(
+      180deg,
+      rgba(9, 8, 6, 0) 0%,
+      rgba(9, 8, 6, 0.82) 12%,
+      rgba(9, 8, 6, 0.82) 88%,
+      rgba(9, 8, 6, 0) 100%
+    );
+  }
+
+  /* The floating player covers the bottom of the screen. */
+  .home-flow {
+    padding-bottom: 7.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .counter-desk-items {
+    gap: 0.75rem;
+  }
+
+  .counter-lantern {
+    width: 92px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mood-eq-bar {
+    animation: none;
+    transform: scaleY(0.7);
+  }
+
+  .desk-physical-receipt,
+  .mood-spine-link,
+  .community-card-img,
+  .round-btn {
+    transition: none;
+  }
+}
