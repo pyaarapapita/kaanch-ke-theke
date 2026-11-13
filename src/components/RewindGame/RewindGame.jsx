@@ -12,6 +12,7 @@ const TOTAL_ANGLE = TAU * TURNS_TO_REWIND
 // One reel click for every sixth of a turn.
 const TICK_ANGLE = TAU / 6
 const KEY_STEP = 0.07
+const PAGE_STEP = 0.25
 const AUTO_REWIND_MS = 1800
 const TARGET_YEAR = 1990
 
@@ -59,6 +60,9 @@ export const RewindGame = memo(function RewindGame({ songs, playlistId, onPlaySo
   const [pickedSong, setPickedSong] = useState(null)
 
   const zoneRef = useRef(null)
+  const rootRef = useRef(null)
+  // Set when the control that had focus is about to disappear, so the next one takes it.
+  const focusResultRef = useRef(false)
   const state = useRef({ progress: 0, angle: 0, lastPointerAngle: 0, sinceTick: 0, frame: 0, autoFrame: 0, done: false, lastSongId: null })
   const [startYear] = useState(() => new Date().getFullYear())
   const hasSongs = songs.length > 0
@@ -86,6 +90,8 @@ export const RewindGame = memo(function RewindGame({ songs, playlistId, onPlaySo
       choice = songs[(songs.indexOf(choice) + 1) % songs.length]
     }
     current.lastSongId = choice?.youtubeId ?? null
+    const active = document.activeElement
+    focusResultRef.current = !active || active === document.body || Boolean(rootRef.current?.contains(active))
     setPickedSong(choice ?? null)
     setIsDragging(false)
     playTapeClunk()
@@ -139,18 +145,14 @@ export const RewindGame = memo(function RewindGame({ songs, playlistId, onPlaySo
     setIsDragging(false)
   }
 
+  // A tape only winds one way, so only the keys that raise a slider move it.
   const handleKeyDown = (event) => {
     if (state.current.done || !hasSongs) return
-    if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
-      event.preventDefault()
-      turn(TOTAL_ANGLE * KEY_STEP)
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
-      event.preventDefault()
-      turn(-TOTAL_ANGLE * KEY_STEP)
-    } else if (event.key === 'End') {
-      event.preventDefault()
-      turn(TOTAL_ANGLE)
-    }
+    const steps = { ArrowRight: KEY_STEP, ArrowUp: KEY_STEP, PageUp: PAGE_STEP, End: 1 }
+    const share = steps[event.key]
+    if (!share) return
+    event.preventDefault()
+    turn(TOTAL_ANGLE * share)
   }
 
   // The button winds the rest of the tape on its own, for anyone who would rather not drag.
@@ -158,6 +160,10 @@ export const RewindGame = memo(function RewindGame({ songs, playlistId, onPlaySo
     const current = state.current
     if (current.done || !hasSongs) return
     cancelAnimationFrame(current.autoFrame)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      turn(TOTAL_ANGLE)
+      return
+    }
     const from = current.progress
     const duration = Math.max(400, AUTO_REWIND_MS * (1 - from))
     const startedAt = performance.now()
@@ -179,6 +185,8 @@ export const RewindGame = memo(function RewindGame({ songs, playlistId, onPlaySo
     current.sinceTick = 0
     setPickedSong(null)
     scheduleFlush()
+    // The reset button is about to go. Hand focus to the reel, which is ready again.
+    zoneRef.current?.focus({ preventScroll: true })
   }
 
   const handlePlay = () => {
@@ -201,7 +209,7 @@ export const RewindGame = memo(function RewindGame({ songs, playlistId, onPlaySo
   const percent = Math.round(progress * 100)
 
   return (
-    <div className={`rewind ${isDone ? 'is-done' : ''} ${isDragging ? 'is-dragging' : ''}`}>
+    <div ref={rootRef} className={`rewind ${isDone ? 'is-done' : ''} ${isDragging ? 'is-dragging' : ''}`}>
       <div className="rewind-deck">
         <svg className="rewind-cassette" viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} role="img" aria-label="मिक्स-टेप कैसेट">
           <defs>
@@ -304,7 +312,17 @@ export const RewindGame = memo(function RewindGame({ songs, playlistId, onPlaySo
                 <strong className="rewind-song-title">{pickedSong.title}</strong>
                 <span className="rewind-song-artist">{pickedSong.artist}</span>
                 <div className="rewind-song-actions">
-                  <button type="button" className="editorial-action-link" onClick={handlePlay}>
+                  <button
+                    type="button"
+                    className="editorial-action-link"
+                    onClick={handlePlay}
+                    ref={(node) => {
+                      if (node && focusResultRef.current) {
+                        focusResultRef.current = false
+                        node.focus({ preventScroll: true })
+                      }
+                    }}
+                  >
                     बजाएँ
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                       <path d="M8 5v14l11-7z" />

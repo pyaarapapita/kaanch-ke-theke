@@ -56,6 +56,13 @@ export const ChapterRail = memo(function ChapterRail() {
     const target = document.getElementById(id)
     if (!target) return
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Keyboard and screen reader users continue from the chapter, not from the rail. Focus
+    // first: focusing during a smooth scroll can retarget it onto the heading.
+    const heading = target.querySelector('h2')
+    if (heading) {
+      heading.setAttribute('tabindex', '-1')
+      heading.focus({ preventScroll: true })
+    }
     target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' })
   }
 

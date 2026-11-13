@@ -52,7 +52,7 @@ const SHARED_HEADER = `      <header class="header">
           <button type="button" class="nav-link nav-link-btn">बारे में</button>
         </nav>
         <button type="button" class="mobile-menu-toggle" aria-label="मेनू खोलें">
-          <span class="mobile-toggle-icon"></span>
+          <span class="mobile-toggle-icon">☰</span>
           <span class="mobile-toggle-label">मेनू</span>
         </button>
       </header>`;

@@ -217,8 +217,20 @@
   box-shadow: var(--focus-gold-glow);
 }
 
-.editorial-action-link svg {
+.home-flow .editorial-action-link svg {
   margin-left: 0.5rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -523,14 +535,23 @@
   display: grid;
   align-items: center;
   width: 100%;
-  min-height: clamp(17rem, 46vw, 19.5rem);
   overflow: hidden;
+}
+
+/* The visible sher and the invisible sizers share one cell. */
+.shayari-stage > * {
+  grid-area: 1 / 1;
 }
 
 .shayari-figure {
   display: grid;
   gap: 1.5rem;
   cursor: grab;
+}
+
+.shayari-sizer {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .shayari-figure:active {

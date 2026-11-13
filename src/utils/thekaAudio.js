@@ -1,5 +1,6 @@
 // Small Web Audio sound effects for the cassette rewind game. No audio files: every sound
-// is synthesized, and every call is made from a user gesture, so autoplay rules allow it.
+// is synthesized. The context is created on the first sound, which always follows a press
+// on the reel or a button, so browsers that need a gesture to start audio allow it.
 
 let audioCtx = null
 

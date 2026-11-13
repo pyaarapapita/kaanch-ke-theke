@@ -194,6 +194,8 @@ export default function ExperienceCanvas({ tier, isHome, isCovered, isPlaying, h
   // The page can ask the record to react: a rewound tape, a chosen mood.
   useEffect(() => {
     const handlePulse = (event) => {
+      // A pulse the record cannot show now would otherwise play late, on return.
+      if (!isActiveRef.current || document.hidden) return
       const strength = Number(event.detail)
       signalRef.current.pulse = Math.min(1, Math.max(signalRef.current.pulse, Number.isFinite(strength) ? strength : 1))
       signalRef.current.dirtyUntil = performance.now() + PULSE_SETTLE_MS

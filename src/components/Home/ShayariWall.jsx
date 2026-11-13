@@ -46,6 +46,22 @@ export const ShayariWall = memo(function ShayariWall() {
       <span className="shayari-mark" aria-hidden="true">“</span>
 
       <div className="shayari-stage" aria-live="polite">
+        {/* Every sher, invisible, in the same grid cell: the stage is always as tall as the
+            longest one at this width, so turning the page never moves what follows. */}
+        {SHAYARI_COLLECTION.map((item) => (
+          <div key={item.id} className="shayari-figure shayari-sizer" aria-hidden="true">
+            <div className="shayari-text">
+              {item.sher.split('\n').map((line) => (
+                <span key={line} className="shayari-line">{line}</span>
+              ))}
+            </div>
+            <div className="shayari-credit">
+              <span className="shayari-poet">— {item.poet}</span>
+              <span className="shayari-era">{item.era}</span>
+              <span className="shayari-context">{item.context}</span>
+            </div>
+          </div>
+        ))}
         <AnimatePresence mode="wait" initial={false} custom={direction}>
           <motion.figure
             key={sher.id}
@@ -80,7 +96,8 @@ export const ShayariWall = memo(function ShayariWall() {
             <path d="M15 5l-7 7 7 7" />
           </svg>
         </button>
-        <span className="shayari-count" aria-label={`शेर ${index + 1}, कुल ${total}`}>
+        <span className="shayari-count">
+          <span className="visually-hidden">शेर {index + 1}, कुल {total}</span>
           <span aria-hidden="true">{toDevanagari(index + 1)}</span>
           <span className="shayari-count-sep" aria-hidden="true">/</span>
           <span aria-hidden="true">{toDevanagari(total)}</span>

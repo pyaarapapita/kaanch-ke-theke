@@ -1,5 +1,8 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+
+const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 /**
  * Handwritten Theka Receipt Modal
@@ -9,30 +12,47 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
   isOpen,
   onClose
 }) {
-  // Close on Escape key
-  const handleKeyDown = useCallback(
-    (e) => {
+  const dialogRef = useRef(null)
+
+  // While open: Escape closes, Tab stays inside the receipt, the page does not scroll, and
+  // focus goes back to whatever opened the receipt once it closes.
+  useEffect(() => {
+    if (!isOpen) return undefined
+    // Record the opener before moving focus in, so closing can hand it back.
+    const opener = document.activeElement
+    dialogRef.current?.querySelector('.receipt-close-btn')?.focus({ preventScroll: true })
+    const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         onClose()
+        return
       }
-    },
-    [onClose]
-  )
-
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown)
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
+      if (e.key !== 'Tab' || !dialogRef.current) return
+      const items = [...dialogRef.current.querySelectorAll(FOCUSABLE)]
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
     }
+    document.addEventListener('keydown', handleKeyDown)
+    document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = ''
+      if (opener instanceof HTMLElement && opener.isConnected) opener.focus({ preventScroll: true })
     }
-  }, [isOpen, handleKeyDown])
+  }, [isOpen, onClose])
 
-  return (
+  if (typeof document === 'undefined') return null
+
+  // Rendered into <body>: inside the page it would sit under later chapters, the header
+  // and the player, which all form their own stacking layers.
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <div
@@ -43,6 +63,7 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
           aria-labelledby="receipt-title"
         >
           <motion.div
+            ref={dialogRef}
             className="theka-receipt-parchment"
             onClick={(e) => e.stopPropagation()}
             initial={{ opacity: 0, scale: 0.9, y: 20, rotate: -2 }}
@@ -55,7 +76,6 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
               type="button"
               className="receipt-close-btn"
               onClick={onClose}
-              autoFocus
               aria-label="पर्ची बंद करें"
               title="पर्ची बंद करें (Esc)"
             >
@@ -173,6 +193,7 @@ export const HandwrittenReceiptModal = React.memo(function HandwrittenReceiptMod
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 })

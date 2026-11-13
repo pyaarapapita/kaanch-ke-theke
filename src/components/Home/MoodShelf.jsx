@@ -32,13 +32,15 @@ export const MoodShelf = memo(function MoodShelf({ playlists, activePlaylistId, 
       <ul className="mood-ready-list" role="list">
         {ready.map((mood) => {
           const isActive = mood.id === activePlaylistId
+          const isOnAir = isActive && isPlaying
+          const playLabel = isOnAir ? 'फिर से बजाएँ' : 'बजाएँ'
           return (
             <li key={mood.id} className={`mood-tape ${isActive ? 'is-active' : ''}`}>
               <div className="mood-tape-top">
                 <span className="mood-code">{mood.code}</span>
                 <span className="mood-status">
-                  {isActive && isPlaying && <EqualizerBars />}
-                  {isActive ? 'बज रही है' : 'तैयार'}
+                  {isOnAir && <EqualizerBars />}
+                  {isOnAir ? 'बज रही है' : isActive ? 'चुनी हुई' : 'तैयार'}
                 </span>
               </div>
               <h3 className="mood-title">{mood.title}</h3>
@@ -52,9 +54,9 @@ export const MoodShelf = memo(function MoodShelf({ playlists, activePlaylistId, 
                   type="button"
                   className="editorial-action-link mood-play-btn"
                   onClick={() => onSelectPlaylist(mood.id)}
-                  aria-label={`${mood.title} बजाएँ`}
+                  aria-label={`${playLabel} — ${mood.title}`}
                 >
-                  {isActive ? 'फिर से बजाएँ' : 'बजाएँ'}
+                  {playLabel}
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                     <path d="M8 5v14l11-7z" />
                   </svg>

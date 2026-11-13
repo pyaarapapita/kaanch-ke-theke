@@ -105,6 +105,11 @@
   animation: turntableSpin 0.65s linear infinite;
 }
 
+/* The arm is on the groove once a mood is picked, so the record plays at its own speed. */
+.time-machine-vinyl-disc.is-settled {
+  animation: turntableSpin 6s linear infinite;
+}
+
 /* Tonearm */
 .turntable-tonearm {
   position: absolute;

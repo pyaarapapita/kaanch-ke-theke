@@ -385,11 +385,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Accessible Keyboard Focus Indicators */
+/* Accessible Keyboard Focus Indicators. Components may add their own shadow or offset. */
 :focus-visible {
   outline: 2px solid var(--accent-gold) !important;
-  outline-offset: 3px !important;
-  box-shadow: none !important;
+  outline-offset: 3px;
 }
 
 .brand-btn:focus-visible,
