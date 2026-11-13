@@ -10,62 +10,70 @@
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
+  z-index: 10;
+}
+
+/* The hero's own atmosphere sits under the persistent canvas, so the disc is never veiled. */
+.vinyl-hero-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  z-index: 0;
+  pointer-events: none;
   background: radial-gradient(
     circle at 72% 48%,
     rgba(32, 22, 14, 0.45) 0%,
     rgba(14, 11, 8, 0.85) 55%,
     var(--bg-near-black, #0a0806) 100%
   );
-  z-index: 10;
 }
 
-/* 3D WebGL Canvas Layer (Non-blocking for pointer events so HTML buttons are interactive) */
-.vinyl-canvas-wrapper {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.vinyl-canvas-wrapper.is-loaded {
-  opacity: 1;
-}
-
-.vinyl-canvas-wrapper canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-
-/* Fallback static poster for environments without WebGL or during 3D model initialization */
+/* Poster captured from the real WebGL scene. Three.js scales the scene with viewport
+   height, so sizing by height keeps poster and disc aligned at every aspect ratio.
+   It scrolls away with the page and matches the canvas's 100lvh height.
+   The aspect-ratio breakpoints match getLayoutName in Experience/sceneConfig.js. */
 .vinyl-static-fallback {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
-  background-image: url('/backgrounds/vinyl-hero-poster.webp');
-  background-size: cover;
-  background-position: center right;
+  height: 100vh;
+  height: 100lvh;
+  background-image: url('/backgrounds/vinyl-hero-3d.webp');
+  background-size: auto 100%;
+  background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.95;
-  filter: contrast(1.05) brightness(0.95);
+  opacity: 1;
   z-index: 1;
   pointer-events: none;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@media (max-aspect-ratio: 26/25) {
+  .vinyl-static-fallback {
+    background-image: url('/backgrounds/vinyl-hero-3d-tablet.webp');
+  }
+}
+
+@media (max-aspect-ratio: 13/20) {
+  .vinyl-static-fallback {
+    background-image: url('/backgrounds/vinyl-hero-3d-phone.webp');
+  }
+}
+
+/* The canvas is already drawn underneath, identical, so the poster can simply fade off it. */
 .vinyl-static-fallback.is-faded-out {
   opacity: 0;
   pointer-events: none;
+  transition: opacity 0.7s ease;
 }
 
-/* Atmospheric warm vignette overlay */
+/* Atmospheric warm vignette. Fixed, because a hero-sized one would drag a dark seam across
+   the disc as the page scrolls. */
 .vinyl-vignette-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   background: radial-gradient(
@@ -89,11 +97,48 @@
   flex-direction: column;
   justify-content: center;
   min-height: 100vh;
+  min-height: 100svh;
   pointer-events: auto;
 }
 
 .vinyl-hero-text-panel {
   max-width: 520px;
+}
+
+/* The disc's left edge sits at the viewport centre, so the text column ends just before it.
+   The subtitle wraps inside this width and never runs under the record. */
+@media (min-width: 901px) {
+  .hero-content.vinyl-hero-text-panel {
+    width: min(560px, calc(50vw - 1rem - 3.5rem - max(0px, (100vw - 1320px) / 2)));
+    max-width: none;
+    align-self: flex-start;
+  }
+
+  .vinyl-hero-text-panel .subtitle-english {
+    text-align: center;
+    line-height: 1.7;
+  }
+}
+
+/* The hero is exactly one screen tall before and after entry. Padding here on top of a
+   full-height child made it taller than the locked page, so unlocking moved the text. */
+.hero.vinyl-hero-container,
+.hero.vinyl-hero-container.is-entered {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 0;
+  transition: none;
+}
+
+/* The master timeline scrubs this panel's transform and opacity: a CSS transition would
+   lag behind it. */
+.hero-content.vinyl-hero-text-panel {
+  transition: none;
+}
+
+/* Keeps the text still when the CTA leaves on entry. */
+.vinyl-hero-text-panel .cta-wrapper {
+  min-height: 3.75rem;
 }
 
 /* Responsive adjustments */
@@ -103,6 +148,9 @@
     justify-content: center;
     text-align: center;
     align-items: flex-end;
+  }
+
+  .vinyl-hero-backdrop {
     background: radial-gradient(
       circle at 50% 32%,
       rgba(38, 25, 16, 0.55) 0%,
@@ -125,6 +173,7 @@
     justify-content: flex-end;
     padding: 0 1.25rem 3.5rem;
     min-height: 100vh;
+    min-height: 100svh;
   }
 
   .vinyl-hero-text-panel {
@@ -155,13 +204,4 @@
     margin-bottom: 1.5rem;
   }
 
-  .vinyl-canvas-wrapper.is-loaded {
-    opacity: 0.95;
-  }
-
-  .vinyl-static-fallback {
-    background-image: url('/backgrounds/vinyl-hero-poster-mobile.webp');
-    background-position: center top;
-    background-size: cover;
-  }
 }

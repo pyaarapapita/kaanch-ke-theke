@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 *.env.local
 scratch/
+# Blender backups and Python bytecode
+*.blend1
+__pycache__/
+*.pyc

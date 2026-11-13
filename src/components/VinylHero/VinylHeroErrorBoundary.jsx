@@ -13,10 +13,13 @@ export class VinylHeroErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.warn('[VinylHero] 3D module failed or WebGL uninitialized, rendering fallback:', error, errorInfo)
+    this.props.onError?.(error)
   }
 
   render() {
     if (this.state.hasError) {
+      // A boundary around one layer can pass its own fallback, including null.
+      if (this.props.fallback !== undefined) return this.props.fallback
       return (
         <VinylHeroFallback
           hasEntered={this.props.hasEntered}

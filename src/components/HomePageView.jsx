@@ -1,14 +1,11 @@
-import React, { useState, lazy, Suspense } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ThekaCounter } from './ThekaCounter/ThekaCounter'
-import { VinylHeroFallback } from './VinylHero/VinylHeroFallback'
+import { MusicalTimeMachine } from './MusicalTimeMachine/MusicalTimeMachine'
+import { VinylHero } from './VinylHero/VinylHero'
 import { VinylHeroErrorBoundary } from './VinylHero/VinylHeroErrorBoundary'
 import './VinylHero/VinylHero.css'
-
-const VinylHeroCanvas = lazy(() =>
-  import('./VinylHero/VinylHeroCanvas').then((m) => ({ default: m.VinylHeroCanvas }))
-)
 
 const SITE_CONFIG = {
   INSTAGRAM_URL: 'https://www.instagram.com/ironically_anujj',
@@ -140,7 +137,10 @@ export const HomePageView = React.memo(function HomePageView({
   currentPlaylist,
   isPlaying = false,
   handleStartEntryTransition,
+  onEntryIntent,
+  isSceneReady = false,
   handleSelectPlaylist,
+  handlePlaySong,
   setShowAbout
 }) {
   const [shayariIndex, setShayariIndex] = useState(0)
@@ -152,28 +152,19 @@ export const HomePageView = React.memo(function HomePageView({
 
   return (
     <>
-      {/* 3D Cinematic Scroll-Driven Vinyl Hero Section (Lazy loaded with instant zero-CLS fallback) */}
+      {/* Hero text, poster and framing. The 3D itself lives in ExperienceLayer, behind the whole page */}
       <VinylHeroErrorBoundary
         hasEntered={hasEntered}
         isVideoTransitioning={isVideoTransitioning}
         handleStartEntryTransition={handleStartEntryTransition}
       >
-        <Suspense
-          fallback={
-            <VinylHeroFallback
-              hasEntered={hasEntered}
-              isVideoTransitioning={isVideoTransitioning}
-              handleStartEntryTransition={handleStartEntryTransition}
-            />
-          }
-        >
-          <VinylHeroCanvas
-            hasEntered={hasEntered}
-            isVideoTransitioning={isVideoTransitioning}
-            isPlaying={isPlaying}
-            handleStartEntryTransition={handleStartEntryTransition}
-          />
-        </Suspense>
+        <VinylHero
+          hasEntered={hasEntered}
+          isVideoTransitioning={isVideoTransitioning}
+          handleStartEntryTransition={handleStartEntryTransition}
+          onEntryIntent={onEntryIntent}
+          isSceneReady={isSceneReady}
+        />
       </VinylHeroErrorBoundary>
 
       {/* Extended Editorial Content Flow & Playlist Overview */}
@@ -263,6 +254,13 @@ export const HomePageView = React.memo(function HomePageView({
                   <span className="shayari-quote-mark close" aria-hidden="true">”</span>
                 </div>
               </div>
+
+              {/* The Musical Time Machine — Interactive Nostalgic Mood Discovery */}
+              <MusicalTimeMachine
+                onSelectPlaylist={handleSelectPlaylist}
+                handlePlaySong={handlePlaySong}
+                currentPlaylist={currentPlaylist}
+              />
 
               {/* The 4 Spirits / Mood Vignettes Grid */}
               <div className="theka-vibes-wrapper">

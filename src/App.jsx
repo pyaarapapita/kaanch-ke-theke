@@ -7,14 +7,46 @@ import { YouTubePlayer } from './components/YouTubePlayer'
 import { MusicPlayer } from './components/MusicPlayer'
 import { MoodSelector } from './components/MoodSelector'
 import { HomePageView } from './components/HomePageView'
+import { ExperienceLayer } from './components/Experience/ExperienceLayer'
 import { fetchPlaylistMetadata } from './utils/youtubeMetadata'
 import './App.css'
 
 // Dynamic lazy imports for non-critical routes and deferred components
-const PlaylistsPage = lazy(() => import('./pages/PlaylistsPage'))
-const PlaylistDetailPage = lazy(() => import('./pages/PlaylistDetailPage'))
-const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
+import { PlaylistsPage, PlaylistDetailPage, NotFoundPage, preloadPlaylistRoutes } from './utils/routePages'
 const VisitorCounter = lazy(() => import('./components/VisitorCounter'))
+
+const ENTRY_VIDEO_SRC = '/shopkeeper-entry-720.mp4'
+const ENTRY_VIDEO_POSTER = '/backgrounds/shopkeeper-entry-poster.webp'
+// The inline script in index.html reads this same key before first paint.
+const ENTRY_SESSION_KEY = 'kkt-entry-played'
+// Matches the .is-fading transition in App.css; the extra time is a safety margin.
+const ENTRY_CROSSFADE_MS = 700
+// Give up on a video that cannot start or has stalled, and enter the site instead.
+const ENTRY_STALL_TIMEOUT_MS = 5000
+
+function hasPlayedEntryThisSession() {
+  try {
+    return window.sessionStorage.getItem(ENTRY_SESSION_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function markEntryPlayed() {
+  try {
+    window.sessionStorage.setItem(ENTRY_SESSION_KEY, '1')
+  } catch {
+    // Without storage the video simply plays again next time.
+  }
+}
+
+// How much of the entry video to fetch before anyone asks for it.
+function getIdleVideoPreload() {
+  const connection = navigator.connection
+  if (!connection) return 'auto'
+  if (connection.saveData || /2g$/.test(connection.effectiveType || '')) return 'none'
+  return connection.effectiveType === '3g' ? 'metadata' : 'auto'
+}
 
 // Configuration for external profile/support links
 const SITE_CONFIG = {
@@ -26,10 +58,18 @@ function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Standalone public routes (/playlists, /playlists/:id) enter directly without landing modal blocking
-  const [hasEntered, setHasEntered] = useState(() => typeof window !== 'undefined' && window.location.pathname !== '/')
-  const [isVideoTransitioning, setIsVideoTransitioning] = useState(false)
-  const [isVideoFinished, setIsVideoFinished] = useState(false)
+  // Standalone public routes (/playlists, /playlists/:id) enter directly without landing modal blocking.
+  // The homepage skips the gate too once the entry video has played in this browser session.
+  const [hasEntered, setHasEntered] = useState(() => (
+    typeof window !== 'undefined' && (window.location.pathname !== '/' || hasPlayedEntryThisSession())
+  ))
+  // idle -> playing -> revealing (page switches under the video) -> fading -> done
+  const [entryPhase, setEntryPhase] = useState('idle')
+  const [videoPreload, setVideoPreload] = useState('none')
+  const isVideoTransitioning = entryPhase === 'playing'
+  const [isExperienceReady, setIsExperienceReady] = useState(false)
+  const handleExperienceReady = useCallback(() => setIsExperienceReady(true), [])
+  const handleExperienceLost = useCallback(() => setIsExperienceReady(false), [])
   const [showAbout, setShowAbout] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -49,15 +89,13 @@ function App() {
 
   const playlistSongs = useMemo(() => currentPlaylist?.songs || [], [currentPlaylist])
 
-  // Synchronize route URL parameter with active playlist state and handle smooth scroll to top on navigation
+  // A new route starts at the top. Choosing a playlist is not navigation and keeps the scroll position.
   useEffect(() => {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    try {
-      window.scrollTo({ top: 0, left: 0, behavior: prefersReduced ? 'auto' : 'smooth' })
-    } catch {
-      window.scrollTo(0, 0)
-    }
+    window.scrollTo(0, 0)
+  }, [location.pathname])
 
+  // Synchronize route URL parameter with active playlist state
+  useEffect(() => {
     Promise.resolve().then(() => {
       setIsMobileMenuOpen(false)
       if (location.pathname !== '/') {
@@ -255,9 +293,6 @@ function App() {
     }
   }, [playlistSongs, currentSongIndex])
 
-  const [isSkippingIntro, setIsSkippingIntro] = useState(false)
-  const isSkippingRef = useRef(false)
-
   const handlePlaySong = useCallback((songId, playlistId = null) => {
     setHasEntered(true)
     setShowAbout(false)
@@ -308,141 +343,194 @@ function App() {
     }
   }, [currentPlaylist, playPlaylistId, currentSongIndex, playlistSongs, playSongId])
 
+  const entryDoneRef = useRef(false)
+  const stallTimerRef = useRef(null)
+  const completeEntryRef = useRef(() => {})
+
+  const clearStallTimer = useCallback(() => {
+    clearTimeout(stallTimerRef.current)
+  }, [])
+
+  const armStallTimer = useCallback(() => {
+    clearTimeout(stallTimerRef.current)
+    stallTimerRef.current = setTimeout(() => completeEntryRef.current(), ENTRY_STALL_TIMEOUT_MS)
+  }, [])
+
+  const handleEntryIntent = useCallback(() => {
+    setVideoPreload('auto')
+  }, [])
+
   const handleStartEntryTransition = useCallback(() => {
-    if (isVideoTransitioning || isVideoFinished || hasEntered) return
-    setIsVideoTransitioning(true)
+    if (entryPhase !== 'idle' || hasEntered) return
+    setVideoPreload('auto')
+    setEntryPhase('playing')
     setShowAbout(false)
-  }, [isVideoTransitioning, isVideoFinished, hasEntered])
+  }, [entryPhase, hasEntered])
 
+  // Also the skip action: it fades from whichever frame is showing.
   const completeEntryTransition = useCallback(() => {
-    if (isVideoFinished || hasEntered) return
-    isSkippingRef.current = false
-    setIsSkippingIntro(false)
-    if (videoRef.current) {
-      try { videoRef.current.pause() } catch (e) { console.warn(e) }
-    }
-    setIsVideoFinished(true)
-    setIsVideoTransitioning(false)
+    if (entryDoneRef.current) return
+    entryDoneRef.current = true
+    clearTimeout(stallTimerRef.current)
+    try { videoRef.current?.pause() } catch (e) { console.warn(e) }
+    markEntryPlayed()
     handleEnterTheka()
-  }, [isVideoFinished, hasEntered, handleEnterTheka])
+    setEntryPhase('revealing')
+  }, [handleEnterTheka])
 
-  const handleVideoEnded = useCallback(() => {
-    const vid = videoRef.current
-    if (vid && vid.duration && !isNaN(vid.duration) && vid.duration > 0.1) {
-      try {
-        vid.pause()
-        vid.currentTime = Math.max(0, vid.duration - 0.08)
-      } catch (e) {
-        console.warn(e)
-      }
-    }
-    completeEntryTransition()
+  useEffect(() => {
+    completeEntryRef.current = completeEntryTransition
   }, [completeEntryTransition])
 
   const handleVideoError = useCallback((err) => {
     console.warn('[App] Entry video load error:', err)
-    completeEntryTransition()
-  }, [completeEntryTransition])
+    if (entryPhase === 'playing') completeEntryRef.current()
+  }, [entryPhase])
 
-  const handleSkipIntro = useCallback(() => {
-    if (isVideoFinished || hasEntered || isSkippingRef.current) return
-    isSkippingRef.current = true
-    setIsSkippingIntro(true)
-
-    const vid = videoRef.current
-    if (vid) {
-      const finalize = () => {
-        if (!isSkippingRef.current) return
-        try { vid.pause() } catch (e) { console.warn(e) }
-        completeEntryTransition()
-      }
-
-      if (vid.duration && !isNaN(vid.duration) && vid.duration > 0.1) {
-        try {
-          vid.pause()
-          // Seek directly to the end frame showing counter with bottle placed down
-          const targetTime = Math.max(0, vid.duration - 0.08)
-          vid.currentTime = targetTime
-          vid.addEventListener('seeked', finalize, { once: true })
-          setTimeout(finalize, 90)
-          return
-        } catch (err) {
-          console.warn('[App] Seek video to end failed on skip:', err)
-        }
-      } else {
-        const onLoadedMeta = () => {
-          try {
-            vid.pause()
-            const targetTime = Math.max(0, (vid.duration || 1) - 0.08)
-            vid.currentTime = targetTime
-            vid.addEventListener('seeked', finalize, { once: true })
-            setTimeout(finalize, 90)
-          } catch {
-            finalize()
-          }
-        }
-        vid.addEventListener('loadedmetadata', onLoadedMeta, { once: true })
-        setTimeout(finalize, 250)
-        return
-      }
+  // Start playback once. This must not depend on the completion handler: its identity
+  // changes when playlist metadata arrives, which would restart the video mid-play.
+  useEffect(() => {
+    if (entryPhase !== 'playing') return
+    const video = videoRef.current
+    armStallTimer()
+    if (video) {
+      video.currentTime = 0
+      video.play()?.catch((err) => {
+        console.warn('[App] Video play request failed:', err)
+        completeEntryRef.current()
+      })
     }
+    return clearStallTimer
+  }, [entryPhase, armStallTimer, clearStallTimer])
 
-    completeEntryTransition()
-  }, [isVideoFinished, hasEntered, completeEntryTransition])
+  // The page below just changed state. Let that paint, so its layout work
+  // happens behind the opaque video and not during the crossfade.
+  useEffect(() => {
+    if (entryPhase !== 'revealing') return
+    let innerFrame = 0
+    const outerFrame = requestAnimationFrame(() => {
+      innerFrame = requestAnimationFrame(() => setEntryPhase('fading'))
+    })
+    return () => {
+      cancelAnimationFrame(outerFrame)
+      cancelAnimationFrame(innerFrame)
+    }
+  }, [entryPhase])
 
   useEffect(() => {
-    if (isVideoTransitioning && videoRef.current) {
-      videoRef.current.currentTime = 0
-      const playPromise = videoRef.current.play()
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('[App] Video play request failed:', err)
-          completeEntryTransition()
-        })
+    if (entryPhase !== 'fading') return
+    const timer = setTimeout(() => setEntryPhase('done'), ENTRY_CROSSFADE_MS + 150)
+    return () => clearTimeout(timer)
+  }, [entryPhase])
+
+  const handleOverlayTransitionEnd = useCallback((e) => {
+    if (e.target === e.currentTarget && e.propertyName === 'opacity' && entryPhase === 'fading') {
+      setEntryPhase('done')
+    }
+  }, [entryPhase])
+
+  // Warm up the entry video after the page has loaded, sized to the connection.
+  useEffect(() => {
+    if (hasEntered || location.pathname !== '/') return
+    const target = getIdleVideoPreload()
+    if (target === 'none') return
+
+    let idleId = 0
+    let timerId = 0
+    const warm = () => setVideoPreload((current) => (current === 'auto' ? current : target))
+    const schedule = () => {
+      if (window.requestIdleCallback) {
+        idleId = window.requestIdleCallback(warm, { timeout: 3000 })
+      } else {
+        timerId = setTimeout(warm, 1500)
       }
     }
-  }, [isVideoTransitioning, completeEntryTransition])
+
+    if (document.readyState === 'complete') {
+      schedule()
+    } else {
+      window.addEventListener('load', schedule, { once: true })
+    }
+
+    return () => {
+      window.removeEventListener('load', schedule)
+      if (idleId) window.cancelIdleCallback?.(idleId)
+      clearTimeout(timerId)
+    }
+  }, [hasEntered, location.pathname])
+
+  // Honor a CTA click that landed on the static shell before React mounted.
+  useEffect(() => {
+    if (!window.__kktPendingEntry) return
+    window.__kktPendingEntry = false
+    Promise.resolve().then(handleStartEntryTransition)
+  }, [handleStartEntryTransition])
+
+  // Fetch the playlist pages in the background so opening them has no loading gap.
+  useEffect(() => {
+    const preload = () => { preloadPlaylistRoutes().catch(() => {}) }
+    if (window.requestIdleCallback) {
+      const id = window.requestIdleCallback(preload, { timeout: 8000 })
+      return () => window.cancelIdleCallback?.(id)
+    }
+    const timer = setTimeout(preload, 4000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  const isEntrySequenceActive = entryPhase !== 'idle' && entryPhase !== 'done'
+  const showEntryOverlay = isEntrySequenceActive || (!hasEntered && videoPreload !== 'none')
 
   return (
     <div className={`landing-container ${hasEntered ? 'is-entered' : ''}`}>
       {/* Hidden YouTube IFrame Player Instance */}
       <YouTubePlayer containerRef={containerRef} />
 
-      {/* Background Layer A */}
-      {!isVideoFinished && (
-        <div className="bg-placeholder" aria-hidden="true">
-          <div className="bg-image" />
-          <div className="ambient-glow" />
-          <div className="overlay-vignette" />
-          <div className="film-grain" />
-        </div>
-      )}
+      {/* Persistent bar background, identical in the static shell, before and after entry */}
+      <div className="bg-placeholder" aria-hidden="true">
+        <div className="bg-image" />
+        <div className="ambient-glow" />
+        <div className="overlay-vignette" />
+        <div className="film-grain" />
+      </div>
 
-      {/* Background Layer B */}
-      {(isVideoTransitioning || isVideoFinished) && (
+      {/* Persistent 3D, fixed behind all page content */}
+      <ExperienceLayer
+        isHome={location.pathname === '/'}
+        isCovered={isVideoTransitioning}
+        isPlaying={isPlaying}
+        hasEntered={hasEntered}
+        activePlaylistId={currentPlaylist?.id}
+        onReady={handleExperienceReady}
+        onLost={handleExperienceLost}
+      />
+
+      {/* Entry video: always above the page, crossfades away, then unmounts */}
+      {showEntryOverlay && (
         <div
-          className={`video-entry-overlay ${isVideoTransitioning ? 'playing-overlay' : 'frozen-bg'}`}
-          aria-hidden={!isVideoTransitioning}
+          className={`video-entry-overlay is-${entryPhase}`}
+          aria-hidden={entryPhase !== 'playing'}
+          onTransitionEnd={handleOverlayTransitionEnd}
         >
           <video
             ref={videoRef}
             className="cinematic-entry-video"
-            src="/shopkeeper-entry.mp4"
-            preload="auto"
-            autoPlay
+            src={ENTRY_VIDEO_SRC}
+            poster={ENTRY_VIDEO_POSTER}
+            preload={videoPreload}
             muted
             playsInline
-            onEnded={handleVideoEnded}
+            onEnded={completeEntryTransition}
             onError={handleVideoError}
+            onPlaying={clearStallTimer}
+            onWaiting={armStallTimer}
           />
 
           {/* Accessible Skip Intro Button during Video Playback */}
-          {isVideoTransitioning && (
+          {entryPhase === 'playing' && (
             <motion.button
               type="button"
-              className={`video-skip-btn ${isSkippingIntro ? 'is-skipping' : ''}`}
-              onClick={handleSkipIntro}
-              disabled={isSkippingIntro}
+              className="video-skip-btn"
+              onClick={completeEntryTransition}
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -491,7 +579,7 @@ function App() {
             </a>
           </div>
 
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {hasEntered && !isScrolled && (
               <motion.div
                 key="header-mood-selector"
@@ -649,7 +737,13 @@ function App() {
       </AnimatePresence>
 
       {/* Primary Application Routes */}
-      <Suspense fallback={<div className="route-loading-fallback" aria-hidden="true" />}>
+      <Suspense
+        fallback={
+          <div className="route-loading-fallback" role="status">
+            <span className="route-loading-text">महफ़िल सज रही है…</span>
+          </div>
+        }
+      >
         <Routes>
         <Route
           path="/"
@@ -663,6 +757,8 @@ function App() {
               currentSong={currentSong}
               isPlaying={isPlaying}
               handleStartEntryTransition={handleStartEntryTransition}
+              onEntryIntent={handleEntryIntent}
+              isSceneReady={isExperienceReady}
               handleSelectPlaylist={handleSelectPlaylist}
               handlePlaySong={handlePlaySong}
               setShowAbout={setShowAbout}

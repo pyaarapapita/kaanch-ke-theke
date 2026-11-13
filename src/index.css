@@ -72,9 +72,12 @@ a {
   text-decoration: none;
 }
 
+/* No CSS smooth scrolling on the root: it fights ScrollTrigger's scroll measurements.
+   Links that should glide pass behavior: 'smooth' to window.scrollTo themselves.
+   The stable gutter keeps the page width identical when entry unlocks scrolling. */
 html {
-  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -88,7 +91,6 @@ html, body {
   min-height: 100%;
   overflow-x: hidden;
   background-color: var(--bg-near-black);
-  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
 

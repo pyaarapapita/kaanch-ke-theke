@@ -11,6 +11,7 @@
   background-color: var(--bg-near-black);
   color: var(--text-cream);
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Prevent main page scrolling until user enters theka */
@@ -22,19 +23,21 @@
   overflow: hidden !important;
 }
 
-/* Fullscreen Cinematic Video Entry & Persistent Frozen Background */
+/* Fullscreen Cinematic Entry Video: stays above the page for its whole life */
 .video-entry-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
+  inset: 0;
   width: 100%;
+  max-width: 100%;
   height: 100vh;
   height: 100svh;
-  z-index: 0;
+  z-index: 500;
   pointer-events: none;
   overflow: hidden;
   background: #0B0A08;
   transform: translateZ(0);
+  opacity: 0;
+  visibility: hidden;
 }
 
 @keyframes videoOverlayFadeIn {
@@ -46,29 +49,23 @@
   }
 }
 
-/* Playing state: Fullscreen fixed overlay during video playback */
-.video-entry-overlay.playing-overlay {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  max-width: 100%;
-  height: 100vh;
-  height: 100svh;
-  z-index: 500;
+.video-entry-overlay.is-playing {
+  opacity: 1;
+  visibility: visible;
   pointer-events: auto;
-  animation: videoOverlayFadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: videoOverlayFadeIn 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Frozen state: Hero-scoped background layer after video finishes */
-.video-entry-overlay.frozen-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  height: 100svh;
-  z-index: 0;
-  pointer-events: none;
+/* The page changes state underneath while this layer is still opaque */
+.video-entry-overlay.is-revealing {
+  opacity: 1;
+  visibility: visible;
+}
+
+.video-entry-overlay.is-fading {
+  opacity: 0;
+  visibility: visible;
+  transition: opacity 700ms ease-in-out;
 }
 
 .cinematic-entry-video {
@@ -108,13 +105,6 @@
     inset 0 1px 0 rgba(232, 215, 181, 0.12);
   transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
   pointer-events: auto;
-}
-
-.video-skip-btn.is-skipping {
-  opacity: 0.65;
-  pointer-events: none;
-  cursor: wait;
-  transform: scale(0.97);
 }
 
 .video-skip-btn:hover {
@@ -1291,22 +1281,23 @@
   bottom: 1.5rem;
   bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
   left: 50%;
-  transform: translateX(-50%);
+  translate: -50% 0;
   width: calc(100% - 2.5rem);
   max-width: 680px;
   z-index: 120;
   pointer-events: auto;
-  transition: bottom 0.35s cubic-bezier(0.25, 1, 0.5, 1),
-              max-width 0.35s cubic-bezier(0.25, 1, 0.5, 1),
-              width 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-  will-change: bottom, max-width;
 }
 
-/* Docked bottom state when user scrolls into editorial content */
-.cinematic-player-wrapper.is-scrolled-docked {
-  bottom: 0.75rem;
-  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
-  max-width: 640px;
+/* Docking changes the layout in one step and the player fades in at its new place.
+   Animating left and width instead would count as layout shift on every scroll. */
+@keyframes playerDockIn {
+  from { opacity: 0.2; transform: translate3d(0, 6px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes playerUndockIn {
+  from { opacity: 0.2; transform: translate3d(0, 6px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 .cinematic-player {
@@ -1338,11 +1329,12 @@
     inset 0 0 14px 0 rgba(184, 137, 74, 0.06);
   transition: border-color 0.35s ease,
               background 0.35s ease,
-              padding 0.35s ease,
               box-shadow 0.35s ease;
+  animation: playerUndockIn 0.3s ease-out;
 }
 
 .cinematic-player.docked {
+  animation: playerDockIn 0.3s ease-out;
   padding: 0.38rem 0.9rem;
   background: linear-gradient(
     135deg,
@@ -1631,6 +1623,213 @@
   width: 60px;
 }
 
+/* Compact player, docked in the corner on wide screens while reading. Content keeps its
+   centre column, and every control stays: the seek bar runs along the top edge and the
+   volume slider opens from its icon on hover or keyboard focus. */
+@media (min-width: 1024px) {
+  .cinematic-player-wrapper.is-scrolled-docked {
+    left: auto;
+    right: 1.5rem;
+    translate: none;
+    width: 420px;
+    max-width: 420px;
+    bottom: 1.25rem;
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Near-opaque: this sits over reading text, which must not show through the controls */
+  .cinematic-player.docked,
+  .cinematic-player.docked:hover {
+    position: relative;
+    gap: 0.6rem;
+    padding: 0.55rem 0.8rem 0.45rem;
+    background: linear-gradient(135deg, rgba(26, 19, 14, 0.96) 0%, rgba(14, 11, 8, 0.97) 100%);
+  }
+
+  .cinematic-player.docked .player-track-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .cinematic-player.docked .player-center-controls {
+    flex: 0 0 auto;
+    position: static;
+  }
+
+  .cinematic-player.docked .player-buttons {
+    gap: 0.25rem;
+  }
+
+  .cinematic-player.docked .player-timeline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    width: auto;
+  }
+
+  .cinematic-player.docked .time-display {
+    display: none;
+  }
+
+  .cinematic-player.docked .slider-container {
+    width: 100%;
+  }
+
+  .cinematic-player.docked .player-volume-control {
+    width: auto;
+    gap: 0;
+  }
+
+  .cinematic-player.docked .volume-slider {
+    width: 0;
+    min-width: 0;
+    opacity: 0;
+    transition: width 0.25s ease, opacity 0.25s ease;
+  }
+
+  .cinematic-player.docked .player-volume-control:hover .volume-slider,
+  .cinematic-player.docked .player-volume-control:focus-within .volume-slider {
+    width: 56px;
+    opacity: 1;
+  }
+
+  .cinematic-player.docked .player-auto-skip-message {
+    flex: 0 1 auto;
+    max-width: 110px;
+    margin-top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Where the page has gutters, the docked player is a slim rail that fits inside the right
+   gutter and covers no content. Hover or keyboard focus (not a mouse click, which would
+   hold it open) opens track details and the seek and volume controls to its left. The height never changes, so hovering cannot flicker,
+   and errors or skip notices open it by themselves. */
+@media (min-width: 1340px) and (hover: hover) and (pointer: fine) {
+  .cinematic-player-wrapper.is-scrolled-docked {
+    right: 0.75rem;
+    width: 64px;
+    max-width: 64px;
+    transition: width 0.22s ease, max-width 0.22s ease;
+  }
+
+  .cinematic-player.docked,
+  .cinematic-player.docked:hover {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 40px;
+    grid-template-rows: auto auto;
+    align-items: center;
+    justify-items: center;
+    column-gap: 0;
+    row-gap: 0.4rem;
+    height: 186px;
+    padding: 0.7rem 0.75rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .cinematic-player.docked .player-artwork {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .cinematic-player.docked .player-center-controls {
+    display: contents;
+  }
+
+  .cinematic-player.docked .player-buttons {
+    grid-column: 2;
+    grid-row: 2;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .cinematic-player.docked .player-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+  }
+
+  /* Collapsed: only the artwork and transport buttons take up space */
+  .cinematic-player.docked .player-track-info,
+  .cinematic-player.docked .player-timeline,
+  .cinematic-player.docked .player-volume-control,
+  .cinematic-player.docked .player-auto-skip-message {
+    display: none;
+  }
+
+  /* Open: details, seek and volume fill the column to the left of the rail */
+  .cinematic-player-wrapper.is-scrolled-docked:hover,
+  .cinematic-player-wrapper.is-scrolled-docked:has(:focus-visible),
+  .cinematic-player-wrapper.is-scrolled-docked:has(.player-auto-skip-message),
+  .cinematic-player-wrapper.is-scrolled-docked:has(.player-error-tag) {
+    width: 380px;
+    max-width: 380px;
+  }
+
+  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked {
+    column-gap: 0.85rem;
+    justify-items: stretch;
+  }
+
+  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-track-info {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-timeline {
+    display: flex;
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    position: static;
+    height: auto;
+    width: 100%;
+    margin-top: 0.4rem;
+  }
+
+  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .time-display {
+    display: inline;
+  }
+
+  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-volume-control {
+    display: flex;
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    justify-self: start;
+    gap: 0.35rem;
+    height: 34px;
+    width: auto;
+  }
+
+  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .volume-slider {
+    width: 90px;
+    opacity: 1;
+  }
+
+  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-artwork,
+  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-buttons {
+    justify-self: center;
+  }
+
+  .cinematic-player-wrapper:has(.player-auto-skip-message) .cinematic-player.docked .player-auto-skip-message {
+    display: inline-block;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    max-width: 100%;
+  }
+}
+
 /* Mobile Responsive Player Layout — Classy, restrained, translucent */
 @media (max-width: 768px) {
   .cinematic-player-wrapper {
@@ -1748,6 +1947,23 @@
 
   .player-timeline {
     display: none;
+  }
+
+  /* The seek bar has no room here, so show playback progress as a thin line */
+  .cinematic-player::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: var(--player-progress, 0%);
+    background: var(--accent-gold);
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  .cinematic-player {
+    position: relative;
   }
 
   .player-volume-control {
@@ -4653,11 +4869,43 @@ a:active,
 }
 
 .route-loading-fallback {
+  position: relative;
+  z-index: 10;
   min-height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
+  padding-top: 6.5rem;
+}
+
+.route-loading-text {
+  font-family: var(--font-hindi-body);
+  font-size: var(--fs-base);
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+/* Static first paint in index.html. The inline <style> there hides it until this
+   stylesheet has arrived, so it can never show unstyled. */
+#kkt-shell {
+  opacity: 1;
+}
+
+html[data-kkt-route='inner'] #kkt-shell .kkt-shell-home {
+  display: none;
+}
+
+html[data-kkt-entered] #kkt-shell .cta-button {
+  visibility: hidden;
+}
+
+.kkt-shell-mood {
+  display: none;
+}
+
+html[data-kkt-entered] .kkt-shell-mood {
+  display: inline-flex;
 }
 
 .mobile-only-artist {

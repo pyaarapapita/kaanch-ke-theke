@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { PLAYLISTS } from '../src/data/playlists.js';
+import { DEFAULT_PLAYLIST_ID, PLAYLISTS } from '../src/data/playlists.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,7 +22,56 @@ if (!fs.existsSync(BASE_HTML_PATH)) {
   process.exit(1);
 }
 
-const baseHtml = fs.readFileSync(BASE_HTML_PATH, 'utf8');
+// Hero posters are only used on the homepage. Preloading them on inner pages wastes
+// bytes and logs an unused-preload warning.
+const baseHtml = fs.readFileSync(BASE_HTML_PATH, 'utf8')
+  .replace(/[ \t]*<link rel="preload" as="image" href="\/backgrounds\/vinyl-hero-3d[^>]*>\r?\n?/g, '');
+
+// These mirror App.jsx so that swapping the static page for React changes nothing visible.
+const SHARED_BACKGROUND = `      <div class="bg-placeholder" aria-hidden="true">
+        <div class="bg-image"></div>
+        <div class="ambient-glow"></div>
+        <div class="overlay-vignette"></div>
+        <div class="film-grain"></div>
+      </div>`;
+
+const SHARED_HEADER = `      <header class="header">
+        <a href="/" class="brand brand-btn" aria-label="काँच के ठेके — मुख्य पृष्ठ" style="text-decoration:none;">
+          <span class="brand-title-hindi">काँच के ठेके</span>
+          <span class="brand-title-english">KAANCH KE THEKE</span>
+        </a>
+        <nav class="nav-links desktop-nav">
+          <div class="support-nav-item">
+            <a href="https://buymeacoffee.com/kaanchketheke" target="_blank" rel="noopener noreferrer" class="nav-support-btn">मेरी अगली बोतल के लिए 🍾</a>
+          </div>
+          <div style="overflow:visible;display:inline-flex;align-items:center;">
+            <div class="mood-selector-container">
+              <button type="button" class="nav-link nav-link-btn mood-toggle-btn">मूड</button>
+            </div>
+          </div>
+          <button type="button" class="nav-link nav-link-btn">बारे में</button>
+        </nav>
+        <button type="button" class="mobile-menu-toggle" aria-label="मेनू खोलें">
+          <span class="mobile-toggle-icon">☰</span>
+          <span class="mobile-toggle-label">मेनू</span>
+        </button>
+      </header>`;
+
+const SHARED_FOOTER = `      <footer class="footer-atmosphere entered">
+        <div class="footer-content-container">
+          <div class="footer-brand-summary">
+            <span class="footer-brand-title">काँच के ठेके</span>
+            <span class="footer-brand-sub">नॉस्टैल्जिक बॉलीवुड संगीत, 90s के सदाबहार नग़मे और महफ़िल का सुकून।</span>
+          </div>
+          <nav class="footer-nav-links" aria-label="फुटर नेविगेशन">
+            <a href="/" class="footer-nav-link">मुख्य पृष्ठ (Home)</a>
+            <a href="/playlists" class="footer-nav-link">सभी प्लेलिस्ट्स (Playlists)</a>
+          </nav>
+          <div class="footer-copyright-row">
+            <p class="copyright-text">© ${new Date().getFullYear()} Kaanch Ke Theke (काँच के ठेके). सर्वाधिकार सुरक्षित।</p>
+          </div>
+        </div>
+      </footer>`;
 
 function escapeHtml(str) {
   return String(str || '')
@@ -109,16 +158,9 @@ function prerenderPlaylistsPage() {
 
   // Styled Semantic content inside #root matching React PlaylistsPage
   const semanticContent = `    <div class="landing-container is-entered">
-      <header class="header is-scrolled">
-        <a href="/" class="brand brand-btn" aria-label="काँच के ठेके — मुख्य पृष्ठ" style="text-decoration:none;">
-          <span class="brand-title-hindi">काँच के ठेके</span>
-          <span class="brand-title-english">KAANCH KE THEKE</span>
-        </a>
-        <nav class="nav-links desktop-nav">
-          <a href="/playlists" class="nav-link nav-link-btn is-active" style="text-decoration:none;">प्लेलिस्ट्स</a>
-          <a href="/" class="nav-link nav-link-btn" style="text-decoration:none;">मुख्य पृष्ठ</a>
-        </nav>
-      </header>
+${SHARED_BACKGROUND}
+
+${SHARED_HEADER}
 
       <div class="page-content-wrapper">
         <nav class="breadcrumb-nav" aria-label="Breadcrumb">
@@ -145,13 +187,14 @@ function prerenderPlaylistsPage() {
 
               <div class="playlists-editorial-grid">
                 ${PLAYLISTS.map((pl) => `
-                  <div class="playlist-card-item ${pl.isUpcoming ? 'upcoming-card' : ''}">
+                  <div class="playlist-card-item ${pl.id === DEFAULT_PLAYLIST_ID ? 'active-card' : ''} ${pl.isUpcoming ? 'upcoming-card' : ''}">
                     <div class="playlist-card-header">
                       <h2 class="playlist-card-title">
                         <a href="/playlists/${pl.id}" class="playlist-title-link">
                           ${escapeHtml(pl.name)}
                         </a>
                       </h2>
+                      ${pl.id === DEFAULT_PLAYLIST_ID ? '<span class="active-equalizer-badge" title="सक्रिय प्लेलिस्ट"><span class="eq-bar bar-1"></span><span class="eq-bar bar-2"></span><span class="eq-bar bar-3"></span><span class="active-badge-text">सक्रिय</span></span>' : ''}
                       ${pl.isUpcoming ? '<span class="upcoming-badge" title="शीघ्र उपलब्ध">शीघ्र उपलब्ध</span>' : ''}
                     </div>
                     <p class="playlist-card-desc">${escapeHtml(pl.description)}</p>
@@ -163,6 +206,7 @@ function prerenderPlaylistsPage() {
                         <a href="/playlists/${pl.id}" class="card-action-btn view-btn">
                           विवरण देखें →
                         </a>
+                        ${pl.isUpcoming ? '' : '<button type="button" class="card-action-btn play-btn">बजाएं ▶</button>'}
                       </div>
                     </div>
                   </div>
@@ -172,6 +216,8 @@ function prerenderPlaylistsPage() {
           </div>
         </section>
       </div>
+
+${SHARED_FOOTER}
     </div>`;
 
   html = replaceRootContent(html, semanticContent);
@@ -250,22 +296,16 @@ function prerenderPlaylistDetailPages() {
     const trackRows = (pl.songs || []).map((s, idx) => `
       <tr class="song-table-row">
         <td class="col-num">${idx + 1}</td>
-        <td class="col-title"><span class="song-title-text">${escapeHtml(s.title)}</span></td>
+        <td class="col-title"><span class="song-title-text">${escapeHtml(s.title)}</span><span class="mobile-only-artist">${escapeHtml(s.artist)}</span></td>
         <td class="col-artist"><span class="song-artist-text">${escapeHtml(s.artist)}</span></td>
+        <td class="col-action"><button type="button" class="song-play-row-btn" aria-label="${escapeHtml(s.title)} बजाएं">▶</button></td>
       </tr>
     `).join('');
 
     const semanticContent = `    <div class="landing-container is-entered">
-      <header class="header is-scrolled">
-        <a href="/" class="brand brand-btn" aria-label="काँच के ठेके — मुख्य पृष्ठ" style="text-decoration:none;">
-          <span class="brand-title-hindi">काँच के ठेके</span>
-          <span class="brand-title-english">KAANCH KE THEKE</span>
-        </a>
-        <nav class="nav-links desktop-nav">
-          <a href="/playlists" class="nav-link nav-link-btn" style="text-decoration:none;">सभी प्लेलिस्ट्स</a>
-          <a href="/" class="nav-link nav-link-btn" style="text-decoration:none;">मुख्य पृष्ठ</a>
-        </nav>
-      </header>
+${SHARED_BACKGROUND}
+
+${SHARED_HEADER}
 
       <div class="page-content-wrapper">
         <nav class="breadcrumb-nav" aria-label="Breadcrumb">
@@ -278,15 +318,23 @@ function prerenderPlaylistDetailPages() {
           </ol>
         </nav>
 
-        <section class="editorial-section playlist-detail-page" aria-label="${escapeHtml(pl.name)}">
+        <section class="editorial-section playlist-detail-section" aria-label="${escapeHtml(pl.name)}">
           <div class="editorial-container">
             <div class="editorial-content-panel full-width-panel">
               <div class="editorial-badge-row">
                 <span class="editorial-badge">Playlist</span>
-                <span class="editorial-meta">${pl.isUpcoming ? 'शीघ्र उपलब्ध' : `${pl.songs?.length || 0} Tracks`}</span>
+                <span class="editorial-meta">${pl.isUpcoming ? 'शीघ्र उपलब्ध • Upcoming' : `${pl.songs?.length || 0} चुनिंदा गीत`}</span>
               </div>
-              <h1 class="editorial-title page-main-heading">${escapeHtml(pl.name)}</h1>
-              <p class="editorial-desc page-intro-desc">${escapeHtml(pl.description)}</p>
+              <div class="playlist-detail-header-row">
+                <div class="playlist-detail-title-group">
+                  <h1 class="editorial-title page-main-heading">${escapeHtml(pl.name)}</h1>
+                  <p class="editorial-desc">${escapeHtml(pl.description)}</p>
+                </div>
+                <div class="playlist-header-actions-group">
+                  <button type="button" class="editorial-action-link share-playlist-btn" aria-label="प्लेलिस्ट लिंक कॉपी करें">🔗 लिंक साझा करें</button>
+                  ${pl.isUpcoming ? '' : `<button type="button" class="editorial-action-link play-playlist-hero-btn">${pl.id === DEFAULT_PLAYLIST_ID ? 'सक्रिय प्लेलिस्ट (Playing)' : 'यह प्लेलिस्ट बजाएं ▶'}</button>`}
+                </div>
+              </div>
 
               ${pl.songs && pl.songs.length > 0 ? `
                 <div class="songs-list-container">
@@ -298,6 +346,7 @@ function prerenderPlaylistDetailPages() {
                           <th scope="col" class="col-num">#</th>
                           <th scope="col" class="col-title">गीत का नाम (Track Title)</th>
                           <th scope="col" class="col-artist">कलाकार (Artist)</th>
+                          <th scope="col" class="col-action">सुनें</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -305,21 +354,23 @@ function prerenderPlaylistDetailPages() {
                       </tbody>
                     </table>
                   </div>
+                  <div style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;">
+                    <a href="/playlists" class="editorial-action-link">← सभी प्लेलिस्ट्स देखें (All Playlists)</a>
+                    <a href="/" class="editorial-action-link">मुख्य पृष्ठ (Home)</a>
+                  </div>
                 </div>
               ` : `
-                <div style="padding:2rem 0;color:var(--text-muted);">
-                  <p>यह प्लेलिस्ट जल्द ही नई धुनों और गीतों के साथ सजाई जाएगी।</p>
+                <div class="upcoming-playlist-notice">
+                  <p class="editorial-desc">यह प्लेलिस्ट जल्द ही नई धुनों और गीतों के साथ सजाई जाएगी।</p>
+                  <a href="/playlists" class="editorial-action-link">← सभी प्लेलिस्ट्स देखें</a>
                 </div>
               `}
-
-              <div style="margin-top:2.5rem;display:flex;gap:1rem;">
-                <a href="/playlists" class="card-action-btn view-btn">← सभी प्लेलिस्ट्स</a>
-                <a href="/" class="card-action-btn view-btn">मुख्य पृष्ठ</a>
-              </div>
             </div>
           </div>
         </section>
       </div>
+
+${SHARED_FOOTER}
     </div>`;
 
     html = replaceRootContent(html, semanticContent);
@@ -342,12 +393,9 @@ function prerender404Page() {
   html = html.replace(/<link rel="canonical"[\s\S]*?\/>/i, `<link rel="canonical" href="${SITE_DOMAIN}/404.html" />`);
 
   const semanticContent = `    <div class="landing-container is-entered">
-      <header class="header is-scrolled">
-        <a href="/" class="brand brand-btn" aria-label="काँच के ठेके — मुख्य पृष्ठ" style="text-decoration:none;">
-          <span class="brand-title-hindi">काँच के ठेके</span>
-          <span class="brand-title-english">KAANCH KE THEKE</span>
-        </a>
-      </header>
+${SHARED_BACKGROUND}
+
+${SHARED_HEADER}
 
       <div class="page-content-wrapper">
         <section class="editorial-section not-found-inline-section" aria-label="पृष्ठ नहीं मिला">
@@ -369,6 +417,8 @@ function prerender404Page() {
           </div>
         </section>
       </div>
+
+${SHARED_FOOTER}
     </div>`;
 
   html = replaceRootContent(html, semanticContent);

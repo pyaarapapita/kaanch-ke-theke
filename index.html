@@ -14,6 +14,28 @@
   <meta name="keywords" content="kaanch ke theke, kaanch ke theke music, old bollywood songs, retro hindi music, 90s hindi songs, bollywood ghazals, classic hindi playlist" />
   <meta name="author" content="Anuj Rai" />
   <meta name="theme-color" content="#120c0a" />
+  <meta name="color-scheme" content="dark" />
+
+  <!-- Before first paint: a dark page, a shell hidden until the app stylesheet applies,
+       the route and entry state for that shell, and a queue for an early CTA click. -->
+  <style>
+    html, body { margin: 0; background: #0B0A08; }
+    #kkt-shell { opacity: 0; }
+  </style>
+  <script>
+    (function () {
+      var root = document.documentElement;
+      // The app always opens at the top. Without this, a reload jumps to the old position first.
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      if (location.pathname !== '/') root.setAttribute('data-kkt-route', 'inner');
+      try {
+        if (sessionStorage.getItem('kkt-entry-played') === '1') root.setAttribute('data-kkt-entered', '1');
+      } catch (e) {}
+      document.addEventListener('click', function (e) {
+        if (e.target && e.target.closest && e.target.closest('[data-kkt-shell-cta]')) window.__kktPendingEntry = true;
+      }, true);
+    })();
+  </script>
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <link rel="canonical" href="https://kaanch-ke-theke.pages.dev/" />
 
@@ -22,8 +44,9 @@
 
   <!-- High-priority preloads for instant zero-flash hero paint -->
   <link rel="preload" as="image" href="/backgrounds/theka-bg.webp" type="image/webp" fetchpriority="high" />
-  <link rel="preload" as="image" href="/backgrounds/vinyl-hero-poster-mobile.webp" media="(max-width: 900px)" type="image/webp" fetchpriority="high" />
-  <link rel="preload" as="image" href="/backgrounds/vinyl-hero-poster.webp" media="(min-width: 901px)" type="image/webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="/backgrounds/vinyl-hero-3d-phone.webp" media="(max-aspect-ratio: 13/20)" type="image/webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="/backgrounds/vinyl-hero-3d-tablet.webp" media="(min-aspect-ratio: 13/20) and (max-aspect-ratio: 26/25)" type="image/webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="/backgrounds/vinyl-hero-3d.webp" media="(min-aspect-ratio: 26/25)" type="image/webp" fetchpriority="high" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -173,14 +196,55 @@
 
 <body>
   <div id="root">
-    <div class="landing-container">
-      <!-- Atmospheric Background Layer (Neutral base for all routes) -->
+    <!-- Static first paint. Uses the same classes as the React hero, which replaces it on mount. -->
+    <div class="landing-container" id="kkt-shell">
       <div class="bg-placeholder" aria-hidden="true">
         <div class="bg-image"></div>
         <div class="ambient-glow"></div>
         <div class="overlay-vignette"></div>
         <div class="film-grain"></div>
       </div>
+
+      <header class="header kkt-shell-home">
+        <a href="/" class="brand brand-btn" aria-label="काँच के ठेके — मुख्य पृष्ठ" style="text-decoration: none;">
+          <span class="brand-title-hindi">काँच के ठेके</span>
+          <span class="brand-title-english">KAANCH KE THEKE</span>
+        </a>
+        <nav class="nav-links desktop-nav">
+          <div class="support-nav-item">
+            <a href="https://buymeacoffee.com/kaanchketheke" target="_blank" rel="noopener noreferrer" class="nav-support-btn">मेरी अगली बोतल के लिए 🍾</a>
+          </div>
+          <div class="kkt-shell-mood" style="align-items: center;">
+            <div class="mood-selector-container">
+              <button type="button" class="nav-link nav-link-btn mood-toggle-btn">मूड</button>
+            </div>
+          </div>
+          <button type="button" class="nav-link nav-link-btn">बारे में</button>
+        </nav>
+        <button type="button" class="mobile-menu-toggle" aria-label="मेनू खोलें">
+          <span class="mobile-toggle-icon">☰</span>
+          <span class="mobile-toggle-label">मेनू</span>
+        </button>
+      </header>
+
+      <div class="vinyl-hero-backdrop kkt-shell-home" aria-hidden="true"></div>
+      <div class="vinyl-static-fallback kkt-shell-home" role="img" aria-label="काँच के ठेके विनाइल रिकॉर्ड"></div>
+      <div class="vinyl-vignette-overlay kkt-shell-home" aria-hidden="true"></div>
+
+      <section class="hero vinyl-hero-container kkt-shell-home" aria-label="काँच के ठेके 3D विनाइल अनुभव">
+        <div class="vinyl-hero-content">
+          <div class="hero-content vinyl-hero-text-panel">
+            <div class="title-wrapper">
+              <h1 class="main-title">काँच के ठेके</h1>
+              <p class="subtitle-english">KAANCH KE THEKE — Retro Bollywood Music &amp; Nostalgic Melodies</p>
+            </div>
+            <p class="tagline">अपने किरदार से महकता है इंसान, चरित्र पवित्र करने का इत्र नहीं आता</p>
+            <div class="cta-wrapper">
+              <button type="button" class="cta-button" data-kkt-shell-cta>ठेके में प्रवेश करें</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   </div>
 

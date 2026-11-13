@@ -1,0 +1,48 @@
+/* ==========================================================================
+   Experience.css - the persistent 3D layer behind the homepage
+
+   Stacking on the homepage, bottom to top:
+     0  bar photo and hero backdrop (scroll with the page)
+     1  this fixed canvas, then the hero poster painted over it
+     2  fixed vignette
+    10  all page content
+   100svh would resize the canvas whenever a phone's address bar moves, so it uses 100lvh.
+   ========================================================================== */
+
+.experience-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.experience-canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  contain: strict;
+}
+
+.experience-canvas.is-loaded {
+  opacity: 1;
+}
+
+/* Loaded but not on the homepage: nothing is drawn, and the context stays for the return. */
+.experience-canvas.is-parked {
+  visibility: hidden;
+}
+
+/* Blur over a canvas that redraws every frame is the most expensive thing on the page.
+   Lower tiers get a slightly denser panel instead. */
+html[data-kkt-tier='mid'] .editorial-container,
+html[data-kkt-tier='mid'] .header.is-scrolled {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: linear-gradient(145deg, rgba(24, 18, 13, 0.92) 0%, rgba(13, 10, 8, 0.96) 100%);
+}

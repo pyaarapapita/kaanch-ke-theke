@@ -5,11 +5,18 @@ import * as THREE from 'three'
 
 const MODEL_PATH = '/models/vinyl-record-opt.glb'
 
+// useFrame runs before each render, so the third call means two frames have been drawn.
+const FRAMES_BEFORE_READY = 2
+// The disc's lighting is very sensitive to tilt. Hold pointer parallax until the poster,
+// which has none, has finished fading, so the canvas takes over on the same image.
+const PARALLAX_START_DELAY_S = 0.9
+
 export function VinylScene({
   scrollProgressRef,
   isPlaying = false,
   isReducedMotion = false,
-  pointerPosRef
+  pointerPosRef,
+  onFirstFrame
 }) {
   const { nodes, materials } = useGLTF(MODEL_PATH)
   const rootRef = useRef(null)
@@ -22,13 +29,16 @@ export function VinylScene({
     const smallMobile = width < 2.0
     const portrait = width < 3.8
     let scale = 1.05
-    if (smallMobile) scale = 0.60
+    if (smallMobile) scale = 0.54
     else if (portrait) scale = 0.72
     return { responsiveScale: scale, isPortrait: portrait, isSmallMobile: smallMobile }
   }, [viewport.width])
 
   // Continuous playback rotation accumulator
   const playbackAngleRef = useRef(0)
+  const framesDrawnRef = useRef(-1)
+  const readyElapsedRef = useRef(0)
+  const parallaxWeightRef = useRef(0)
 
   useFrame((state, delta) => {
     if (!rootRef.current) return
@@ -63,8 +73,24 @@ export function VinylScene({
 
     // 4. Pointer parallax (subtle interactive float, disabled on mobile/reduced motion)
     const ptr = pointerPosRef?.current || { x: 0, y: 0 }
-    const parallaxX = (isReducedMotion || isPortrait) ? 0 : ptr.x * 0.08
-    const parallaxY = (isReducedMotion || isPortrait) ? 0 : ptr.y * 0.08
+    if (framesDrawnRef.current >= FRAMES_BEFORE_READY) {
+      readyElapsedRef.current += delta
+      if (readyElapsedRef.current > PARALLAX_START_DELAY_S) {
+        parallaxWeightRef.current = THREE.MathUtils.damp(parallaxWeightRef.current, 1, 2, delta)
+      }
+    }
+    const parallaxX = (isReducedMotion || isPortrait) ? 0 : ptr.x * 0.08 * parallaxWeightRef.current
+    const parallaxY = (isReducedMotion || isPortrait) ? 0 : ptr.y * 0.08 * parallaxWeightRef.current
+
+    // The first frame starts exactly on target, so the disc never travels in from world origin
+    framesDrawnRef.current += 1
+    if (framesDrawnRef.current === 0) {
+      rootRef.current.position.set(targetX + parallaxX, targetY - parallaxY, targetZ)
+      rootRef.current.rotation.x = targetRotX - parallaxY * 0.18
+      rootRef.current.rotation.z = targetRotZ + parallaxX * 0.18
+      if (spinGroupRef.current) spinGroupRef.current.rotation.y = targetRotY
+      return
+    }
 
     // Smooth physics-based damping without garbage allocations
     rootRef.current.position.x = THREE.MathUtils.damp(rootRef.current.position.x, targetX + parallaxX, 6, delta)
@@ -77,6 +103,8 @@ export function VinylScene({
     if (spinGroupRef.current) {
       spinGroupRef.current.rotation.y = THREE.MathUtils.damp(spinGroupRef.current.rotation.y, targetRotY, 8, delta)
     }
+
+    if (framesDrawnRef.current === FRAMES_BEFORE_READY) onFirstFrame?.()
   })
 
   return (
