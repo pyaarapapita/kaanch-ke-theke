@@ -10,8 +10,8 @@
  * room baked back room visibility              tapes cassette visibility
  * stack 0 = tapes loose, 1 = gathered in a stack beside the playlists
  *
- * Stage names are historical: "chronicles" lands on the shayari chapter and "shayari" on
- * the Time Machine. scrollTimeline.js holds the mapping from stage to page anchor.
+ * Stage names: "chronicles" lands on the shayari chapter and "rewind" on
+ * the cassette rewind game. scrollTimeline.js holds the mapping from stage to page anchor.
  *
  * The hero stages must match the captured posters. Recapture them if a hero value changes.
  */

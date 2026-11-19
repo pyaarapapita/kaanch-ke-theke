@@ -34,7 +34,6 @@ function measureStages() {
     // Dimmed by the time the counter's heading rises into the frame.
     ['counter', at('#chapter-counter', 0.5)],
     ['chronicles', at('#chapter-shayari', 0.45)],
-    ['shayari', at('#chapter-machine', 0.4)],
     // The tapes come loose around the cassette game, then stack up for the mixtapes.
     ['rewind', at('#chapter-rewind', 0.45)],
     ['playlist', at('#chapter-moods', 0.4)],
@@ -117,7 +116,7 @@ export function createScrollTimeline({ rig, poses, textFadeShare, onUpdate, onRe
     onRebuild?.(built)
   }
 
-  // Sections change height (the Time Machine result, fonts), which moves every
+  // Sections change height (dynamic content, fonts), which moves every
   // anchor below them. Rebuilding keeps the story pinned to where the sections really are.
   const scheduleRebuild = () => {
     clearTimeout(timer)

@@ -1135,81 +1135,58 @@
   }
 }
 
-/* Custom Cinematic Floating & Docked Music Player */
+/* Custom Cinematic Floating Music Player */
 .cinematic-player-wrapper {
   position: fixed;
   bottom: 1.5rem;
   bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
   left: 50%;
-  translate: -50% 0;
   width: calc(100% - 2.5rem);
   max-width: 680px;
   z-index: 120;
   pointer-events: auto;
 }
 
-/* Docking changes the layout in one step and the player fades in at its new place.
-   Animating left and width instead would count as layout shift on every scroll. */
-@keyframes playerDockIn {
-  from { opacity: 0.2; transform: translate3d(0, 6px, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
-@keyframes playerUndockIn {
-  from { opacity: 0.2; transform: translate3d(0, 6px, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
 .cinematic-player {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
+  gap: 1.25rem;
+  padding: 0.55rem 1.25rem;
   background: linear-gradient(
     135deg,
-    rgba(28, 21, 15, 0.62) 0%,
-    rgba(14, 11, 8, 0.72) 50%,
-    rgba(22, 16, 12, 0.65) 100%
+    rgba(28, 20, 14, 0.88) 0%,
+    rgba(14, 10, 7, 0.94) 50%,
+    rgba(22, 15, 11, 0.90) 100%
   );
-  border: 1px solid rgba(212, 175, 118, 0.28);
-  border-radius: var(--radius-md);
-  backdrop-filter: blur(18px) saturate(170%);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  border: 1px solid rgba(212, 175, 118, 0.3);
+  border-radius: var(--radius-lg, 16px);
+  backdrop-filter: blur(20px) saturate(175%);
+  -webkit-backdrop-filter: blur(20px) saturate(175%);
   isolation: isolate;
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   overflow: hidden;
   box-shadow: 
-    0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 1px 0 rgba(255, 238, 200, 0.24), inset 0 0 14px 0 rgba(184, 137, 74, 0.06);
-  transition: border-color 0.35s var(--ease-out), background 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
-  animation: playerUndockIn 0.3s ease-out;
-}
-
-.cinematic-player.docked {
-  animation: playerDockIn 0.3s ease-out;
-  padding: 0.375rem 1rem;
-  background: linear-gradient(
-    135deg,
-    rgba(24, 18, 13, 0.75) 0%,
-    rgba(13, 10, 7, 0.82) 100%
-  );
-  border-color: rgba(212, 175, 118, 0.38);
-  box-shadow: 
-    0 18px 45px rgba(0, 0, 0, 0.9), inset 0 1px 1px 0 rgba(255, 238, 200, 0.28), inset 0 0 16px 0 rgba(184, 137, 74, 0.08);
+    0 18px 45px rgba(0, 0, 0, 0.82),
+    inset 0 1px 1px 0 rgba(255, 238, 200, 0.22),
+    inset 0 0 16px 0 rgba(184, 137, 74, 0.08);
+  transition: border-color 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
 }
 
 .cinematic-player:hover {
-  border-color: rgba(232, 195, 138, 0.52);
-  background: linear-gradient(
-    135deg,
-    rgba(34, 25, 18, 0.68) 0%,
-    rgba(17, 13, 9, 0.76) 100%
-  );
+  border-color: rgba(232, 195, 138, 0.5);
   box-shadow: 
-    0 20px 48px rgba(0, 0, 0, 0.85), inset 0 1px 1px 0 rgba(255, 245, 215, 0.32), inset 0 0 18px 0 rgba(184, 137, 74, 0.1);
+    0 22px 50px rgba(0, 0, 0, 0.88),
+    inset 0 1px 1px 0 rgba(255, 245, 215, 0.3),
+    inset 0 0 20px 0 rgba(184, 137, 74, 0.12);
+}
+
+/* Meta Group: Artwork & Track Details */
+.player-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 0 1 180px;
 }
 
 /* Vinyl Artwork Badge */
@@ -1467,237 +1444,229 @@
   width: 60px;
 }
 
-/* Compact player, docked in the corner on wide screens while reading. Content keeps its
-   centre column, and every control stays: the seek bar runs along the top edge and the
-   volume slider opens from its icon on hover or keyboard focus. */
-@media (min-width: 1024px) {
-  .cinematic-player-wrapper.is-scrolled-docked {
-    left: auto;
-    right: 1.5rem;
-    translate: none;
-    width: 420px;
-    max-width: 420px;
-    bottom: 1.25rem;
-    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  /* Near-opaque: this sits over reading text, which must not show through the controls */
-  .cinematic-player.docked,
-  .cinematic-player.docked:hover {
-    position: relative;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem 0.5rem;
-    background: linear-gradient(135deg, rgba(26, 19, 14, 0.96) 0%, rgba(14, 11, 8, 0.97) 100%);
-  }
-
-  .cinematic-player.docked .player-track-info {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: none;
-  }
-
-  .cinematic-player.docked .player-center-controls {
-    flex: 0 0 auto;
-    position: static;
-  }
-
-  .cinematic-player.docked .player-buttons {
-    gap: 0.25rem;
-  }
-
-  .cinematic-player.docked .player-timeline {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 10px;
-    width: auto;
-  }
-
-  .cinematic-player.docked .time-display {
-    display: none;
-  }
-
-  .cinematic-player.docked .slider-container {
-    width: 100%;
-  }
-
-  .cinematic-player.docked .player-volume-control {
-    width: auto;
-    gap: 0;
-  }
-
-  .cinematic-player.docked .volume-slider {
-    width: 0;
-    min-width: 0;
-    opacity: 0;
-    transition: width 0.25s var(--ease-out), opacity 0.25s var(--ease-out);
-  }
-
-  .cinematic-player.docked .player-volume-control:hover .volume-slider,
-  .cinematic-player.docked .player-volume-control:focus-within .volume-slider {
-    width: 56px;
-    opacity: 1;
-  }
-
-  .cinematic-player.docked .player-auto-skip-message {
-    flex: 0 1 auto;
-    max-width: 110px;
-    margin-top: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+/* Corner Mini-Player Anchor when Scrolled */
+.corner-mini-player-anchor {
+  position: fixed;
+  bottom: 1.5rem;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+  right: 1.5rem;
+  right: calc(1.5rem + env(safe-area-inset-right, 0px));
+  z-index: 125;
 }
 
-/* Where the page has gutters, the docked player is a slim rail that fits inside the right
-   gutter and covers no content. Hover or keyboard focus (not a mouse click, which would
-   hold it open) opens track details and the seek and volume controls to its left. The height never changes, so hovering cannot flicker,
-   and errors or skip notices open it by themselves. */
-@media (min-width: 1340px) and (hover: hover) and (pointer: fine) {
-  .cinematic-player-wrapper.is-scrolled-docked {
-    right: 0.75rem;
-    width: 64px;
-    max-width: 64px;
-    transition: width 0.22s var(--ease-out), max-width 0.22s var(--ease-out);
-  }
-
-  .cinematic-player.docked,
-  .cinematic-player.docked:hover {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 40px;
-    grid-template-rows: auto auto;
-    align-items: center;
-    justify-items: center;
-    column-gap: 0;
-    row-gap: 0.375rem;
-    height: 186px;
-    padding: 0.75rem 0.75rem;
-    border-radius: var(--radius-lg);
-  }
-
-  .cinematic-player.docked .player-artwork {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .cinematic-player.docked .player-center-controls {
-    display: contents;
-  }
-
-  .cinematic-player.docked .player-buttons {
-    grid-column: 2;
-    grid-row: 2;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .cinematic-player.docked .player-btn {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    min-height: 34px;
-  }
-
-  /* Collapsed: only the artwork and transport buttons take up space */
-  .cinematic-player.docked .player-track-info,
-  .cinematic-player.docked .player-timeline,
-  .cinematic-player.docked .player-volume-control,
-  .cinematic-player.docked .player-auto-skip-message {
-    display: none;
-  }
-
-  /* Open: details, seek and volume fill the column to the left of the rail */
-  .cinematic-player-wrapper.is-scrolled-docked:hover,
-  .cinematic-player-wrapper.is-scrolled-docked:has(:focus-visible),
-  .cinematic-player-wrapper.is-scrolled-docked:has(.player-auto-skip-message),
-  .cinematic-player-wrapper.is-scrolled-docked:has(.player-error-tag) {
-    width: 380px;
-    max-width: 380px;
-  }
-
-  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked {
-    column-gap: 0.75rem;
-    justify-items: stretch;
-  }
-
-  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-track-info {
-    display: flex;
-    grid-column: 1;
-    grid-row: 1;
-    max-width: none;
-    min-width: 0;
-  }
-
-  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-timeline {
-    display: flex;
-    grid-column: 1;
-    grid-row: 2;
-    align-self: start;
-    position: static;
-    height: auto;
-    width: 100%;
-    margin-top: 0.375rem;
-  }
-
-  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .time-display {
-    display: inline;
-  }
-
-  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-volume-control {
-    display: flex;
-    grid-column: 1;
-    grid-row: 2;
-    align-self: end;
-    justify-self: start;
-    gap: 0.375rem;
-    height: 34px;
-    width: auto;
-  }
-
-  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .volume-slider {
-    width: 90px;
-    opacity: 1;
-  }
-
-  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-artwork,
-  .cinematic-player-wrapper:is(:hover, :has(:focus-visible), :has(.player-auto-skip-message), :has(.player-error-tag)) .cinematic-player.docked .player-buttons {
-    justify-self: center;
-  }
-
-  .cinematic-player-wrapper:has(.player-auto-skip-message) .cinematic-player.docked .player-auto-skip-message {
-    display: inline-block;
-    grid-column: 1;
-    grid-row: 1;
-    align-self: end;
-    max-width: 100%;
-  }
+.corner-mini-vinyl-btn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(28, 20, 14, 0.95), rgba(12, 9, 6, 0.98));
+  border: 1.5px solid rgba(212, 175, 118, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.85), 0 0 16px rgba(184, 137, 74, 0.25);
+  transition: transform 0.25s var(--ease-out), border-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent !important;
 }
 
-/* Mobile Responsive Player Layout — Classy, restrained, translucent */
+.corner-mini-vinyl-btn:hover {
+  transform: scale(1.08);
+  border-color: var(--accent-gold-hover);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.9), 0 0 22px rgba(212, 175, 118, 0.45);
+}
+
+.corner-mini-vinyl-btn:active {
+  transform: scale(0.96);
+}
+
+.corner-vinyl-svg {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+}
+
+.corner-vinyl-svg.spinning {
+  animation: rotateVinyl 6s linear infinite;
+}
+
+.corner-mini-pulse {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+  border: 2px solid #120F0C;
+  box-shadow: 0 0 8px var(--accent-gold);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+/* Clean Popup Player when clicked in corner */
+.corner-expanded-player {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  right: 0;
+  width: 340px;
+  max-width: calc(100vw - 2rem);
+  padding: 1rem 1.15rem;
+  background: linear-gradient(
+    145deg,
+    rgba(28, 20, 14, 0.96) 0%,
+    rgba(14, 10, 7, 0.98) 100%
+  );
+  border: 1px solid rgba(212, 175, 118, 0.38);
+  border-radius: var(--radius-lg, 16px);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.92), inset 0 1px 1px rgba(255, 238, 200, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  transform-origin: bottom right;
+}
+
+.corner-expanded-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.corner-expanded-track {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.corner-expanded-title {
+  font-family: var(--font-hindi-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.corner-expanded-artist {
+  font-family: var(--font-hindi-body);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.corner-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.corner-close-btn:hover {
+  color: var(--text-cream);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.corner-expanded-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.corner-expanded-timeline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* Tablet Responsive Player Layout */
 @media (max-width: 768px) {
   .cinematic-player-wrapper {
-    bottom: 0.85rem;
-    bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
-    width: calc(100% - 1.25rem);
+    bottom: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    width: calc(100% - 1.5rem);
     max-width: 520px;
   }
 
   .cinematic-player {
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 0.85rem;
     gap: 0.75rem;
-    min-height: 46px;
-    background: linear-gradient(
-      135deg,
-      rgba(24, 18, 13, 0.76) 0%,
-      rgba(12, 9, 7, 0.84) 100%
-    );
-    border: 1px solid rgba(212, 175, 118, 0.24);
-    border-radius: var(--radius-pill);
-    backdrop-filter: blur(14px) saturate(150%);
-    -webkit-backdrop-filter: blur(14px) saturate(150%);
-    box-shadow: 
-      0 10px 28px rgba(0, 0, 0, 0.75), inset 0 1px 1px 0 rgba(255, 238, 200, 0.18);
+  }
+
+  .player-meta-group {
+    flex: 0 1 150px;
+  }
+
+  .player-volume-control .volume-slider {
+    display: none;
+  }
+
+  .corner-mini-player-anchor {
+    bottom: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+    right: calc(1rem + env(safe-area-inset-right, 0px));
+  }
+
+  .corner-mini-vinyl-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .corner-vinyl-svg {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Mobile Responsive Player Layout — Clean 2-row layout with full scrubber support */
+@media (max-width: 560px) {
+  .cinematic-player-wrapper {
+    bottom: 0.75rem;
+    bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    width: calc(100% - 1rem);
+    max-width: 440px;
+  }
+
+  .cinematic-player {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    row-gap: 0.35rem;
+    column-gap: 0.5rem;
+    padding: 0.55rem 0.85rem;
+    align-items: center;
+    border-radius: 16px;
+  }
+
+  .player-meta-group {
+    grid-column: 1;
+    grid-row: 1;
+    flex: none;
+    min-width: 0;
   }
 
   .player-artwork,
@@ -1707,69 +1676,13 @@
     min-width: 32px;
   }
 
-  .player-track-info {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: none;
-    overflow: hidden;
-  }
-
-  .player-song-title {
-    font-size: 0.82rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .player-song-artist {
-    font-size: 0.68rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    opacity: 0.85;
-  }
-
-  .player-volume-control {
-    width: auto;
-    gap: 0;
-  }
-
-  /* Hide horizontal volume slider on mobile to prevent cramming */
-  .volume-slider {
-    display: none !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .cinematic-player-wrapper {
-    bottom: 0.65rem;
-    bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));
-    width: calc(100% - 0.75rem);
-    max-width: 420px;
-  }
-
-  .cinematic-player {
-    padding: 0.375rem 0.75rem;
-    gap: 0.5rem;
-    min-height: 44px;
-    border-radius: 24px;
-    border: 1px solid rgba(212, 175, 118, 0.2);
-    background: linear-gradient(
-      135deg,
-      rgba(22, 16, 12, 0.78) 0%,
-      rgba(11, 8, 6, 0.86) 100%
-    );
-  }
-
-  .player-artwork,
-  .vinyl-record {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
+  .player-center-controls {
+    display: contents;
   }
 
   .player-buttons {
+    grid-column: 2;
+    grid-row: 1;
     gap: 0.25rem;
   }
 
@@ -1788,65 +1701,24 @@
   }
 
   .player-timeline {
-    display: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    gap: 0.35rem;
   }
 
-  /* The seek bar has no room here, so show playback progress as a thin line */
-  .cinematic-player::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 2px;
-    width: var(--player-progress, 0%);
-    background: var(--accent-gold);
-    opacity: 0.75;
-    pointer-events: none;
-  }
-
-  .cinematic-player {
-    position: relative;
+  .time-display {
+    font-size: 0.7rem;
+    min-width: 24px;
   }
 
   .player-volume-control {
     display: none !important;
   }
 
-  .player-track-info {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: 140px;
-    overflow: hidden;
-  }
-
-  .player-song-title {
-    font-size: 0.78rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .player-song-artist {
-    font-size: 0.65rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .player-error-tag.player-retry-btn {
-    min-height: 36px;
-    min-width: 36px;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.65rem;
-  }
-
-  .player-loading-state {
-    font-size: 0.65rem;
-  }
-
-  .player-auto-skip-message {
-    font-size: 0.62rem;
-    padding: 0.125rem 0.375rem;
+  .corner-expanded-player {
+    width: calc(100vw - 2rem);
+    right: 0;
   }
 }
 

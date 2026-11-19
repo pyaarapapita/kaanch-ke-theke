@@ -10,7 +10,6 @@ export function toDevanagari(value) {
 export const CHAPTERS = [
   { id: 'chapter-counter', label: 'काउण्टर' },
   { id: 'chapter-shayari', label: 'शायरी' },
-  { id: 'chapter-machine', label: 'टाइम मशीन' },
   { id: 'chapter-rewind', label: 'रील लपेटो' },
   { id: 'chapter-moods', label: 'महफ़िलें' },
   { id: 'chapter-story', label: 'कहानी' }

@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { ThekaCounter } from './ThekaCounter/ThekaCounter'
-import { MusicalTimeMachine } from './MusicalTimeMachine/MusicalTimeMachine'
 import { RewindGame } from './RewindGame/RewindGame'
 import { VinylHero } from './VinylHero/VinylHero'
 import { VinylHeroErrorBoundary } from './VinylHero/VinylHeroErrorBoundary'
@@ -84,23 +83,8 @@ export const HomePageView = React.memo(function HomePageView({
         </Chapter>
 
         <Chapter
-          id="chapter-machine"
-          number="०३"
-          kicker="Time Machine"
-          title="संगीत का टाइम मशीन"
-          lede="पुरानी दुकान की धूल जमी रिकॉर्ड रैक से जैसे अचानक कोई अनमोल विनाइल हाथ लग जाए। पहिया घुमाइए और देखिए आज की रात कौन-सा मिज़ाज आपका इंतज़ार कर रहा है।"
-          layout="center"
-        >
-          <MusicalTimeMachine
-            onSelectPlaylist={handleSelectPlaylist}
-            handlePlaySong={handlePlaySong}
-            currentPlaylist={currentPlaylist}
-          />
-        </Chapter>
-
-        <Chapter
           id="chapter-rewind"
-          number="०४"
+          number="०३"
           kicker="Pencil Rewind"
           title="पेंसिल से रील लपेटो"
           lede="याद है? वॉकमैन की बैटरी बचाने के लिए कैसेट में पेंसिल फँसाकर रील घुमाना। वही खेल फिर खेलिए — रील लपेटिए, साल 1990 तक लौटिए और टेप को आपके लिए एक नग़मा चुनने दीजिए।"
@@ -116,7 +100,7 @@ export const HomePageView = React.memo(function HomePageView({
 
         <Chapter
           id="chapter-moods"
-          number="०५"
+          number="०४"
           kicker="The Mixtapes"
           title="हर मिज़ाज की एक टेप"
           lede="अपनी शाम के हिसाब से टेप उठाइए। जो तैयार हैं वो अभी बजेंगी, बाक़ी रिकॉर्डिंग में हैं।"
@@ -131,7 +115,7 @@ export const HomePageView = React.memo(function HomePageView({
 
         <Chapter
           id="chapter-story"
-          number="०६"
+          number="०५"
           kicker="The Story"
           title="ठेके के पीछे की कहानी"
         >
